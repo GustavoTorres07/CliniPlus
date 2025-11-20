@@ -1,0 +1,220 @@
+﻿/* Fondo general */
+.login-page {
+    min-height: 100vh;
+    background: #ffffff;
+    padding: 32px 16px;
+    font-family: 'Nunito', sans-serif; /* Asegura la fuente redondeada */
+}
+
+/* Tarjeta central */
+.login-card {
+    width: 100%;
+    max-width: 380px;
+    border-radius: 40px;
+    padding: 32px 24px 24px;
+    background-color: #ffffff;
+    margin: 0 auto;
+}
+
+.shadow-soft {
+    box-shadow: 0 20px 45px rgba(96, 112, 255, 0.18);
+}
+
+/* --- LOGO CRUZ PURA (Estilo Nuevo) --- */
+.logo-pure {
+    width: 42px;
+    height: 42px;
+    position: relative;
+}
+
+    .logo-pure span {
+        position: absolute;
+        background-color: #6e7bff; /* Azul principal */
+        border-radius: 8px;
+    }
+
+    .logo-pure .bar-vertical {
+        width: 13px;
+        height: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .logo-pure .bar-horizontal {
+        width: 100%;
+        height: 13px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+/* Marca (Texto alineado) */
+.brand-name {
+    font-weight: 800;
+    font-size: 2rem; /* Letra grande para acompañar al logo */
+    color: #15161b;
+    line-height: 1;
+    margin: 0;
+}
+
+    .brand-name span {
+        color: #6e7bff;
+    }
+
+/* Títulos */
+.login-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #15161b;
+}
+
+.login-subtitle {
+    font-size: 0.88rem;
+    color: #9ba0b8;
+}
+
+/* Inputs elevados */
+.input-elevated {
+    border-radius: 18px;
+    background-color: #f5f6fb;
+    border: 1px solid #edf0fc;
+    overflow: hidden;
+    height: 52px;
+    transition: all 0.2s;
+}
+
+    /* Efecto focus al input completo */
+    .input-elevated:focus-within {
+        background-color: #ffffff;
+        border-color: #6e7bff;
+        box-shadow: 0 4px 15px rgba(110, 123, 255, 0.1);
+    }
+
+    .input-elevated .input-group-text {
+        background-color: transparent;
+        border: none;
+        color: #9aa0b9;
+        padding-left: 16px;
+        font-size: 1rem;
+    }
+
+    .input-elevated .form-control {
+        border: none;
+        background-color: transparent;
+        box-shadow: none;
+        padding: 10px 14px;
+        font-size: 0.9rem;
+        color: #15161b;
+        font-weight: 600;
+    }
+
+        .input-elevated .form-control::placeholder {
+            color: #b1b6c9;
+            font-weight: 400;
+        }
+
+/* Botón ojo */
+.btn-icon {
+    border: none;
+    background: transparent;
+    padding: 0 14px;
+    color: #9aa0b9;
+    display: flex;
+    align-items: center;
+}
+
+    .btn-icon:hover {
+        color: #6e7bff;
+    }
+
+/* Botón principal */
+.btn-pill {
+    border-radius: 999px;
+}
+
+.login-main-button {
+    height: 52px;
+    font-size: 1rem;
+    letter-spacing: 0.3px;
+    box-shadow: 0 8px 20px rgba(110, 123, 255, 0.25);
+}
+
+.btn-primary {
+    background: #6e7bff;
+    border: none;
+    font-weight: 700;
+}
+
+    .btn-primary:hover {
+        background: #6070ff;
+    }
+
+    .btn-primary:disabled {
+        opacity: 0.7;
+    }
+
+/* Botón outline */
+.btn-outline-primary {
+    border-width: 1.5px;
+    border-color: #dbe0eb; /* Borde gris sutil */
+    color: #6e7bff;
+    background-color: transparent;
+    font-weight: 600;
+    height: 52px;
+}
+
+    .btn-outline-primary:hover {
+        background-color: #f8f9fc;
+        border-color: #dbe0eb;
+        color: #4a56e2;
+    }
+
+/* Links y Checkbox */
+.btn-link-underline {
+    color: #6e7bff;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+    .btn-link-underline:hover {
+        text-decoration: underline;
+    }
+
+.form-check-input {
+    border-color: #d1d5f4;
+    cursor: pointer;
+}
+
+    .form-check-input:checked {
+        background-color: #6e7bff;
+        border-color: #6e7bff;
+    }
+
+/* Divider */
+.login-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+    .login-divider .line {
+        flex: 1;
+        height: 1px;
+        background-color: #eceff6;
+    }
+
+    .login-divider .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 999px;
+        background-color: #d1d5f4;
+    }
+
+.login-footer {
+    font-size: 0.78rem;
+    color: #b1b6c9;
+}
+
+.validation-message {
+    font-size: 0.78rem;
+}

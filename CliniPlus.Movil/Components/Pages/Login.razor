@@ -1,0 +1,161 @@
+﻿@page "/"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+@using CliniPlus.Shared.DTOs
+@using Microsoft.AspNetCore.Components.Forms
+@inject CliniPlus.Movil.Services.Contrato.IAuthService Auth
+@inject NavigationManager Nav
+
+<EditForm Model="_model" OnValidSubmit="IngresarAsync">
+    <DataAnnotationsValidator />
+
+    <div class="login-page d-flex align-items-center justify-content-center">
+        <div class="login-card shadow-soft">
+            
+            <div class="d-flex align-items-center justify-content-center mb-4 gap-3">
+                <div class="logo-pure">
+                    <span class="bar-vertical"></span>
+                    <span class="bar-horizontal"></span>
+                </div>
+                <div class="brand-name">Clini<span>+</span></div>
+            </div>
+
+            <h5 class="login-title text-center mb-1">Bienvenido a Clini+</h5>
+            <p class="login-subtitle text-center mb-4">
+                Inicia sesión para continuar
+            </p>
+
+            <div class="mb-3">
+                <div class="input-group input-elevated">
+                    <span class="input-group-text">
+                        <i class="bi bi-envelope"></i>
+                    </span>
+                    <InputText @bind-Value="_model.Email"
+                               class="form-control"
+                               placeholder="Correo electrónico"
+                               autocomplete="email" />
+                </div>
+                <ValidationMessage For="@(() => _model.Email)" class="text-danger small mt-1" />
+            </div>
+
+            <div class="mb-4"> <div class="input-group input-elevated">
+                    <span class="input-group-text">
+                        <i class="bi bi-lock"></i>
+                    </span>
+                    <InputText @bind-Value="_model.Password"
+                               type="@(_mostrarPassword ? "text" : "password")"
+                               class="form-control"
+                               placeholder="Contraseña"
+                               autocomplete="current-password" />
+                    <button type="button"
+                            class="btn btn-icon"
+                            @onclick="TogglePassword"
+                            tabindex="-1">
+                        <i class="bi @( _mostrarPassword ? "bi-eye-slash" : "bi-eye" )"></i>
+                    </button>
+                </div>
+                <ValidationMessage For="@(() => _model.Password)" class="text-danger small mt-1" />
+            </div>
+
+            <button type="submit"
+                    class="btn btn-primary btn-pill w-100 mb-3 login-main-button"
+                    disabled="@_cargando">
+                @if (_cargando)
+                {
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                    <span>Ingresando...</span>
+                }
+                else
+                {
+                    <span>Ingresar</span>
+                }
+            </button>
+
+            <div class="d-flex justify-content-between align-items-center mb-3 px-1">
+                <div class="form-check small">
+                    <InputCheckbox @bind-Value="_recordarme" class="form-check-input" id="rec" />
+                    <label for="rec" class="form-check-label">Recordarme</label>
+                </div>
+                <button type="button"
+                        class="btn btn-link btn-link-underline p-0 small"
+                        @onclick="RecuperarPassword">
+                    ¿Olvidaste tu contraseña?
+                </button>
+            </div>
+
+            <div class="login-divider my-3">
+                <span class="line"></span>
+                <span class="dot"></span>
+                <span class="line"></span>
+            </div>
+
+            <button type="button"
+                    class="btn btn-outline-primary btn-pill w-100 mb-2"
+                    @onclick="IngresarInvitado"
+                    disabled="@_cargando">
+                Ingresar como invitado
+            </button>
+
+            @if (!string.IsNullOrWhiteSpace(_error))
+            {
+                <div class="alert alert-danger alert-dismissible py-2 mt-3 small" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    @_error
+                    <button type="button"
+                            class="btn-close"
+                            @onclick="@(() => _error = null)"
+                            aria-label="Cerrar"></button>
+                </div>
+            }
+
+            <p class="login-footer text-center mt-4 mb-0">
+                Clini+ © 2025 – ITES Santa Rosa
+            </p>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    private AuthLoginRequest _model = new();
+    private bool _recordarme = false;
+    private bool _cargando = false;
+    private bool _mostrarPassword = false;
+    private string? _error;
+
+    private async Task IngresarAsync()
+    {
+        _error = null;
+        _cargando = true;
+
+        try
+        {
+            var resp = await Auth.LoginAsync(_model, _recordarme);
+            if (resp is null)
+            {
+                _error = "Usuario o contraseña inválidos.";
+                return;
+            }
+
+            Nav.NavigateTo("/home", forceLoad: true);
+        }
+        catch (HttpRequestException)
+        {
+            _error = "No se pudo conectar al servidor.";
+        }
+        catch (Exception ex)
+        {
+            _error = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    private void IngresarInvitado()
+    {
+        if (!_cargando) Nav.NavigateTo("/guest", forceLoad: true);
+    }
+
+    private void TogglePassword() => _mostrarPassword = !_mostrarPassword;
+    private void RecuperarPassword() => Nav.NavigateTo("/recuperar-password");
+}
