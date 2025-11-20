@@ -1,0 +1,151 @@
+﻿@page "/admin/medicos"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+@using CliniPlus.Shared.DTOs
+@using CliniPlus.Shared
+@inject CliniPlus.Movil.Services.Contrato.IAuthService Auth
+@inject CliniPlus.Movil.Services.Contrato.IMedicoService MedicosSrv
+@inject NavigationManager Nav
+
+@if (_cargando)
+{
+    <div class="home-loading d-flex flex-column align-items-center justify-content-center" style="height: 60vh;">
+        <div class="spinner-border text-primary mb-3"></div>
+        <span>Cargando médicos...</span>
+    </div>
+}
+else if (!_esAdmin)
+{
+    <RedirectToLogin />
+}
+else
+{
+    <div class="home-page">
+        <div class="home-header mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <BotonVolver />
+                <div class="home-greeting">
+                    <p class="home-hello">Gestión</p>
+                    <h4 class="home-name mb-0">Médicos</h4>
+                </div>
+            </div>
+            <button class="btn btn-primary btn-sm btn-pill shadow-sm" @onclick="IrNuevoMedico">
+                <i class="bi bi-plus-lg"></i> Nuevo
+            </button>
+        </div>
+
+        @if (_medicos is null || !_medicos.Any())
+        {
+            <div class="home-card text-center py-5">
+                <i class="bi bi-person-vcard text-muted fs-1 mb-3 d-block"></i>
+                <p class="mb-3 text-muted">No hay médicos registrados en el sistema.</p>
+                <button class="btn btn-primary btn-pill px-4" @onclick="IrNuevoMedico">
+                    Agregar primer médico
+                </button>
+            </div>
+        }
+        else
+        {
+            <div class="d-flex flex-column gap-3">
+                @foreach (var m in _medicos)
+                {
+                    <div class="home-card p-3 medico-card border-0 shadow-sm">
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <div class="medico-avatar-circle">
+                                <span>@m.NombreCompleto[0].ToString().ToUpper()</span>
+                            </div>
+
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0 fw-bold text-dark">@m.NombreCompleto</h6>
+
+                                <small class="text-muted">
+                                    @(!string.IsNullOrEmpty(m.Especialidad) ? m.Especialidad : "Sin especialidad")
+                                </small>
+                            </div>
+
+                            @if (m.IsActive)
+                            {
+                                <span class="badge bg-success-subtle text-success rounded-pill">Activo</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary-subtle text-secondary rounded-pill">Inactivo</span>
+                            }
+                        </div>
+
+                        <hr class="my-2 text-muted opacity-25" />
+
+                        <div class="d-flex justify-content-between align-items-center small text-muted">
+                            <span class="text-truncate" style="max-width: 150px;">
+                                <i class="bi bi-envelope me-1"></i> @m.Email
+                            </span>
+                            <button class="btn btn-link p-0 text-decoration-none fw-bold" @onclick="() => VerDetalle(m.IdMedico)">
+                                Ver más
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        <div class="spacer-bottom"></div>
+    </div>
+}
+
+<div class="bottom-nav shadow-soft">
+    <button class="bottom-nav-item" @onclick="IrInicio">
+        <i class="bi bi-house-door"></i>
+        <span>Inicio</span>
+    </button>
+    <button class="bottom-nav-item active" @onclick="IrMedicos">
+        <i class="bi bi-person-badge-fill"></i> <span>Médicos</span>
+    </button>
+    <button class="bottom-nav-item" @onclick="IrConfiguracion">
+        <i class="bi bi-gear"></i>
+        <span>Config</span>
+    </button>
+</div>
+
+@code {
+    private List<MedicoDetalleDTO>? _medicos;
+    private bool _cargando = true;
+    private bool _esAdmin = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var me = await Auth.MeAsync();
+            if (me is null || me.Rol != "Administrador")
+            {
+                _esAdmin = false;
+                Nav.NavigateTo("/", true);
+                return;
+            }
+
+            _esAdmin = true;
+            _medicos = await MedicosSrv.GetMedicosAsync();
+        }
+        catch
+        {
+            // Manejo de error
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    private void IrInicio() => Nav.NavigateTo("/admin/home");
+    private void IrMedicos() => Nav.NavigateTo("/admin/medicos");
+    private void IrConfiguracion() => Nav.NavigateTo("/admin/configuracion");
+
+    private void IrNuevoMedico()
+    {
+        // Nav.NavigateTo("/admin/medicos/nuevo");
+    }
+
+    private void VerDetalle(int id)
+    {
+        // Nav.NavigateTo($"/admin/medicos/{id}");
+    }
+}

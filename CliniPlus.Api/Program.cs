@@ -86,6 +86,10 @@ builder.Services.AddControllers();
 
 // Servicios propios
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
+builder.Services.AddScoped<IMedicoRepository, MedicoRepository>();
+builder.Services.AddScoped<IEspecialidadRepository, EspecialidadRepository>(); 
+
+
 
 var app = builder.Build();
 

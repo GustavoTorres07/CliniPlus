@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace CliniPlus.Shared.DTOs
 {
-    public class EspecialidadDTO
+    public class EspecialidadEstadoDTO
     {
-        public int IdEspecialidad { get; set; }
-        public string Nombre { get; set; } = null!;
-        public string? Descripcion { get; set; }
         public bool IsActive { get; set; }
+
     }
 }

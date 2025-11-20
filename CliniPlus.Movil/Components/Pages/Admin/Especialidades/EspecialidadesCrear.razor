@@ -1,0 +1,98 @@
+﻿@page "/admin/especialidades/crear"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+@using CliniPlus.Movil.Services.Contrato
+@using CliniPlus.Shared.DTOs
+@using CliniPlus.Shared
+@inject IEspecialidadService SpecialService
+@inject IAuthService Auth
+@inject NavigationManager Nav
+
+<div class="home-page">
+    <div class="home-header mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <BotonVolver />
+            <div class="home-greeting">
+                <p class="home-hello">Configuración</p>
+                <h4 class="home-name mb-0">Nueva</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="home-card p-4">
+        <EditForm Model="_model" OnValidSubmit="Guardar">
+            <DataAnnotationsValidator />
+
+            <div class="mb-3">
+                <label class="form-label small fw-bold text-muted">Nombre</label>
+                <div class="input-group input-elevated">
+                    <span class="input-group-text bg-transparent border-0">
+                        <i class="bi bi-tag"></i>
+                    </span>
+                    <InputText class="form-control border-0 bg-transparent"
+                               placeholder="Ej. Neurología"
+                               @bind-Value="_model.Nombre" />
+                </div>
+                <ValidationMessage For="@(() => _model.Nombre)" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label small fw-bold text-muted">Descripción</label>
+                <div class="input-elevated p-2" style="height: auto;">
+                    <InputTextArea class="form-control border-0 bg-transparent"
+                                   rows="3"
+                                   placeholder="Descripción opcional..."
+                                   @bind-Value="_model.Descripcion"></InputTextArea>
+                </div>
+            </div>
+
+            <div class="form-check form-switch mb-4">
+                <InputCheckbox class="form-check-input" id="activeSwitch" @bind-Value="_model.IsActive" />
+                <label class="form-check-label" for="activeSwitch">
+                    Habilitar inmediatamente
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-pill w-100 shadow-sm py-2">
+                Crear Especialidad
+            </button>
+        </EditForm>
+    </div>
+
+    <div class="spacer-bottom"></div>
+</div>
+
+<div class="bottom-nav shadow-soft">
+    <button class="bottom-nav-item" @onclick="IrInicio">
+        <i class="bi bi-house-door"></i>
+        <span>Inicio</span>
+    </button>
+
+    <button class="bottom-nav-item active">
+        <i class="bi bi-grid-3x3-gap-fill"></i>
+        <span>Espec.</span>
+    </button>
+
+    <button class="bottom-nav-item text-danger" @onclick="CerrarSesion">
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Salir</span>
+    </button>
+</div>
+
+@code {
+    private EspecialidadDTO _model = new() { IsActive = true };
+
+    private async Task Guardar()
+    {
+        var resp = await SpecialService.CrearAsync(_model);
+        if (resp != null)
+            Nav.NavigateTo("/admin/especialidades", true);
+    }
+
+    private void IrInicio() => Nav.NavigateTo("/admin/home");
+
+    private async Task CerrarSesion()
+    {
+        await Auth.LogoutAsync();
+        Nav.NavigateTo("/", true);
+    }
+}

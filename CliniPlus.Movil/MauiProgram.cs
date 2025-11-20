@@ -26,7 +26,7 @@ public static class MauiProgram
 #endif
 
         // Handler que inyecta el token en cada request
-        builder.Services.AddSingleton<TokenMessageHandler>();
+        builder.Services.AddTransient<TokenMessageHandler>();
 
         // HttpClient nombrado para la API (Somee)
         builder.Services.AddHttpClient("ApiCliniPlus", c =>
@@ -39,6 +39,9 @@ public static class MauiProgram
         // Servicios del front (Contrato / Implementa)
         builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<ITokenService, TokenService>();
+        builder.Services.AddScoped<IMedicoService, MedicoService>();
+        builder.Services.AddScoped<IEspecialidadService, EspecialidadService>();
+
 
         return builder.Build();
     }

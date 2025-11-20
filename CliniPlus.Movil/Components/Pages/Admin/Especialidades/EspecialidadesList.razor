@@ -1,0 +1,134 @@
+﻿@page "/admin/especialidades"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+@using CliniPlus.Movil.Services.Contrato
+@using CliniPlus.Shared.DTOs
+@using CliniPlus.Shared
+@inject IEspecialidadService SpecialService
+@inject IAuthService Auth
+@inject NavigationManager Nav
+
+@if (_loading)
+{
+    <div class="home-loading d-flex flex-column align-items-center justify-content-center" style="height: 60vh;">
+        <div class="spinner-border text-primary mb-3"></div>
+        <span>Cargando especialidades...</span>
+    </div>
+}
+else
+{
+    <div class="home-page">
+        <div class="home-header mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <BotonVolver />
+                <div class="home-greeting">
+                    <p class="home-hello">Configuración</p>
+                    <h4 class="home-name mb-0">Especialidades</h4>
+                </div>
+            </div>
+
+            <button class="btn btn-primary btn-sm btn-pill shadow-sm" @onclick="Crear">
+                <i class="bi bi-plus-lg"></i> Nuevo
+            </button>
+        </div>
+
+        @if (_lista == null || !_lista.Any())
+        {
+            <div class="home-card text-center py-5">
+                <div class="icon-box bg-teal-light mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                    <i class="bi bi-grid-3x3-gap text-teal"></i>
+                </div>
+                <p class="text-muted mb-3">No hay especialidades cargadas.</p>
+                <button class="btn btn-primary btn-pill px-4" @onclick="Crear">
+                    Agregar la primera
+                </button>
+            </div>
+        }
+        else
+        {
+            <div class="d-flex flex-column gap-3">
+                @foreach (var esp in _lista)
+                {
+                    <div class="home-card p-3 specialty-card border-0 shadow-sm position-relative"
+                         @onclick="() => Editar(esp.IdEspecialidad)">
+
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="icon-box bg-teal-light flex-shrink-0">
+                                <i class="bi bi-heart-pulse text-teal"></i>
+                            </div>
+
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1 fw-bold text-dark">@esp.Nombre</h6>
+                                <p class="mb-0 small text-muted text-truncate" style="max-width: 180px;">
+                                    @(string.IsNullOrEmpty(esp.Descripcion) ? "Sin descripción" : esp.Descripcion)
+                                </p>
+                            </div>
+
+                            <div class="d-flex flex-column align-items-end gap-1">
+                                @if (esp.IsActive)
+                                {
+                                    <span class="badge bg-success-subtle text-success rounded-pill" style="font-size: 0.65rem;">Activa</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger-subtle text-danger rounded-pill" style="font-size: 0.65rem;">Inactiva</span>
+                                }
+                                <i class="bi bi-chevron-right text-muted small mt-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        <div class="spacer-bottom"></div>
+    </div>
+}
+
+<div class="bottom-nav shadow-soft">
+    <button class="bottom-nav-item" @onclick="IrInicio">
+        <i class="bi bi-house-door"></i>
+        <span>Inicio</span>
+    </button>
+
+    <button class="bottom-nav-item active">
+        <i class="bi bi-grid-3x3-gap-fill"></i>
+        <span>Espec.</span>
+    </button>
+
+    <button class="bottom-nav-item text-danger" @onclick="CerrarSesion">
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Salir</span>
+    </button>
+</div>
+
+@code {
+    private List<EspecialidadDTO>? _lista;
+    private bool _loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _lista = await SpecialService.ListarAsync();
+        }
+        catch
+        {
+            // Manejo de errores
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private void Crear() => Nav.NavigateTo("/admin/especialidades/crear");
+    private void Editar(int id) => Nav.NavigateTo($"/admin/especialidades/{id}");
+
+    private void IrInicio() => Nav.NavigateTo("/admin/home");
+
+    private async Task CerrarSesion()
+    {
+        await Auth.LogoutAsync();
+        Nav.NavigateTo("/", true);
+    }
+}

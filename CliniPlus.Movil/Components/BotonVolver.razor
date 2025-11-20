@@ -1,0 +1,12 @@
+﻿@inject IJSRuntime JS
+
+<button type="button" class="btn-volver shadow-soft" @onclick="VolverAtras" title="Volver">
+    <i class="bi bi-chevron-left"></i>
+</button>
+
+@code {
+    private async Task VolverAtras()
+    {
+        await JS.InvokeVoidAsync("history.back");
+    }
+}

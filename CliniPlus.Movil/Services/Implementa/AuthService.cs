@@ -20,18 +20,29 @@ namespace CliniPlus.Movil.Services.Implementa
             _token = tokenStorage;
         }
 
-        public async Task<AuthLoginResponse?> LoginAsync(AuthLoginRequest req, bool recordar)
+        public async Task<AuthLoginResponseDTO?> LoginAsync(AuthLoginRequest req, bool recordar)
         {
             // Para login no necesitamos el handler que agrega token. Usamos el mismo client (no hay token todavía).
             var cli = _http.CreateClient("ApiCliniPlus");
             var res = await cli.PostAsJsonAsync("api/auth/login", req);
             if (!res.IsSuccessStatusCode) return null;
 
-            var payload = await res.Content.ReadFromJsonAsync<AuthLoginResponse>();
+            var payload = await res.Content.ReadFromJsonAsync<AuthLoginResponseDTO>();
             if (payload != null && !string.IsNullOrWhiteSpace(payload.Token))
                 await _token.GuardarAsync(payload.Token, recordar);
 
             return payload;
+        }
+
+        public async Task<AuthMeResponse?> MeAsync()
+        {
+            var cli = _http.CreateClient("ApiCliniPlus");
+            var res = await cli.GetAsync("api/auth/me");
+
+            if (!res.IsSuccessStatusCode)
+                return null;
+
+            return await res.Content.ReadFromJsonAsync<AuthMeResponse>();
         }
 
         public async Task LogoutAsync() => await _token.BorrarAsync();

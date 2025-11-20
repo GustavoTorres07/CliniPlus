@@ -1,0 +1,168 @@
+﻿@page "/admin/home"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+@using CliniPlus.Shared.DTOs
+@using CliniPlus.Shared
+@inject CliniPlus.Movil.Services.Contrato.IAuthService Auth
+@inject NavigationManager Nav
+
+@if (_cargando)
+{
+    <div class="home-loading d-flex flex-column align-items-center justify-content-center" style="height: 60vh;">
+        <div class="spinner-border text-primary me-2"></div>
+        <p class="mt-2 text-muted small">Cargando panel de administración...</p>
+    </div>
+}
+else if (_usuario is null)
+{
+    <RedirectToLogin />
+}
+else
+{
+    <div class="home-page">
+        <div class="home-header mb-4">
+            <div class="home-greeting">
+                <p class="home-hello">Bienvenido,</p>
+                <h4 class="home-name">@_usuario.NombreCompleto</h4>
+                <span class="badge bg-primary-subtle text-primary px-3 py-1 rounded-pill">
+                    Administrador
+                </span>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn-logout" @onclick="CerrarSesion" title="Cerrar sesión">
+                    <i class="bi bi-box-arrow-right"></i>
+                </button>
+                <div class="home-avatar">
+                    <span>@_usuario.NombreCompleto[0].ToString().ToUpper()</span>
+                </div>
+            </div>
+        </div>
+
+        <h6 class="section-title">Gestión Principal</h6>
+        <div class="home-quick-actions mb-4">
+            <button class="quick-card" @onclick="IrUsuarios">
+                <div class="icon-box bg-blue-light">
+                    <i class="bi bi-people text-primary"></i>
+                </div>
+                <span>Usuarios</span>
+            </button>
+            <button class="quick-card" @onclick="IrMedicos">
+                <div class="icon-box bg-purple-light">
+                    <i class="bi bi-person-badge text-purple"></i>
+                </div>
+                <span>Médicos</span>
+            </button>
+            <button class="quick-card" @onclick="IrPacientes">
+                <div class="icon-box bg-green-light">
+                    <i class="bi bi-person-lines-fill text-green"></i>
+                </div>
+                <span>Pacientes</span>
+            </button>
+        </div>
+
+        <h6 class="section-title">Configuración Médica</h6>
+        <div class="home-quick-actions mb-4">
+            <button class="quick-card" @onclick="IrObrasSociales">
+                <div class="icon-box bg-orange-light">
+                    <i class="bi bi-heart-pulse text-orange"></i>
+                </div>
+                <span>Obras Soc.</span>
+            </button>
+            <button class="quick-card" @onclick="IrEspecialidades">
+                <div class="icon-box bg-teal-light">
+                    <i class="bi bi-grid-3x3-gap text-teal"></i>
+                </div>
+                <span>Espec.</span>
+            </button>
+            <button class="quick-card disabled-card">
+                <div class="icon-box bg-gray-light">
+                    <i class="bi bi-sliders text-muted"></i>
+                </div>
+                <span>Ajustes</span>
+            </button>
+        </div>
+
+        <div class="home-card mb-2">
+            <div class="home-card-header">
+                <span class="home-card-title">Resumen del Sistema</span>
+                <i class="bi bi-graph-up text-muted"></i>
+            </div>
+            <div class="admin-metrics">
+                <div class="metric-row">
+                    <span class="metric-label"><i class="bi bi-calendar-check me-2"></i>Turnos hoy</span>
+                    <span class="metric-value">0</span>
+                </div>
+                <div class="metric-divider"></div>
+                <div class="metric-row">
+                    <span class="metric-label"><i class="bi bi-activity me-2"></i>Médicos activos</span>
+                    <span class="metric-value">0</span>
+                </div>
+                <div class="metric-divider"></div>
+                <div class="metric-row">
+                    <span class="metric-label"><i class="bi bi-person-check me-2"></i>Pacientes activos</span>
+                    <span class="metric-value">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="spacer-bottom"></div>
+    </div>
+}
+
+<div class="bottom-nav shadow-soft">
+    <button class="bottom-nav-item active" @onclick="IrInicio">
+        <i class="bi bi-house-door-fill"></i>
+        <span>Inicio</span>
+    </button>
+    <button class="bottom-nav-item" @onclick="IrUsuarios">
+        <i class="bi bi-people"></i>
+        <span>Usuarios</span>
+    </button>
+    <button class="bottom-nav-item" @onclick="IrConfiguracion">
+        <i class="bi bi-gear"></i>
+        <span>Config</span>
+    </button>
+</div>
+
+@code {
+    private AuthMeResponse? _usuario;
+    private bool _cargando = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _cargando = true;
+            _usuario = await Auth.MeAsync();
+            // Verificación de seguridad básica
+            if (_usuario is null || _usuario.Rol != "Administrador")
+            {
+                Nav.NavigateTo("/", true);
+                return;
+            }
+        }
+        catch
+        {
+            Nav.NavigateTo("/", true);
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    // Lógica cerrar sesión
+    private async Task CerrarSesion()
+    {
+        await Auth.LogoutAsync();
+        Nav.NavigateTo("/", forceLoad: true);
+    }
+
+    private void IrInicio() => Nav.NavigateTo("/admin/home", true);
+    private void IrUsuarios() => Nav.NavigateTo("/admin/usuarios");
+    private void IrMedicos() => Nav.NavigateTo("/admin/medicos");
+    private void IrPacientes() => Nav.NavigateTo("/admin/pacientes");
+    private void IrObrasSociales() => Nav.NavigateTo("/admin/obras-sociales");
+    private void IrEspecialidades() => Nav.NavigateTo("/admin/especialidades");
+    private void IrConfiguracion() => Nav.NavigateTo("/admin/configuracion");
+}

@@ -1,0 +1,136 @@
+﻿@page "/paciente/home"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+@using CliniPlus.Shared.DTOs
+@inject CliniPlus.Movil.Services.Contrato.IAuthService Auth
+@inject NavigationManager Nav
+@using CliniPlus.Shared
+
+@if (_cargando)
+{
+    <div class="home-loading d-flex flex-column align-items-center justify-content-center" style="height: 60vh;">
+        <div class="spinner-border text-primary mb-3"></div>
+        <span>Cargando tu información...</span>
+    </div>
+}
+else if (_usuario is null)
+{
+    <RedirectToLogin />
+}
+else
+{
+    <div class="home-page">
+        <div class="home-header mb-4">
+            <div class="home-greeting">
+                <p class="home-hello">Hola,</p>
+                <h4 class="home-name">@ObtenerPrimerNombre(_usuario.NombreCompleto)</h4>
+                <span class="badge-paciente">Paciente</span>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn-logout" @onclick="CerrarSesion" title="Cerrar sesión">
+                    <i class="bi bi-box-arrow-right"></i>
+                </button>
+
+                <div class="home-avatar">
+                    <span>@_usuario.NombreCompleto[0].ToString().ToUpper()</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="home-quick-actions mb-4">
+            <button class="quick-card" @onclick="IrReservarTurno">
+                <div class="icon-box bg-blue">
+                    <i class="bi bi-calendar-plus"></i>
+                </div>
+                <span>Sacar turno</span>
+            </button>
+            <button class="quick-card" @onclick="IrMisTurnos">
+                <div class="icon-box bg-purple">
+                    <i class="bi bi-list-check"></i>
+                </div>
+                <span>Mis turnos</span>
+            </button>
+            <button class="quick-card" @onclick="IrPerfil">
+                <div class="icon-box bg-green">
+                    <i class="bi bi-person"></i>
+                </div>
+                <span>Mi perfil</span>
+            </button>
+        </div>
+
+        <div class="home-card mb-4">
+            <div class="home-card-header">
+                <span class="home-card-title">Próximo turno</span>
+                <button class="btn btn-link btn-sm p-0 text-decoration-none fw-bold" @onclick="IrMisTurnos">
+                    Ver todos
+                </button>
+            </div>
+            <div class="home-card-body text-center py-3">
+                <i class="bi bi-calendar-x text-muted fs-1 mb-2 d-block"></i>
+                <p class="small text-muted mb-3">Aún no tienes turnos reservados.</p>
+                <button class="btn btn-primary btn-sm btn-pill w-100" @onclick="IrReservarTurno">
+                    Reservar ahora
+                </button>
+            </div>
+        </div>
+
+        <div class="home-card">
+            <div class="home-card-header">
+                <span class="home-card-title">Novedades</span>
+                <i class="bi bi-bell text-muted"></i>
+            </div>
+            <div class="home-card-body small text-muted">
+                Próximamente verás aquí recordatorios y mensajes de tu médico.
+            </div>
+        </div>
+    </div>
+}
+
+<div class="bottom-nav shadow-soft">
+    <button class="bottom-nav-item active" @onclick="IrInicio">
+        <i class="bi bi-house-door-fill"></i>
+        <span>Inicio</span>
+    </button>
+    <button class="bottom-nav-item" @onclick="IrMisTurnos">
+        <i class="bi bi-calendar-event"></i>
+        <span>Turnos</span>
+    </button>
+    <button class="bottom-nav-item" @onclick="IrPerfil">
+        <i class="bi bi-person"></i>
+        <span>Perfil</span>
+    </button>
+</div>
+
+@code {
+    private AuthMeResponse? _usuario;
+    private bool _cargando = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _cargando = true;
+            _usuario = await Auth.MeAsync();
+            if (_usuario is null) Nav.NavigateTo("/", true);
+        }
+        catch { Nav.NavigateTo("/", true); }
+        finally { _cargando = false; }
+    }
+
+    private string ObtenerPrimerNombre(string nombre) =>
+        string.IsNullOrWhiteSpace(nombre) ? "Paciente" : nombre.Split(' ')[0];
+
+    // Lógica para cerrar sesión
+    private async Task CerrarSesion()
+    {
+        // Asumo que tu IAuthService tiene un método LogoutAsync.
+        // Si no lo tiene, simplemente borramos token y navegamos.
+        await Auth.LogoutAsync();
+        Nav.NavigateTo("/", forceLoad: true);
+    }
+
+    private void IrInicio() => Nav.NavigateTo("/paciente/home", true);
+    private void IrReservarTurno() => Nav.NavigateTo("/turnos/reservar");
+    private void IrMisTurnos() => Nav.NavigateTo("/turnos");
+    private void IrPerfil() => Nav.NavigateTo("/perfil");
+}

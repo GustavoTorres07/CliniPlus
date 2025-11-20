@@ -34,7 +34,7 @@ namespace CliniPlus.Api.Controllers
         /// </summary>
         [HttpPost("login")]
         [AllowAnonymous]
-        public async Task<ActionResult<AuthLoginResponse>> Login([FromBody] AuthLoginRequest req)
+        public async Task<ActionResult<AuthLoginResponseDTO>> Login([FromBody] AuthLoginRequest req)
         {
             if (!ModelState.IsValid) return BadRequest("Datos inválidos.");
 
@@ -47,7 +47,7 @@ namespace CliniPlus.Api.Controllers
 
             var token = _tokens.EmitirToken(u.IdUsuario, u.Nombre, u.Apellido, u.Email, u.Rol);
 
-            return new AuthLoginResponse
+            return new AuthLoginResponseDTO
             {
                 UsuarioId = u.IdUsuario,
                 NombreCompleto = $"{u.Nombre} {u.Apellido}",
@@ -61,7 +61,7 @@ namespace CliniPlus.Api.Controllers
         /// </summary>
         [HttpGet("me")]
         [Authorize]
-        public IActionResult Me()
+        public ActionResult<AuthMeResponse> Me()
         {
             string? id =
                 User.FindFirstValue(ClaimTypes.NameIdentifier) ??
@@ -79,13 +79,19 @@ namespace CliniPlus.Api.Controllers
                 User.FindFirstValue(ClaimTypes.Role) ??
                 User.FindFirstValue("role");
 
-            return Ok(new
+            if (id is null)
+                return Unauthorized("No se pudo obtener el usuario desde el token.");
+
+            var dto = new AuthMeResponse
             {
-                UsuarioId = id,
-                NombreCompleto = nombre,
-                Email = email,
-                Rol = rol
-            });
+                UsuarioId = int.Parse(id),
+                NombreCompleto = nombre ?? "",
+                Email = email ?? "",
+                Rol = rol ?? ""
+            };
+
+            return Ok(dto);
         }
+
     }
 }

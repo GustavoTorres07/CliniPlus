@@ -1,0 +1,162 @@
+﻿/* --- ESTRUCTURA GENERAL --- */
+.home-page {
+    padding: 24px 20px;
+    font-family: 'Nunito', sans-serif;
+    background-color: #f8f9fc;
+    min-height: 100vh;
+}
+
+.spacer-bottom {
+    height: 80px; /* Espacio para la bottom nav */
+}
+
+/* --- HEADER --- */
+.home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.home-greeting .home-hello {
+    font-size: 0.85rem;
+    color: #9ba0b8;
+    margin-bottom: 0;
+}
+
+.home-greeting .home-name {
+    font-weight: 800;
+    color: #15161b;
+    margin-bottom: 6px;
+    font-size: 1.4rem;
+}
+
+/* --- TARJETA DE MÉDICO (Specifico de esta página) --- */
+.medico-card {
+    background: white;
+    border-radius: 20px;
+    /* Sombra suave individual para cada item */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    border: 1px solid #f0f2f5;
+    transition: transform 0.1s ease, background-color 0.2s;
+}
+
+    /* Efecto al tocar la tarjeta en móvil */
+    .medico-card:active {
+        transform: scale(0.98);
+        background-color: #fbfbfc;
+    }
+
+/* Avatar Redondo del Médico */
+.medico-avatar-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%; /* Círculo perfecto */
+    /* Gradiente suave azulado */
+    background: linear-gradient(135deg, #eff1ff, #e2e6ff);
+    color: #6e7bff; /* Color primario */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.2rem;
+    flex-shrink: 0; /* Evita que se aplaste si hay mucho texto */
+}
+
+/* Textos dentro de la tarjeta */
+.medico-card h6 {
+    font-size: 0.95rem;
+    color: #15161b;
+}
+
+.medico-card small {
+    font-size: 0.8rem;
+    color: #9ba0b8;
+}
+
+/* Separador interno */
+hr.text-muted {
+    border-top: 1px solid #f0f2f5;
+}
+
+/* --- ESTADOS VACÍOS Y CARGA --- */
+.home-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+}
+
+.home-loading {
+    color: #9ba0b8;
+    font-size: 0.9rem;
+}
+
+/* --- BOTONES --- */
+.btn-pill {
+    border-radius: 99px;
+}
+
+.btn-primary {
+    background-color: #6e7bff;
+    border: none;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(110, 123, 255, 0.25);
+}
+
+    .btn-primary:active {
+        background-color: #5b66d9;
+    }
+
+/* Enlaces de texto */
+.btn-link {
+    color: #6e7bff;
+}
+
+/* --- BOTTOM NAV (Idéntico al Home para evitar saltos) --- */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    box-shadow: 0 -5px 30px rgba(0,0,0,0.05);
+    z-index: 1000;
+}
+
+.bottom-nav-item {
+    background: none;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #b1b6c9;
+    gap: 4px;
+    flex: 1;
+    height: 100%;
+}
+
+    .bottom-nav-item i {
+        font-size: 1.4rem;
+        transition: transform 0.2s;
+    }
+
+    .bottom-nav-item span {
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+
+    /* Estado Activo */
+    .bottom-nav-item.active {
+        color: #6e7bff;
+    }
+
+        .bottom-nav-item.active i {
+            transform: translateY(-2px);
+        }

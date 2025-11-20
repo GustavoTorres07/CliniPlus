@@ -1,0 +1,251 @@
+﻿/* --- ESTRUCTURA --- */
+.home-page {
+    padding: 24px 20px;
+    font-family: 'Nunito', sans-serif;
+    background-color: #f8f9fc;
+    min-height: 100vh;
+}
+
+.spacer-bottom {
+    height: 80px;
+}
+
+/* --- HEADER --- */
+.home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.home-hello {
+    font-size: 0.85rem;
+    color: #9ba0b8;
+    margin-bottom: 0;
+}
+
+.home-name {
+    font-weight: 800;
+    color: #15161b;
+    margin-bottom: 6px;
+}
+
+/* Avatar */
+.home-avatar {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #15161b, #3a3d4a); /* Oscuro para Admin */
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.2rem;
+    box-shadow: 0 8px 20px rgba(0,0,0, 0.15);
+}
+
+/* --- GRID DE BOTONES --- */
+.section-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #5e6278;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.home-quick-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 columnas exactas */
+    gap: 12px;
+}
+
+.quick-card {
+    background: white;
+    border: none;
+    border-radius: 18px;
+    padding: 14px 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    transition: transform 0.1s;
+}
+
+    .quick-card:active {
+        transform: scale(0.96);
+    }
+
+    .quick-card span {
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #4b506d;
+        text-align: center;
+        line-height: 1.2;
+    }
+
+    .quick-card.disabled-card {
+        opacity: 0.6;
+        background-color: #f1f1f4;
+    }
+
+/* --- ICONOS DE COLORES --- */
+.icon-box {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
+.bg-blue-light {
+    background-color: #eff1ff;
+}
+
+.text-primary {
+    color: #6e7bff !important;
+}
+
+.bg-purple-light {
+    background-color: #f4efff;
+}
+
+.text-purple {
+    color: #9b5de5;
+}
+
+.bg-green-light {
+    background-color: #e8fcf5;
+}
+
+.text-green {
+    color: #00b4d8;
+}
+
+.bg-orange-light {
+    background-color: #fff4e6;
+}
+
+.text-orange {
+    color: #ff922b;
+}
+
+.bg-teal-light {
+    background-color: #e6fcf5;
+}
+
+.text-teal {
+    color: #20c997;
+}
+
+.bg-gray-light {
+    background-color: #e9ecef;
+}
+
+/* --- CARD DE MÉTRICAS --- */
+.home-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+}
+
+.home-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    font-weight: 700;
+    color: #15161b;
+}
+
+.metric-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+}
+
+.metric-label {
+    font-size: 0.9rem;
+    color: #7e8299;
+    display: flex;
+    align-items: center;
+}
+
+.metric-value {
+    font-weight: 800;
+    font-size: 1rem;
+    color: #15161b;
+}
+
+.metric-divider {
+    height: 1px;
+    background-color: #f1f1f4;
+    margin: 4px 0;
+}
+
+/* --- BOTTOM NAV --- */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    box-shadow: 0 -5px 30px rgba(0,0,0,0.05);
+    z-index: 1000;
+}
+
+.bottom-nav-item {
+    background: none;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #b1b6c9;
+    gap: 4px;
+    flex: 1;
+    height: 100%;
+}
+
+    .bottom-nav-item i {
+        font-size: 1.4rem;
+    }
+
+    .bottom-nav-item span {
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+
+    .bottom-nav-item.active {
+        color: #6e7bff;
+    }
+/* --- Botón Cerrar Sesión --- */
+.btn-logout {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    border: none;
+    background-color: #fff5f5; /* Rojo suave */
+    color: #ff6b6b; /* Rojo icono */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    transition: all 0.2s ease;
+}
+
+    .btn-logout:active {
+        transform: scale(0.95);
+        background-color: #ffe0e0;
+    }

@@ -9,8 +9,10 @@ namespace CliniPlus.Movil.Services.Contrato
 {
     internal interface IAuthService
     {
-        Task<AuthLoginResponse?> LoginAsync(AuthLoginRequest req, bool recordar);
+        Task<AuthLoginResponseDTO?> LoginAsync(AuthLoginRequest req, bool recordar);
         Task LogoutAsync();
-        Task<bool> PingAsync(); // opcional
+        Task<AuthMeResponse?> MeAsync();   
+
+        Task<bool> PingAsync(); 
     }
 }
