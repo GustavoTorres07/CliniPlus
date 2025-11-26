@@ -47,6 +47,7 @@ namespace CliniPlus.Api.Data
                 e.Property(x => x.IsActive).HasDefaultValue(true);
                 e.Property(x => x.FechaRegistro);
                 e.HasIndex(x => x.Email).IsUnique();
+
             });
 
             // -------------------- ObraSocial --------------------
@@ -304,24 +305,6 @@ namespace CliniPlus.Api.Data
                 e.HasOne(x => x.Medico)
                  .WithMany(m => m.Consultas)
                  .HasForeignKey(x => x.MedicoId)
-                 .OnDelete(DeleteBehavior.Restrict);
-            });
-
-            // -------------------- ConsultaDiagnostico (N:M) --------------------
-            mb.Entity<ConsultaDiagnostico>(e =>
-            {
-                e.ToTable("ConsultaDiagnostico");
-                e.HasKey(x => new { x.ConsultaId, x.CIE10Codigo });
-                e.Property(x => x.Comentario).HasMaxLength(500);
-
-                e.HasOne(x => x.Consulta)
-                 .WithMany(c => c.Diagnosticos)
-                 .HasForeignKey(x => x.ConsultaId)
-                 .OnDelete(DeleteBehavior.Restrict);
-
-                e.HasOne(x => x.CIE10)
-                 .WithMany(c => c.ConsultaDiagnosticos)
-                 .HasForeignKey(x => x.CIE10Codigo)
                  .OnDelete(DeleteBehavior.Restrict);
             });
 

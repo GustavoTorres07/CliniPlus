@@ -1,0 +1,326 @@
+﻿@page "/admin/pacientes/editar/{Id:int}"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+
+@using CliniPlus.Shared.DTOs
+@using CliniPlus.Movil.Services.Contrato
+@using CliniPlus.Shared
+@using Microsoft.AspNetCore.Components.Forms
+
+@inject IAuthService Auth
+@inject IPacienteService PacienteSrv
+@inject IObraSocialService ObrasSrv
+@inject NavigationManager Nav
+
+@if (_cargando)
+{
+    <div class="home-loading d-flex flex-column align-items-center justify-content-center" style="height: 60vh;">
+        <div class="spinner-border text-success mb-3"></div>
+        <span>Cargando datos del paciente...</span>
+    </div>
+}
+else if (!_permitido || _detalle is null)
+{
+    <RedirectToLogin />
+}
+else
+{
+    <div class="home-page">
+        <!-- HEADER -->
+        <div class="home-header mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <BotonVolver />
+                <div class="home-greeting">
+                    <p class="home-hello">Gestión</p>
+                    <h4 class="home-name mb-0">Editar Paciente</h4>
+                </div>
+            </div>
+        </div>
+
+        <!-- TARJETA PRINCIPAL -->
+        <div class="home-card p-4">
+
+            <!-- RESUMEN DE PERFIL VISUAL -->
+            <div class="d-flex flex-column align-items-center mb-4">
+                <div class="patient-profile-circle shadow-sm mb-2">
+                    <span>@(GetInicial(_detalle.NombreCompleto))</span>
+                </div>
+
+                <h5 class="fw-bold text-dark mb-1 text-center">
+                    @(_detalle.NombreCompleto ?? "Sin Nombre")
+                </h5>
+
+                <div class="d-flex flex-wrap justify-content-center gap-2">
+                    <!-- Badge Tipo -->
+                    @if (_detalle.IsProvisional)
+                    {
+                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill">Provisional</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill">Cuenta App</span>
+                    }
+
+                    <!-- Badge Estado -->
+                    @if (_detalle.IsActive)
+                    {
+                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">Activo</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill">Inactivo</span>
+                    }
+                </div>
+            </div>
+
+            <!-- FORMULARIO -->
+            <EditForm Model="_model" OnValidSubmit="GuardarAsync">
+                <DataAnnotationsValidator />
+
+                <!-- DNI -->
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted">DNI</label>
+                    <div class="input-group input-elevated">
+                        <span class="input-group-text bg-transparent border-0">
+                            <i class="bi bi-credit-card-2-front"></i>
+                        </span>
+                        <InputText class="form-control border-0 bg-transparent"
+                                   placeholder="DNI"
+                                   @bind-Value="_model.DNI" />
+                    </div>
+                    <ValidationMessage For="@(() => _model.DNI)" />
+                </div>
+
+                <!-- Fila Doble: Email y Teléfono -->
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label class="form-label small fw-bold text-muted">Email</label>
+                        <div class="input-group input-elevated">
+                            <span class="input-group-text bg-transparent border-0 px-2">
+                                <i class="bi bi-envelope"></i>
+                            </span>
+                            <InputText class="form-control border-0 bg-transparent px-1"
+                                       placeholder="Email"
+                                       @bind-Value="_model.Email" />
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small fw-bold text-muted">Teléfono</label>
+                        <div class="input-group input-elevated">
+                            <span class="input-group-text bg-transparent border-0 px-2">
+                                <i class="bi bi-telephone"></i>
+                            </span>
+                            <InputText class="form-control border-0 bg-transparent px-1"
+                                       placeholder="Tel"
+                                       @bind-Value="_model.Telefono" />
+                        </div>
+                    </div>
+                </div>
+                <ValidationMessage For="@(() => _model.Email)" />
+
+                <!-- Obra Social -->
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted">Obra Social</label>
+                    <div class="input-group input-elevated">
+                        <span class="input-group-text bg-transparent border-0">
+                            <i class="bi bi-heart-pulse"></i>
+                        </span>
+                        <InputSelect class="form-select border-0 bg-transparent" @bind-Value="_model.ObraSocialId">
+                            <option value="">Sin obra social</option>
+                            @foreach (var o in _obrasSociales)
+                            {
+                                <option value="@o.IdObraSocial">@o.Nombre</option>
+                            }
+                        </InputSelect>
+                    </div>
+                </div>
+
+                <!-- Nro Afiliado -->
+                <div class="mb-4">
+                    <label class="form-label small fw-bold text-muted">Nro. Afiliado</label>
+                    <div class="input-group input-elevated">
+                        <span class="input-group-text bg-transparent border-0">
+                            <i class="bi bi-credit-card"></i>
+                        </span>
+                        <InputText class="form-control border-0 bg-transparent"
+                                   placeholder="Opcional"
+                                   @bind-Value="_model.NumeroAfiliado" />
+                    </div>
+                </div>
+
+                <!-- Opciones Avanzadas -->
+                <div class="mb-4 p-3 bg-light rounded-3 border border-light">
+                    <div class="form-check form-switch mb-2">
+                        <InputCheckbox class="form-check-input" id="chkProvEdit" @bind-Value="_model.IsProvisional" />
+                        <label class="form-check-label small fw-bold text-muted" for="chkProvEdit">
+                            Es provisional
+                        </label>
+                    </div>
+
+                    <div class="input-group input-elevated bg-white">
+                        <span class="input-group-text bg-transparent border-0">
+                            <i class="bi bi-person-badge"></i>
+                        </span>
+                        <InputNumber class="form-control border-0 bg-transparent"
+                                     placeholder="ID Usuario Vinculado"
+                                     @bind-Value="_model.UsuarioId" />
+                    </div>
+                    <small class="text-muted" style="font-size: 0.7rem;">ID del usuario app (opcional)</small>
+                </div>
+
+                <!-- Botones -->
+                <div class="d-flex gap-2">
+                    <button type="button"
+                            class="btn btn-outline-secondary btn-pill flex-fill"
+                            @onclick="VolverLista"
+                            disabled="@_guardando">
+                        Cancelar
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-primary btn-pill flex-fill shadow-sm"
+                            disabled="@_guardando">
+                        @if (_guardando)
+                        {
+                            <span><span class="spinner-border spinner-border-sm me-1"></span> Guardando...</span>
+                        }
+                        else
+                        {
+                            <span>Guardar</span>
+                        }
+                    </button>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(_error))
+                {
+                    <div class="alert alert-danger mt-3 small text-center border-0 bg-danger-subtle text-danger">
+                        <i class="bi bi-exclamation-triangle me-1"></i> @_error
+                    </div>
+                }
+            </EditForm>
+        </div>
+
+        <div class="spacer-bottom"></div>
+    </div>
+}
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav shadow-soft">
+    <button class="bottom-nav-item" @onclick="IrInicio">
+        <i class="bi bi-house-door"></i>
+        <span>Inicio</span>
+    </button>
+
+    <button class="bottom-nav-item active">
+        <i class="bi bi-person-lines-fill"></i>
+        <span>Pacientes</span>
+    </button>
+
+    <button class="bottom-nav-item text-danger" @onclick="CerrarSesion">
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Salir</span>
+    </button>
+</div>
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private PacienteEditarDTO _model = new();
+    private PacienteDetalleDTO? _detalle;
+    private List<ObraSocialDTO> _obrasSociales = new();
+
+    private bool _cargando = true;
+    private bool _permitido = false;
+    private bool _guardando = false;
+    private string? _error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var me = await Auth.MeAsync();
+            if (me is null || (me.Rol != "Administrador" && me.Rol != "Secretario"))
+            {
+                _permitido = false;
+                Nav.NavigateTo("/", true);
+                return;
+            }
+
+            _permitido = true;
+            _obrasSociales = await ObrasSrv.ListarAsync() ?? new();
+
+            _detalle = await PacienteSrv.ObtenerAsync(Id);
+
+            if (_detalle is null)
+            {
+                Nav.NavigateTo("/admin/pacientes");
+                return;
+            }
+
+            // Mapeo manual
+            _model = new PacienteEditarDTO
+            {
+                DNI = _detalle.DNI,
+                Telefono = _detalle.Telefono,
+                Email = _detalle.Email,
+                ObraSocialId = _detalle.ObraSocialId,
+                NumeroAfiliado = _detalle.NumeroAfiliado,
+                IsProvisional = _detalle.IsProvisional,
+                UsuarioId = _detalle.UsuarioId
+            };
+        }
+        catch
+        {
+            _permitido = false;
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    private async Task GuardarAsync()
+    {
+        _error = null;
+        _guardando = true;
+
+        try
+        {
+            var res = await PacienteSrv.EditarAsync(Id, _model);
+            if (res is null)
+            {
+                _error = "Error al guardar. Verifica que el DNI no esté duplicado.";
+                return;
+            }
+
+            // Actualizar detalle local para refrescar la vista si nos quedamos
+            _detalle = res;
+            Nav.NavigateTo("/admin/pacientes", true);
+        }
+        catch (Exception ex)
+        {
+            if (ex.Message.Contains("DNI_EXISTE", StringComparison.OrdinalIgnoreCase))
+                _error = "Ya existe otro paciente con ese DNI.";
+            else
+                _error = "Error: " + ex.Message;
+        }
+        finally
+        {
+            _guardando = false;
+        }
+    }
+
+    private string GetInicial(string? nombre)
+    {
+        if (string.IsNullOrWhiteSpace(nombre)) return "?";
+        return nombre[0].ToString().ToUpper();
+    }
+
+    private void VolverLista() => Nav.NavigateTo("/admin/pacientes");
+    private void IrInicio() => Nav.NavigateTo("/admin/home");
+
+    private async Task CerrarSesion()
+    {
+        await Auth.LogoutAsync();
+        Nav.NavigateTo("/", true);
+    }
+}

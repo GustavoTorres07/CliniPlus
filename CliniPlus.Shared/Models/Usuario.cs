@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CliniPlus.Shared.Models
 {
-    [Table("Usuario")] 
+    [Table("Usuario")]
     public class Usuario
     {
         [Key]
@@ -42,4 +42,3 @@ namespace CliniPlus.Shared.Models
         public virtual Paciente? Paciente { get; set; }
     }
 }
-

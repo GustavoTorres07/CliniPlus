@@ -1,0 +1,187 @@
+﻿@page "/medico/home"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+
+@using CliniPlus.Shared
+@using CliniPlus.Shared.DTOs
+@inject CliniPlus.Movil.Services.Contrato.IAuthService Auth
+@inject NavigationManager Nav
+
+@if (_cargando)
+{
+    <div class="home-loading d-flex flex-column align-items-center justify-content-center" style="height: 60vh;">
+        <div class="spinner-border text-primary me-2"></div>
+        <p class="mt-2 text-muted small">Cargando panel del médico...</p>
+    </div>
+}
+else if (_usuario is null || _usuario.Rol != "Medico")
+{
+    <RedirectToLogin />
+}
+else
+{
+    <div class="home-page">
+        <!-- HEADER -->
+        <div class="home-header mb-4">
+            <div class="home-greeting">
+                <p class="home-hello">Hola,</p>
+                <h4 class="home-name">@_usuario.NombreCompleto</h4>
+                <span class="badge badge-medico mt-1">
+                    Médico
+                </span>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn-logout" @onclick="CerrarSesion" title="Cerrar sesión">
+                    <i class="bi bi-box-arrow-right"></i>
+                </button>
+                <!-- Usamos la clase home-avatar que estilizaremos igual que el anterior -->
+                <div class="home-avatar">
+                    <span>@GetInicial(_usuario.NombreCompleto)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACCIONES RÁPIDAS (GRID) -->
+        <h6 class="section-title">Agenda y Consultas</h6>
+        <div class="home-quick-actions mb-4">
+            <button class="quick-card" @onclick="IrTurnosHoy">
+                <div class="icon-box bg-blue-light">
+                    <i class="bi bi-calendar-check text-blue"></i>
+                </div>
+                <span>Turnos hoy</span>
+            </button>
+
+            <button class="quick-card" @onclick="IrAgendaSemanal">
+                <div class="icon-box bg-purple-light">
+                    <i class="bi bi-clock-history text-purple"></i>
+                </div>
+                <span>Agenda</span>
+            </button>
+
+            <button class="quick-card" @onclick="IrMisPacientes">
+                <div class="icon-box bg-green-light">
+                    <i class="bi bi-people text-green"></i>
+                </div>
+                <span>Pacientes</span>
+            </button>
+        </div>
+
+        <h6 class="section-title">Perfil profesional</h6>
+        <div class="home-quick-actions mb-4">
+            <button class="quick-card" @onclick="IrPerfilMedico">
+                <div class="icon-box bg-orange-light">
+                    <i class="bi bi-person-badge text-orange"></i>
+                </div>
+                <span>Mi perfil</span>
+            </button>
+
+            <!-- Card deshabilitada visualmente -->
+            <button class="quick-card disabled-card">
+                <div class="icon-box bg-gray-light">
+                    <i class="bi bi-activity text-muted"></i>
+                </div>
+                <span>Estadísticas</span>
+            </button>
+
+            <button class="quick-card disabled-card">
+                <div class="icon-box bg-gray-light">
+                    <i class="bi bi-gear text-muted"></i>
+                </div>
+                <span>Ajustes</span>
+            </button>
+        </div>
+
+        <!-- RESUMEN DEL DÍA -->
+        <div class="home-card mb-2">
+            <div class="home-card-header p-3 border-bottom border-light">
+                <span class="home-card-title fw-bold text-dark">Resumen de hoy</span>
+                <i class="bi bi-graph-up text-muted"></i>
+            </div>
+            <div class="admin-metrics p-3">
+                <div class="metric-row d-flex justify-content-between align-items-center mb-3">
+                    <span class="metric-label text-muted small fw-bold">
+                        <i class="bi bi-calendar-check me-2 text-primary"></i>Turnos programados
+                    </span>
+                    <span class="metric-value fw-bold text-dark">0</span>
+                </div>
+                <div class="metric-divider border-bottom mb-3"></div>
+                
+                <div class="metric-row d-flex justify-content-between align-items-center mb-3">
+                    <span class="metric-label text-muted small fw-bold">
+                        <i class="bi bi-person-check me-2 text-success"></i>Pacientes atendidos
+                    </span>
+                    <span class="metric-value fw-bold text-dark">0</span>
+                </div>
+                <div class="metric-divider border-bottom mb-3"></div>
+                
+                <div class="metric-row d-flex justify-content-between align-items-center">
+                    <span class="metric-label text-muted small fw-bold">
+                        <i class="bi bi-clipboard2-pulse me-2 text-warning"></i>Consultas pendientes
+                    </span>
+                    <span class="metric-value fw-bold text-dark">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="spacer-bottom"></div>
+    </div>
+}
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav shadow-soft">
+    <button class="bottom-nav-item active" @onclick="IrInicio">
+        <i class="bi bi-house-door-fill"></i>
+        <span>Inicio</span>
+    </button>
+    <button class="bottom-nav-item" @onclick="IrTurnosHoy">
+        <i class="bi bi-calendar3"></i>
+        <span>Turnos</span>
+    </button>
+    <button class="bottom-nav-item" @onclick="IrPerfilMedico">
+        <i class="bi bi-person"></i>
+        <span>Perfil</span>
+    </button>
+</div>
+
+@code {
+    private AuthMeResponse? _usuario;
+    private bool _cargando = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _cargando = true;
+            _usuario = await Auth.MeAsync();
+
+            if (_usuario is null || _usuario.Rol != "Medico")
+            {
+                Nav.NavigateTo("/", true);
+                return;
+            }
+        }
+        catch
+        {
+            Nav.NavigateTo("/", true);
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    private async Task CerrarSesion()
+    {
+        await Auth.LogoutAsync();
+        Nav.NavigateTo("/", true);
+    }
+    
+    private string GetInicial(string? nombre) => 
+        string.IsNullOrWhiteSpace(nombre) ? "?" : nombre[0].ToString().ToUpper();
+
+    private void IrInicio() => Nav.NavigateTo("/medico/home", true);
+    private void IrTurnosHoy() => Nav.NavigateTo("/medico/turnos-hoy");
+    private void IrAgendaSemanal() => Nav.NavigateTo("/medico/agenda");
+    private void IrMisPacientes() => Nav.NavigateTo("/medico/pacientes");
+    private void IrPerfilMedico() => Nav.NavigateTo("/medico/perfil");
+}

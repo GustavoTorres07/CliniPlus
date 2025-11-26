@@ -10,5 +10,7 @@ namespace CliniPlus.Shared.DTOs
     {
         public int IdObraSocial { get; set; }
         public string Nombre { get; set; } = null!;
+        public string? Descripcion { get; set; }
+        public bool IsActive { get; set; } = true;
     }
 }

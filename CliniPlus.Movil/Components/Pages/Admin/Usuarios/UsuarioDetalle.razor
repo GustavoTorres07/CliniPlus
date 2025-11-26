@@ -1,0 +1,320 @@
+﻿@page "/admin/usuarios/{Id:int}"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+@using CliniPlus.Shared.DTOs
+@using CliniPlus.Movil.Services.Contrato
+@using CliniPlus.Shared
+@using Microsoft.AspNetCore.Components.Forms
+@inject IUsuarioService UsuarioService
+@inject IAuthService Auth
+@inject NavigationManager Nav
+
+@if (_cargando)
+{
+    <div class="home-loading d-flex flex-column align-items-center justify-content-center" style="height: 60vh;">
+        <div class="spinner-border text-primary mb-3"></div>
+        <span>Cargando usuario...</span>
+    </div>
+}
+else if (_detalle is null)
+{
+    <div class="home-page text-center pt-5">
+        <BotonVolver />
+        <p class="text-danger mt-4">Usuario no encontrado.</p>
+    </div>
+}
+else
+{
+    <div class="home-page">
+        <div class="home-header mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <BotonVolver />
+                <div class="home-greeting">
+                    <p class="home-hello">Gestión</p>
+                    <h4 class="home-name mb-0">Editar</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="home-card p-4">
+
+            <div class="mb-4 text-center">
+                <div class="badge bg-light text-muted border mb-2">ID: @_detalle.IdUsuario</div>
+                <p class="small text-muted mb-0">
+                    Registrado el: @_detalle.FechaRegistro.ToLocalTime().ToString("dd/MM/yyyy")
+                </p>
+            </div>
+
+            <EditForm Model="_editar" OnValidSubmit="GuardarAsync">
+                <DataAnnotationsValidator />
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted">Nombre</label>
+                    <div class="input-group input-elevated">
+                        <span class="input-group-text bg-transparent border-0">
+                            <i class="bi bi-person"></i>
+                        </span>
+                        <InputText class="form-control border-0 bg-transparent" @bind-Value="_editar.Nombre" />
+                    </div>
+                    <ValidationMessage For="@(() => _editar.Nombre)" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted">Apellido</label>
+                    <div class="input-group input-elevated">
+                        <span class="input-group-text bg-transparent border-0">
+                            <i class="bi bi-person-fill"></i>
+                        </span>
+                        <InputText class="form-control border-0 bg-transparent" @bind-Value="_editar.Apellido" />
+                    </div>
+                    <ValidationMessage For="@(() => _editar.Apellido)" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted">Email</label>
+                    <div class="input-group input-elevated">
+                        <span class="input-group-text bg-transparent border-0">
+                            <i class="bi bi-envelope"></i>
+                        </span>
+                        <InputText class="form-control border-0 bg-transparent" @bind-Value="_editar.Email" />
+                    </div>
+                    <ValidationMessage For="@(() => _editar.Email)" />
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label small fw-bold text-muted">Rol</label>
+                    <div class="input-group input-elevated">
+                        <span class="input-group-text bg-transparent border-0">
+                            <i class="bi bi-shield-lock"></i>
+                        </span>
+                        <InputSelect class="form-select border-0 bg-transparent" @bind-Value="_editar.Rol">
+                            @foreach (var rol in _rolesDisponibles)
+                            {
+                                <option value="@rol">@rol</option>
+                            }
+                        </InputSelect>
+                    </div>
+                </div>
+
+                <button type="submit"
+                        class="btn btn-primary btn-pill w-100 shadow-sm py-2"
+                        disabled="@_guardando">
+                    @if (_guardando)
+                    {
+                        <span>
+                            <span class="spinner-border spinner-border-sm me-2"></span>
+                            Guardando...
+                        </span>
+                    }
+                    else
+                    {
+                        <span>Guardar Cambios</span>
+                    }
+                </button>
+
+                @if (!string.IsNullOrWhiteSpace(_error))
+                {
+                    <div class="alert alert-danger mt-3 small text-center border-0 bg-danger-subtle text-danger">
+                        <i class="bi bi-exclamation-circle me-1"></i> @_error
+                    </div>
+                }
+            </EditForm>
+
+            <hr class="my-4 opacity-25" />
+
+            <button type="button"
+                    class="btn btn-outline-danger btn-pill w-100"
+                    @onclick="ToggleEstadoAsync">
+                <i class="bi @(_detalle.IsActive ? "bi-x-circle" : "bi-check-circle") me-2"></i>
+                @(_detalle.IsActive ? "Desactivar Usuario" : "Activar Usuario")
+            </button>
+
+            <!-- ============================= -->
+            <!-- BLOQUE: CAMBIAR CONTRASEÑA   -->
+            <!-- ============================= -->
+<hr class="my-4 opacity-25" />
+
+<div class="p-3 bg-light rounded-3 border">
+    <h6 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+        <i class="bi bi-key text-warning"></i> Cambiar contraseña
+    </h6>
+
+    <div class="mb-3">
+        <label class="small text-muted fw-bold d-block mb-1">Nueva contraseña</label>
+        <input type="password"
+               class="form-control input-elevated"
+               @bind="_passNueva" />
+    </div>
+
+    <div class="mb-3">
+        <label class="small text-muted fw-bold d-block mb-1">Confirmar contraseña</label>
+        <input type="password"
+               class="form-control input-elevated"
+               @bind="_passConfirmar" />
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(_passError))
+    {
+        <div class="alert alert-danger small py-2 mb-2">
+            <i class="bi bi-exclamation-triangle me-1"></i> @_passError
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(_passOk))
+    {
+        <div class="alert alert-success small py-2 mb-2">
+            <i class="bi bi-check-circle me-1"></i> @_passOk
+        </div>
+    }
+
+    <button type="button"
+            class="btn btn-warning btn-pill w-100 shadow-sm"
+            @onclick="CambiarPasswordAsync">
+        <i class="bi bi-key-fill me-2"></i>
+        Actualizar contraseña
+    </button>
+</div>
+
+        </div>
+
+        <div class="spacer-bottom"></div>
+    </div>
+}
+
+<div class="bottom-nav shadow-soft">
+    <button class="bottom-nav-item" @onclick="IrInicio">
+        <i class="bi bi-house-door"></i>
+        <span>Inicio</span>
+    </button>
+
+    <button class="bottom-nav-item active">
+        <i class="bi bi-people-fill"></i>
+        <span>Usuarios</span>
+    </button>
+
+    <button class="bottom-nav-item text-danger" @onclick="CerrarSesion">
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Salir</span>
+    </button>
+</div>
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private UsuarioDetalleDTO? _detalle;
+    private UsuarioEditarDTO _editar = new();
+    private bool _cargando = true;
+    private bool _guardando = false;
+    private string? _error;
+
+    private readonly string[] _rolesDisponibles = { "Administrador", "Secretario", "Medico", "Paciente" };
+
+    // ---- Campos para cambiar contraseña ----
+    private string _passNueva = string.Empty;
+    private string _passConfirmar = string.Empty;
+    private string? _passError;
+    private string? _passOk;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _detalle = await UsuarioService.ObtenerAsync(Id);
+
+            if (_detalle != null)
+            {
+                _editar = new UsuarioEditarDTO
+                {
+                    Nombre = _detalle.Nombre,
+                    Apellido = _detalle.Apellido,
+                    Email = _detalle.Email,
+                    Rol = _detalle.Rol
+                };
+            }
+        }
+        catch
+        {
+            // Manejo de error
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    private async Task GuardarAsync()
+    {
+        _error = null;
+        _guardando = true;
+
+        var res = await UsuarioService.EditarAsync(Id, _editar);
+
+        if (res is null)
+        {
+            _error = "Error al guardar. Verifica el email.";
+            _guardando = false;
+            return;
+        }
+
+        _detalle = res; // Actualizamos la vista con la respuesta
+        _guardando = false;
+        Nav.NavigateTo("/admin/usuarios", true); // Opcional: volver a la lista
+    }
+
+    private async Task ToggleEstadoAsync()
+    {
+        if (_detalle is null) return;
+
+        var nuevo = !_detalle.IsActive;
+        var ok = await UsuarioService.CambiarEstadoAsync(Id, nuevo);
+
+        if (ok)
+            _detalle.IsActive = nuevo;
+    }
+
+    // ===========================
+    // CAMBIO DE CONTRASEÑA (ADMIN)
+    // ===========================
+    private async Task CambiarPasswordAsync()
+    {
+        _passError = null;
+        _passOk = null;
+
+        if (string.IsNullOrWhiteSpace(_passNueva) || _passNueva.Length < 6)
+        {
+            _passError = "La contraseña debe tener al menos 6 caracteres.";
+            return;
+        }
+
+        if (_passNueva != _passConfirmar)
+        {
+            _passError = "Las contraseñas no coinciden.";
+            return;
+        }
+
+        if (_detalle is null)
+        {
+            _passError = "Usuario no cargado.";
+            return;
+        }
+
+        var ok = await UsuarioService.CambiarPasswordAdminAsync(_detalle.IdUsuario, _passNueva);
+
+        if (!ok)
+        {
+            _passError = "No se pudo actualizar la contraseña.";
+            return;
+        }
+
+        _passOk = "Contraseña actualizada correctamente.";
+        _passNueva = string.Empty;
+        _passConfirmar = string.Empty;
+    }
+
+    private void IrInicio() => Nav.NavigateTo("/admin/home");
+
+    private async Task CerrarSesion()
+    {
+        await Auth.LogoutAsync();
+        Nav.NavigateTo("/", true);
+    }
+}

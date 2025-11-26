@@ -9,17 +9,18 @@ namespace CliniPlus.Shared.DTOs
 {
     public class PacienteEditarDTO
     {
-        [Phone, MaxLength(30)]
-        public string? Telefono { get; set; }
+        [Required]
+        [StringLength(8)]
+        public string DNI { get; set; } = null!;
 
-        [EmailAddress, MaxLength(150)]
+        public bool IsProvisional { get; set; }
+
+        public string? Telefono { get; set; }
         public string? Email { get; set; }
 
         public int? ObraSocialId { get; set; }
-
-        [MaxLength(50)]
         public string? NumeroAfiliado { get; set; }
 
-        public bool? IsActive { get; set; }
+        public int? UsuarioId { get; set; }  // se puede asignar un usuario al activar
     }
 }

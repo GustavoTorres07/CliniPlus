@@ -1,0 +1,258 @@
+﻿@page "/admin/medicos"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+
+@using CliniPlus.Shared.DTOs
+@using CliniPlus.Movil.Services.Contrato
+@using CliniPlus.Shared
+
+@inject IMedicoService MedicoService
+@inject IAuthService Auth
+@inject NavigationManager Nav
+
+<div class="home-page">
+    <!-- HEADER -->
+    <div class="home-header mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <BotonVolver />
+            <div class="home-greeting">
+                <p class="home-hello">Gestión</p>
+                <h4 class="home-name mb-0">Médicos</h4>
+            </div>
+        </div>
+
+        <button class="btn btn-primary btn-sm btn-pill shadow-sm" @onclick="IrCrear">
+            <i class="bi bi-plus-lg"></i> Nuevo
+        </button>
+    </div>
+
+    <!-- FILTROS (CHIPS) -->
+    <div class="filters-container mb-3">
+        <!-- Filtro Estado -->
+        <div class="d-flex gap-2 mb-3 overflow-auto pb-1 no-scrollbar">
+            @foreach (var item in _filtrosEstado)
+            {
+                var activeClass = item == _filtroEstado ? "active" : "";
+                <button type="button" class="filter-chip @activeClass"
+                        @onclick="@(() => CambiarFiltroEstado(item))">
+                    @item
+                </button>
+            }
+        </div>
+
+        <!-- Filtro Especialidad -->
+        @if (_especialidadesFiltro.Count > 1)
+        {
+            <div class="d-flex gap-2 overflow-auto pb-1 no-scrollbar">
+                @foreach (var esp in _especialidadesFiltro)
+                {
+                    var activeClass = esp == _filtroEspecialidad ? "active-secondary" : "";
+                    <button type="button" class="filter-chip-secondary @activeClass"
+                            @onclick="@(() => CambiarFiltroEspecialidad(esp))">
+                        @esp
+                    </button>
+                }
+            </div>
+        }
+    </div>
+
+    <!-- LISTA -->
+    @if (_cargando)
+    {
+        <div class="home-loading d-flex flex-column align-items-center justify-content-center py-5">
+            <div class="spinner-border text-primary mb-3"></div>
+            <span>Cargando médicos...</span>
+        </div>
+    }
+    else if (_listaFiltrada.Count == 0)
+    {
+        <div class="home-card text-center py-5 mt-3">
+            <div class="icon-box bg-purple-light mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                <i class="bi bi-search text-purple"></i>
+            </div>
+            <p class="text-muted mb-0">No hay médicos con estos filtros.</p>
+        </div>
+    }
+    else
+    {
+        <div class="d-flex flex-column gap-3 mt-2">
+            @foreach (var m in _listaFiltrada)
+            {
+                <div class="home-card p-3 medico-card border-0 shadow-sm position-relative"
+                     @onclick="() => IrDetalle(m.IdMedico)">
+
+                    <div class="d-flex align-items-center gap-3">
+                        <!-- Avatar -->
+                        @if (!string.IsNullOrWhiteSpace(m.FotoUrl))
+                        {
+                            <img src="@m.FotoUrl" class="medico-avatar-img" alt="Foto" />
+                        }
+                        else
+                        {
+                            <div class="medico-avatar-circle">
+                                <span>@GetInicial(m.NombreCompleto)</span>
+                            </div>
+                        }
+
+                        <!-- Info Principal -->
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0 fw-bold text-dark">@m.NombreCompleto</h6>
+                            <small class="text-muted d-block">
+                                <i class="bi bi-stethoscope me-1"></i>
+                                @(!string.IsNullOrEmpty(m.Especialidad) ? m.Especialidad : "General")
+                            </small>
+
+                            <!-- BOTONES DE ACCIÓN RÁPIDA -->
+                            <div class="d-flex flex-wrap gap-2 mt-2">
+                                <!-- Botón Horarios (Azul) -->
+                                <button class="btn btn-sm btn-light text-primary border px-3 py-1 rounded-pill shadow-sm action-btn"
+                                        @onclick="() => IrHorarios(m.IdMedico)"
+                                        @onclick:stopPropagation="true">
+                                    <i class="bi bi-clock me-1"></i> Horarios
+                                </button>
+
+                                <!-- Botón Bloqueos (Rojo) -->
+                                <button class="btn btn-sm btn-light text-danger border px-3 py-1 rounded-pill shadow-sm action-btn"
+                                        @onclick="() => IrBloqueos(m.IdMedico)"
+                                        @onclick:stopPropagation="true">
+                                    <i class="bi bi-calendar-x me-1"></i> Bloqueos
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Badge Estado y Flecha -->
+                        <div class="d-flex flex-column align-items-end gap-1">
+                            @if (m.IsActive)
+                            {
+                                <span class="badge bg-success-subtle text-success rounded-pill border border-success-subtle" style="font-size: 0.65rem;">Activo</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary-subtle text-secondary rounded-pill border border-secondary-subtle" style="font-size: 0.65rem;">Inactivo</span>
+                            }
+                            <i class="bi bi-chevron-right text-muted small mt-2"></i>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <div class="spacer-bottom"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav shadow-soft">
+    <button class="bottom-nav-item" @onclick="IrInicio">
+        <i class="bi bi-house-door"></i>
+        <span>Inicio</span>
+    </button>
+
+    <button class="bottom-nav-item active">
+        <i class="bi bi-person-badge-fill"></i>
+        <span>Médicos</span>
+    </button>
+
+    <button class="bottom-nav-item text-danger" @onclick="CerrarSesion">
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Salir</span>
+    </button>
+</div>
+
+@code {
+    private List<MedicoListadoDTO> _lista = new();
+    private List<MedicoListadoDTO> _listaFiltrada = new();
+    private bool _cargando = true;
+    private bool _permitido = false;
+
+    private string _filtroEstado = "Todos";
+    private readonly List<string> _filtrosEstado = new() { "Todos", "Activos", "Inactivos" };
+
+    private string _filtroEspecialidad = "Todas";
+    private List<string> _especialidadesFiltro = new() { "Todas" };
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var me = await Auth.MeAsync();
+            if (me is null || (me.Rol != "Administrador" && me.Rol != "Secretario"))
+            {
+                _permitido = false;
+                Nav.NavigateTo("/", true);
+                return;
+            }
+
+            _permitido = true;
+            _cargando = true;
+
+            _lista = await MedicoService.ListarAsync() ?? new();
+
+            // Extraer especialidades únicas
+            var esp = _lista
+                .Where(m => !string.IsNullOrEmpty(m.Especialidad))
+                .Select(m => m.Especialidad!)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToList();
+
+            _especialidadesFiltro = new List<string> { "Todas" };
+            _especialidadesFiltro.AddRange(esp);
+
+            AplicarFiltros();
+        }
+        catch
+        {
+            _permitido = false;
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    private void CambiarFiltroEstado(string valor)
+    {
+        _filtroEstado = valor;
+        AplicarFiltros();
+    }
+
+    private void CambiarFiltroEspecialidad(string valor)
+    {
+        _filtroEspecialidad = valor;
+        AplicarFiltros();
+    }
+
+    private void AplicarFiltros()
+    {
+        IEnumerable<MedicoListadoDTO> q = _lista;
+
+        if (_filtroEstado == "Activos")
+            q = q.Where(m => m.IsActive);
+        else if (_filtroEstado == "Inactivos")
+            q = q.Where(m => !m.IsActive);
+
+        if (_filtroEspecialidad != "Todas")
+            q = q.Where(m => m.Especialidad == _filtroEspecialidad);
+
+        _listaFiltrada = q.ToList();
+    }
+
+    private string GetInicial(string? nombre) => string.IsNullOrWhiteSpace(nombre) ? "?" : nombre[0].ToString().ToUpper();
+
+    private void IrCrear() => Nav.NavigateTo("/admin/medicos/crear");
+    private void IrDetalle(int id) => Nav.NavigateTo($"/admin/medicos/{id}");
+
+    // Navegación a Bloqueos
+    private void IrBloqueos(int id) => Nav.NavigateTo($"/admin/medicos/{id}/bloqueos");
+
+    // Navegación a Horarios (NUEVO)
+    private void IrHorarios(int id) => Nav.NavigateTo($"/admin/medicos/{id}/horarios");
+
+    private void IrInicio() => Nav.NavigateTo("/admin/home");
+
+    private async Task CerrarSesion()
+    {
+        await Auth.LogoutAsync();
+        Nav.NavigateTo("/", true);
+    }
+}

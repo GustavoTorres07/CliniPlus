@@ -1,0 +1,380 @@
+﻿@page "/admin/cie10"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+
+@using CliniPlus.Shared.DTOs
+@using CliniPlus.Movil.Services.Contrato
+@using Microsoft.AspNetCore.Components.Forms
+
+@inject IAuthService Auth
+@inject ICie10Service Cie10Service
+@inject NavigationManager Nav
+
+@if (_cargando)
+{
+    <div class="home-loading d-flex flex-column align-items-center justify-content-center" style="height: 60vh;">
+        <div class="spinner-border text-primary mb-3"></div>
+        <span>Cargando CIE-10...</span>
+    </div>
+}
+else if (_usuario is null || (_usuario.Rol != "Administrador" && _usuario.Rol != "Secretario"))
+{
+    <RedirectToLogin />
+}
+else
+{
+    <div class="home-page">
+
+        <!-- HEADER CON FLECHA DE VOLVER -->
+        <div class="home-header mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn-back" @onclick="IrInicio">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <div class="home-greeting">
+                    <p class="home-hello">Catálogo</p>
+                    <h4 class="home-name">CIE-10</h4>
+                    <span class="badge badge-header mt-1">
+                        Diagnósticos
+                    </span>
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <div class="home-avatar">
+                    <span>@GetInicial(_usuario?.NombreCompleto)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- BUSCADOR -->
+        <div class="home-card p-3 mb-3">
+            <label class="form-label label-mini text-muted mb-2">Buscar diagnóstico</label>
+            <div class="input-group input-elevated">
+                <span class="input-group-text bg-transparent border-0 ps-3">
+                    <i class="bi bi-search text-muted"></i>
+                </span>
+                <input class="form-control border-0 bg-transparent"
+                       placeholder="Código o descripción (ej: E11)"
+                       @bind="_filtro"
+                       @bind:event="oninput"
+                       @onkeydown="OnKeyDown" />
+                
+                <button class="btn btn-search"
+                        @onclick="BuscarAsync"
+                        disabled="@_buscando">
+                    @if (_buscando)
+                    {
+                        <span class="spinner-border spinner-border-sm"></span>
+                    }
+                    else
+                    {
+                        <i class="bi bi-arrow-right"></i>
+                    }
+                </button>
+            </div>
+            <div class="d-flex justify-content-end mt-2">
+                 <small class="text-muted fst-italic" style="font-size: 0.7rem;">
+                    Enter para buscar
+                </small>
+            </div>
+        </div>
+
+        <!-- FORMULARIO ALTA / EDICIÓN -->
+        <div class="home-card p-3 mb-3 border-purple-subtle">
+            <h6 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2" style="font-size: 0.95rem;">
+                <div class="icon-box-sm @(_editando ? "bg-orange-light text-orange" : "bg-purple-light text-purple")">
+                    <i class="bi @(_editando ? "bi-pencil" : "bi-plus-lg")"></i>
+                </div>
+                @(_editando ? "Editar diagnóstico" : "Nuevo diagnóstico")
+            </h6>
+
+            <EditForm Model="_form" OnValidSubmit="GuardarAsync">
+                <DataAnnotationsValidator />
+
+                <div class="mb-2">
+                    <label class="label-mini text-muted mb-1">Código</label>
+                    <input class="form-control input-elevated-simple"
+                           placeholder="Ej: A01"
+                           @bind="_form.Codigo"
+                           disabled="@_editando" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="label-mini text-muted mb-1">Descripción</label>
+                    <textarea class="form-control input-elevated-simple"
+                              rows="2"
+                              placeholder="Descripción detallada"
+                              @bind="_form.Descripcion"></textarea>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(_error))
+                {
+                    <div class="alert alert-danger small py-2 mb-2 border-0 bg-danger-subtle text-danger rounded-3">
+                        <i class="bi bi-exclamation-circle me-1"></i> @_error
+                    </div>
+                }
+
+                <div class="d-flex gap-2">
+                    @if (_editando)
+                    {
+                        <button type="button"
+                                class="btn btn-light btn-pill flex-grow-1 text-muted fw-bold"
+                                @onclick="CancelarEdicion">
+                            Cancelar
+                        </button>
+                    }
+                    
+                    <button type="submit"
+                            class="btn btn-primary btn-pill flex-grow-1 shadow-sm"
+                            disabled="@_guardando">
+                        @if (_guardando)
+                        {
+                            <span class="spinner-border spinner-border-sm me-1"></span>
+                            <span>Guardando...</span>
+                        }
+                        else
+                        {
+                            <span>@(_editando ? "Actualizar" : "Guardar")</span>
+                        }
+                    </button>
+                </div>
+            </EditForm>
+        </div>
+
+        <!-- RESULTADOS -->
+        @if (_lista is null || !_lista.Any())
+        {
+            <div class="empty-state text-center py-4">
+                <div class="icon-box-lg bg-light mx-auto mb-3">
+                    <i class="bi bi-journal-medical text-muted"></i>
+                </div>
+                <p class="small text-muted mb-0">
+                    No se encontraron diagnósticos.
+                </p>
+            </div>
+        }
+        else
+        {
+            <div class="d-flex justify-content-between align-items-center mb-3 px-1">
+                <span class="label-mini text-muted">Resultados (@_lista.Count)</span>
+            </div>
+
+            <div class="d-flex flex-column gap-2 fade-in">
+                @foreach (var c in _lista)
+                {
+                    <div class="cie-card p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="cie-code-box">
+                                @c.Codigo
+                            </div>
+                            <!-- Botones de Acción -->
+                            <div class="d-flex gap-1">
+                                <button class="btn-icon-secondary"
+                                        title="Editar"
+                                        @onclick="() => EditarItem(c)">
+                                    <i class="bi bi-pencil-fill" style="font-size: 0.8rem;"></i>
+                                </button>
+                                <button class="btn-icon-danger"
+                                        title="Eliminar"
+                                        @onclick="() => EliminarItemAsync(c)">
+                                    <i class="bi bi-trash-fill" style="font-size: 0.8rem;"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <p class="cie-desc mb-0 text-muted small">
+                            @c.Descripcion
+                        </p>
+                    </div>
+                }
+            </div>
+        }
+
+        <div class="spacer-bottom"></div>
+    </div>
+}
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav shadow-soft">
+    <button class="bottom-nav-item" @onclick="IrInicio">
+        <i class="bi bi-house-door"></i>
+        <span>Inicio</span>
+    </button>
+    <button class="bottom-nav-item" @onclick="IrConfiguracion">
+        <i class="bi bi-gear"></i>
+        <span>Config</span>
+    </button>
+    <button class="bottom-nav-item active">
+        <i class="bi bi-journal-medical"></i>
+        <span>CIE-10</span>
+    </button>
+</div>
+
+@code {
+    private AuthMeResponse? _usuario;
+    private bool _cargando = true;
+    private bool _buscando = false;
+    private bool _guardando = false;
+    private bool _editando = false;
+
+    private string _filtro = string.Empty;
+    private List<Cie10DTO> _lista = new();
+    private string? _error;
+    private string? _codigoOriginal;
+
+    private class Cie10FormVm
+    {
+        public string Codigo { get; set; } = string.Empty;
+        public string Descripcion { get; set; } = string.Empty;
+    }
+
+    private Cie10FormVm _form = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _usuario = await Auth.MeAsync();
+            if (_usuario is null || (_usuario.Rol != "Administrador" && _usuario.Rol != "Secretario"))
+            {
+                Nav.NavigateTo("/", true);
+                return;
+            }
+
+            await BuscarAsync();
+        }
+        catch
+        {
+            Nav.NavigateTo("/", true);
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    private async Task BuscarAsync()
+    {
+        _buscando = true;
+        try
+        {
+            _lista = await Cie10Service.BuscarAsync(_filtro) ?? new();
+        }
+        finally
+        {
+            _buscando = false;
+        }
+    }
+
+    private async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+            await BuscarAsync();
+    }
+
+    private async Task GuardarAsync()
+    {
+        _guardando = true;
+        _error = null;
+
+        try
+        {
+            if (string.IsNullOrWhiteSpace(_form.Codigo))
+            {
+                _error = "El código es obligatorio.";
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(_form.Descripcion))
+            {
+                _error = "La descripción es obligatoria.";
+                return;
+            }
+
+            if (!_editando)
+            {
+                var dto = new Cie10CrearDTO
+                {
+                    Codigo = _form.Codigo.Trim(),
+                    Descripcion = _form.Descripcion.Trim()
+                };
+
+                var res = await Cie10Service.CrearAsync(dto);
+                if (res == null)
+                {
+                    _error = "No se pudo crear (quizás ya existe).";
+                    return;
+                }
+            }
+            else if (!string.IsNullOrWhiteSpace(_codigoOriginal))
+            {
+                var dto = new Cie10EditarDTO
+                {
+                    Descripcion = _form.Descripcion.Trim()
+                };
+
+                var res = await Cie10Service.EditarAsync(_codigoOriginal, dto);
+                if (res == null)
+                {
+                    _error = "No se pudo actualizar el diagnóstico.";
+                    return;
+                }
+            }
+
+            await BuscarAsync();
+            CancelarEdicion();
+        }
+        finally
+        {
+            _guardando = false;
+        }
+    }
+
+    private void EditarItem(Cie10DTO item)
+    {
+        _editando = true;
+        _codigoOriginal = item.Codigo;
+        _error = null;
+
+        _form = new Cie10FormVm
+        {
+            Codigo = item.Codigo,
+            Descripcion = item.Descripcion
+        };
+    }
+
+    private void CancelarEdicion()
+    {
+        _editando = false;
+        _codigoOriginal = null;
+        _error = null;
+        _form = new Cie10FormVm();
+    }
+
+    private async Task EliminarItemAsync(Cie10DTO item)
+    {
+        _error = null;
+        var ok = await Cie10Service.EliminarAsync(item.Codigo);
+        if (!ok)
+        {
+            _error = "No se pudo eliminar (puede estar en uso).";
+            return;
+        }
+
+        await BuscarAsync();
+
+        if (_editando && _codigoOriginal == item.Codigo)
+            CancelarEdicion();
+    }
+
+    private async Task CerrarSesion()
+    {
+        await Auth.LogoutAsync();
+        Nav.NavigateTo("/", true);
+    }
+
+    private void IrInicio() => Nav.NavigateTo("/admin/home");
+    private void IrConfiguracion() => Nav.NavigateTo("/admin/configuracion");
+
+    private string GetInicial(string? nombre) =>
+        string.IsNullOrWhiteSpace(nombre) ? "?" : nombre[0].ToString().ToUpper();
+}

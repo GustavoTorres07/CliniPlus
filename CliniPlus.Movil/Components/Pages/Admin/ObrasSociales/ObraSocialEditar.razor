@@ -1,0 +1,176 @@
+﻿@page "/admin/obras-sociales/{Id:int}"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+@using CliniPlus.Movil.Services.Contrato
+@using CliniPlus.Shared
+@using CliniPlus.Shared.DTOs
+@inject IObraSocialService ObraSocialService
+@inject IAuthService Auth
+@inject NavigationManager Nav
+
+@if (_cargando)
+{
+    <div class="home-loading d-flex flex-column align-items-center justify-content-center" style="height: 60vh;">
+        <div class="spinner-border text-warning mb-3"></div>
+        <span>Cargando datos...</span>
+    </div>
+}
+else if (_modelo is null)
+{
+    <div class="home-page text-center pt-5">
+        <BotonVolver />
+        <p class="text-danger mt-4">Obra social no encontrada.</p>
+    </div>
+}
+else
+{
+    <div class="home-page">
+        <!-- HEADER -->
+        <div class="home-header mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <BotonVolver />
+                <div class="home-greeting">
+                    <p class="home-hello">Configuración</p>
+                    <h4 class="home-name mb-0">Editar OS</h4>
+                </div>
+            </div>
+        </div>
+
+        <!-- TARJETA FORMULARIO -->
+        <div class="home-card p-4">
+            <EditForm Model="_modelo" OnValidSubmit="Guardar">
+                <DataAnnotationsValidator />
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted">Nombre</label>
+                    <div class="input-group input-elevated">
+                        <span class="input-group-text bg-transparent border-0">
+                            <i class="bi bi-card-heading"></i>
+                        </span>
+                        <InputText class="form-control border-0 bg-transparent"
+                                   placeholder="Ej. OSDE"
+                                   @bind-Value="_modelo.Nombre" />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted">Descripción</label>
+                    <div class="input-elevated p-2" style="height: auto;">
+                        <InputTextArea class="form-control border-0 bg-transparent"
+                                       rows="3"
+                                       placeholder="Información adicional..."
+                                       @bind-Value="_modelo.Descripcion"></InputTextArea>
+                    </div>
+                </div>
+
+                <!-- Switch de Estado -->
+                <div class="form-check form-switch mb-4">
+                    <InputCheckbox class="form-check-input" id="isActiveSwitch" @bind-Value="_modelo.IsActive" />
+                    <label class="form-check-label" for="isActiveSwitch">
+                        @(_modelo.IsActive ? "Actualmente Activa" : "Actualmente Inactiva")
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-pill w-100 shadow-sm py-2">
+                    Guardar Cambios
+                </button>
+
+                @if (!string.IsNullOrWhiteSpace(_error))
+                {
+                    <div class="alert alert-danger mt-3 small text-center border-0 bg-danger-subtle text-danger">
+                        <i class="bi bi-exclamation-circle me-1"></i> @_error
+                    </div>
+                }
+            </EditForm>
+
+            <hr class="my-4 opacity-25" />
+
+            <button class="btn btn-outline-danger btn-pill w-100" @onclick="ToggleEstado">
+                <i class="bi @(_modelo.IsActive ? "bi-x-circle" : "bi-check-circle") me-2"></i>
+                @(_modelo.IsActive ? "Desactivar Obra Social" : "Activar Obra Social")
+            </button>
+        </div>
+
+        <div class="spacer-bottom"></div>
+    </div>
+}
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav shadow-soft">
+    <button class="bottom-nav-item" @onclick="IrInicio">
+        <i class="bi bi-house-door"></i>
+        <span>Inicio</span>
+    </button>
+
+    <!-- Botón Activo -->
+    <button class="bottom-nav-item active">
+        <i class="bi bi-heart-pulse-fill"></i>
+        <span>O. Soc.</span>
+    </button>
+
+    <!-- Botón Salir -->
+    <button class="bottom-nav-item text-danger" @onclick="CerrarSesion">
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Salir</span>
+    </button>
+</div>
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private ObraSocialDTO? _modelo;
+    private bool _cargando = true;
+    private string? _error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _modelo = await ObraSocialService.ObtenerAsync(Id);
+        }
+        catch
+        {
+            // Manejo de error
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    private async Task Guardar()
+    {
+        _error = null;
+        if (_modelo is null) return;
+
+        var res = await ObraSocialService.EditarAsync(Id, _modelo);
+
+        if (res is null)
+        {
+            _error = "Error al guardar. Verifique los datos.";
+            return;
+        }
+
+        Nav.NavigateTo("/admin/obras-sociales", true);
+    }
+
+    private async Task ToggleEstado()
+    {
+        if (_modelo is null) return;
+        bool nuevoEstado = !_modelo.IsActive;
+
+        var ok = await ObraSocialService.CambiarEstadoAsync(Id, nuevoEstado);
+
+        if (ok)
+        {
+            _modelo.IsActive = nuevoEstado;
+        }
+    }
+
+    private void IrInicio() => Nav.NavigateTo("/admin/home");
+
+    private async Task CerrarSesion()
+    {
+        await Auth.LogoutAsync();
+        Nav.NavigateTo("/", true);
+    }
+}

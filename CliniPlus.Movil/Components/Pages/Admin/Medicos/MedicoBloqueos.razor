@@ -1,0 +1,313 @@
+﻿@page "/admin/medicos/{Id:int}/bloqueos"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+
+@using CliniPlus.Shared.DTOs
+@using CliniPlus.Movil.Services.Contrato
+@using CliniPlus.Shared
+@using Microsoft.AspNetCore.Components.Forms
+
+@inject IMedicoService MedicoService
+@inject IAuthService Auth
+@inject NavigationManager Nav
+
+@if (_cargando)
+{
+    <div class="home-loading d-flex flex-column align-items-center justify-content-center" style="height: 60vh;">
+        <div class="spinner-border text-danger mb-3"></div>
+        <span>Cargando agenda...</span>
+    </div>
+}
+else if (!_permitido)
+{
+    <RedirectToLogin />
+}
+else
+{
+    <div class="home-page">
+        <!-- HEADER -->
+        <div class="home-header mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <BotonVolver />
+                <div class="home-greeting">
+                    <p class="home-hello">Agenda</p>
+                    <h4 class="home-name mb-0 text-truncate" style="max-width: 220px;">
+                        Bloqueos
+                    </h4>
+                </div>
+            </div>
+
+            <div class="medico-mini-avatar">
+                <span>@GetInicial(_medico?.NombreCompleto)</span>
+            </div>
+        </div>
+
+        <!-- INFO CARD -->
+        <div class="alert alert-light border-0 shadow-sm small text-muted mb-4 d-flex align-items-start gap-2">
+            <i class="bi bi-info-circle-fill text-primary mt-1"></i>
+            <div>
+                <span class="fw-bold text-dark">@(_medico?.NombreCompleto ?? "Médico")</span>
+                <br />
+                Los bloqueos impiden que los pacientes reserven turnos en estos horarios.
+            </div>
+        </div>
+
+        <!-- LISTA DE BLOQUEOS ACTUALES -->
+        <h6 class="fw-bold text-dark mb-3 ps-1">Bloqueos Vigentes</h6>
+
+        @if (!_bloqueos.Any())
+        {
+            <div class="home-card text-center py-4 mb-4">
+                <div class="icon-box bg-orange-light mx-auto mb-2" style="width: 50px; height: 50px; font-size: 1.2rem;">
+                    <i class="bi bi-calendar-check text-orange"></i>
+                </div>
+                <p class="small text-muted mb-0">Agenda totalmente disponible.</p>
+            </div>
+        }
+        else
+        {
+            <div class="d-flex flex-column gap-2 mb-4">
+                @foreach (var b in _bloqueos)
+                {
+                    <div class="home-card p-3 border-0 shadow-sm d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-start gap-3">
+                            <!-- Icono Calendario -->
+                            <div class="icon-box bg-danger-light flex-shrink-0" style="width: 40px; height: 40px;">
+                                <i class="bi bi-calendar-x text-danger"></i>
+                            </div>
+
+                            <div class="overflow-hidden">
+                                <!-- AQUÍ ESTÁ LA CORRECCIÓN: text-nowrap para evitar salto de línea -->
+                                <div class="fw-bold text-dark small text-nowrap">
+                                    @b.Desde.ToLocalTime().ToString("dd/MM/yy HH:mm")
+                                    <i class="bi bi-arrow-right-short text-muted mx-1"></i>
+                                    @b.Hasta.ToLocalTime().ToString("dd/MM/yy HH:mm")
+                                </div>
+
+                                @if (!string.IsNullOrWhiteSpace(b.Motivo))
+                                {
+                                    <div class="small text-muted text-truncate" style="max-width: 180px;">
+                                        @b.Motivo
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="small text-muted fst-italic">Sin motivo especificado</div>
+                                }
+                            </div>
+                        </div>
+
+                        <button class="btn btn-icon-danger flex-shrink-0 ms-2" @onclick="() => EliminarBloqueoAsync(b)">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                }
+            </div>
+        }
+
+        <!-- FORMULARIO NUEVO BLOQUEO -->
+        <div class="home-card p-4">
+            <h6 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+                <i class="bi bi-plus-circle-fill text-danger"></i> Agregar Bloqueo
+            </h6>
+
+            <EditForm Model="_form" OnValidSubmit="GuardarBloqueoAsync">
+                <DataAnnotationsValidator />
+
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label class="form-label small fw-bold text-muted">Desde</label>
+                        <div class="input-group input-elevated">
+                            <input type="datetime-local"
+                                   class="form-control border-0 bg-transparent px-2 small-date-input"
+                                   value="@_form.Desde"
+                                   @onchange="@((e) => _form.Desde = e.Value?.ToString() ?? "")" />
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small fw-bold text-muted">Hasta</label>
+                        <div class="input-group input-elevated">
+                            <input type="datetime-local"
+                                   class="form-control border-0 bg-transparent px-2 small-date-input"
+                                   value="@_form.Hasta"
+                                   @onchange="@((e) => _form.Hasta = e.Value?.ToString() ?? "")" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted">Motivo (Opcional)</label>
+                    <div class="input-elevated p-2" style="height: auto;">
+                        <InputTextArea class="form-control border-0 bg-transparent"
+                                       rows="2"
+                                       placeholder="Ej: Vacaciones, Congreso..."
+                                       @bind-Value="_form.Motivo"></InputTextArea>
+                    </div>
+                </div>
+
+                <button type="submit"
+                        class="btn btn-danger btn-pill w-100 shadow-sm py-2"
+                        disabled="@_guardando">
+                    @if (_guardando)
+                    {
+                        <span><span class="spinner-border spinner-border-sm me-1"></span> Procesando...</span>
+                    }
+                    else
+                    {
+                        <span>Bloquear Horario</span>
+                    }
+                </button>
+
+                @if (!string.IsNullOrWhiteSpace(_error))
+                {
+                    <div class="alert alert-danger mt-3 small text-center border-0 bg-danger-subtle text-danger mb-0">
+                        <i class="bi bi-exclamation-triangle me-1"></i> @_error
+                    </div>
+                }
+            </EditForm>
+        </div>
+
+        <div class="spacer-bottom"></div>
+    </div>
+}
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav shadow-soft">
+    <button class="bottom-nav-item" @onclick="IrInicio">
+        <i class="bi bi-house-door"></i>
+        <span>Inicio</span>
+    </button>
+
+    <button class="bottom-nav-item active" @onclick="IrMedicos">
+        <i class="bi bi-person-badge-fill"></i>
+        <span>Médicos</span>
+    </button>
+
+    <button class="bottom-nav-item text-danger" @onclick="CerrarSesion">
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Salir</span>
+    </button>
+</div>
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private MedicoDetalleDTO? _medico;
+    private List<MedicoBloqueoDTO> _bloqueos = new();
+
+    private bool _cargando = true;
+    private bool _guardando = false;
+    private bool _permitido = false;
+    private string? _error;
+
+    private class BloqueoFormVm
+    {
+        public string Desde { get; set; } = DateTime.Now.ToString("yyyy-MM-ddTHH:mm");
+        public string Hasta { get; set; } = DateTime.Now.AddHours(1).ToString("yyyy-MM-ddTHH:mm");
+        public string? Motivo { get; set; }
+    }
+
+    private BloqueoFormVm _form = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var me = await Auth.MeAsync();
+            if (me is null || (me.Rol != "Administrador" && me.Rol != "Secretario"))
+            {
+                _permitido = false;
+                Nav.NavigateTo("/", true);
+                return;
+            }
+
+            _permitido = true;
+            _medico = await MedicoService.ObtenerAsync(Id);
+            await CargarBloqueos();
+        }
+        catch
+        {
+            _permitido = false;
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    private async Task CargarBloqueos()
+    {
+        _bloqueos = await MedicoService.ListarBloqueosAsync(Id) ?? new();
+    }
+
+    private async Task GuardarBloqueoAsync()
+    {
+        _error = null;
+        _guardando = true;
+
+        try
+        {
+            if (!DateTime.TryParse(_form.Desde, out var desde) || !DateTime.TryParse(_form.Hasta, out var hasta))
+            {
+                _error = "Formato de fecha inválido.";
+                return;
+            }
+
+            if (hasta <= desde)
+            {
+                _error = "La fecha 'Hasta' debe ser posterior a 'Desde'.";
+                return;
+            }
+
+            var dto = new MedicoBloqueoDTO
+            {
+                MedicoId = Id,
+                Desde = DateTime.SpecifyKind(desde, DateTimeKind.Local),
+                Hasta = DateTime.SpecifyKind(hasta, DateTimeKind.Local),
+                Motivo = _form.Motivo
+            };
+
+            var res = await MedicoService.CrearBloqueoAsync(Id, dto);
+
+            if (res is null)
+            {
+                _error = "No se pudo crear el bloqueo. Puede haber superposición.";
+                return;
+            }
+
+            await CargarBloqueos();
+            _form.Motivo = "";
+        }
+        catch (Exception ex)
+        {
+            _error = "Error: " + ex.Message;
+        }
+        finally
+        {
+            _guardando = false;
+        }
+    }
+
+    private async Task EliminarBloqueoAsync(MedicoBloqueoDTO b)
+    {
+        var ok = await MedicoService.EliminarBloqueoAsync(Id, b.IdBloqueo);
+        if (ok)
+        {
+            await CargarBloqueos();
+        }
+        else
+        {
+            _error = "No se pudo eliminar el bloqueo.";
+        }
+    }
+
+    private string GetInicial(string? nombre) => string.IsNullOrWhiteSpace(nombre) ? "?" : nombre[0].ToString().ToUpper();
+
+    private void IrInicio() => Nav.NavigateTo("/admin/home");
+    private void IrMedicos() => Nav.NavigateTo("/admin/medicos");
+
+    private async Task CerrarSesion()
+    {
+        await Auth.LogoutAsync();
+        Nav.NavigateTo("/", true);
+    }
+}

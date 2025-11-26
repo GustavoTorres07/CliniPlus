@@ -1,10 +1,7 @@
 ﻿using CliniPlus.Movil.Services.Contrato;
 using CliniPlus.Shared.DTOs;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http.Json;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace CliniPlus.Movil.Services.Implementa
@@ -18,15 +15,133 @@ namespace CliniPlus.Movil.Services.Implementa
             _http = http;
         }
 
-        public async Task<List<MedicoDetalleDTO>?> GetMedicosAsync()
+        private HttpClient CreateClient() => _http.CreateClient("ApiCliniPlus");
+
+        // ================= MÉDICOS =================
+
+        public async Task<List<MedicoListadoDTO>?> ListarAsync()
         {
-            var cli = _http.CreateClient("ApiCliniPlus");
-            var res = await cli.GetAsync("api/medicos/listar");
+            var cli = CreateClient();
+            var res = await cli.GetAsync("api/medicos");
 
             if (!res.IsSuccessStatusCode)
                 return null;
 
-            return await res.Content.ReadFromJsonAsync<List<MedicoDetalleDTO>>();
+            return await res.Content.ReadFromJsonAsync<List<MedicoListadoDTO>>();
+        }
+
+        public async Task<MedicoDetalleDTO?> ObtenerAsync(int id)
+        {
+            var cli = CreateClient();
+            var res = await cli.GetAsync($"api/medicos/{id}");
+
+            if (!res.IsSuccessStatusCode)
+                return null;
+
+            return await res.Content.ReadFromJsonAsync<MedicoDetalleDTO>();
+        }
+
+        public async Task<MedicoDetalleDTO?> CrearAsync(MedicoCrearDTO dto)
+        {
+            var cli = CreateClient();
+            var res = await cli.PostAsJsonAsync("api/medicos", dto);
+
+            if (!res.IsSuccessStatusCode)
+                return null;
+
+            return await res.Content.ReadFromJsonAsync<MedicoDetalleDTO>();
+        }
+
+        public async Task<MedicoDetalleDTO?> EditarAsync(int id, MedicoEditarDTO dto)
+        {
+            var cli = CreateClient();
+            var res = await cli.PutAsJsonAsync($"api/medicos/{id}", dto);
+
+            if (!res.IsSuccessStatusCode)
+                return null;
+
+            return await res.Content.ReadFromJsonAsync<MedicoDetalleDTO>();
+        }
+
+        public async Task<bool> CambiarEstadoAsync(int id, bool activo)
+        {
+            var cli = CreateClient();
+            var body = new MedicoEstadoDTO { IsActive = activo };
+            var res = await cli.PatchAsJsonAsync($"api/medicos/{id}/estado", body);
+            return res.IsSuccessStatusCode;
+        }
+
+        // ================= HORARIOS =================
+
+        public async Task<List<MedicoHorarioDTO>?> ListarHorariosAsync(int medicoId)
+        {
+            var cli = CreateClient();
+            var res = await cli.GetAsync($"api/medicos/{medicoId}/horarios");
+
+            if (!res.IsSuccessStatusCode)
+                return null;
+
+            return await res.Content.ReadFromJsonAsync<List<MedicoHorarioDTO>>();
+        }
+
+        public async Task<MedicoHorarioDTO?> CrearHorarioAsync(int medicoId, MedicoHorarioDTO dto)
+        {
+            var cli = CreateClient();
+            var res = await cli.PostAsJsonAsync($"api/medicos/{medicoId}/horarios", dto);
+
+            if (!res.IsSuccessStatusCode)
+                return null;
+
+            return await res.Content.ReadFromJsonAsync<MedicoHorarioDTO>();
+        }
+
+        public async Task<MedicoHorarioDTO?> EditarHorarioAsync(int medicoId, int idHorario, MedicoHorarioDTO dto)
+        {
+            var cli = CreateClient();
+            var res = await cli.PutAsJsonAsync($"api/medicos/{medicoId}/horarios/{idHorario}", dto);
+
+            if (!res.IsSuccessStatusCode)
+                return null;
+
+            return await res.Content.ReadFromJsonAsync<MedicoHorarioDTO>();
+        }
+
+        public async Task<bool> EliminarHorarioAsync(int medicoId, int idHorario)
+        {
+            var cli = CreateClient();
+            var res = await cli.DeleteAsync($"api/medicos/{medicoId}/horarios/{idHorario}");
+            return res.IsSuccessStatusCode;
+        }
+
+        // ================= BLOQUEOS =================
+
+        public async Task<List<MedicoBloqueoDTO>?> ListarBloqueosAsync(int medicoId)
+        {
+            var cli = CreateClient();
+            var res = await cli.GetAsync($"api/medicos/{medicoId}/bloqueos");
+
+            if (!res.IsSuccessStatusCode)
+                return null;
+
+            return await res.Content.ReadFromJsonAsync<List<MedicoBloqueoDTO>>();
+        }
+
+        public async Task<MedicoBloqueoDTO?> CrearBloqueoAsync(int medicoId, MedicoBloqueoDTO dto)
+        {
+            var cli = CreateClient();
+            var res = await cli.PostAsJsonAsync($"api/medicos/{medicoId}/bloqueos", dto);
+
+            if (!res.IsSuccessStatusCode)
+                return null;
+
+            return await res.Content.ReadFromJsonAsync<MedicoBloqueoDTO>();
+        }
+
+        public async Task<bool> EliminarBloqueoAsync(int medicoId, int idBloqueo)
+        {
+            var cli = CreateClient();
+            var res = await cli.DeleteAsync($"api/medicos/{medicoId}/bloqueos/{idBloqueo}");
+            return res.IsSuccessStatusCode;
         }
     }
 }

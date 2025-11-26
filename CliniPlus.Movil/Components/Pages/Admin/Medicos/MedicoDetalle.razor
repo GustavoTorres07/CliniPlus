@@ -1,0 +1,249 @@
+﻿@page "/admin/medicos/{Id:int}"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+@using CliniPlus.Shared.DTOs
+@using CliniPlus.Movil.Services.Contrato
+@using CliniPlus.Shared
+@using Microsoft.AspNetCore.Components.Forms
+@inject IMedicoService MedicoService
+@inject IEspecialidadService EspecialidadService
+@inject IAuthService Auth
+@inject NavigationManager Nav
+
+@if (_cargando)
+{
+    <div class="home-loading d-flex flex-column align-items-center justify-content-center" style="height: 60vh;">
+        <div class="spinner-border text-primary mb-3"></div>
+        <span>Cargando médico...</span>
+    </div>
+}
+else if (_detalle is null)
+{
+    <div class="home-page text-center pt-5">
+        <BotonVolver />
+        <p class="text-danger mt-4">Médico no encontrado.</p>
+    </div>
+}
+else
+{
+    <div class="home-page">
+        <div class="home-header mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <BotonVolver />
+                <div class="home-greeting">
+                    <p class="home-hello">Gestión</p>
+                    <h4 class="home-name mb-0">Editar Médico</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="home-card p-4">
+
+            <div class="d-flex flex-column align-items-center mb-4">
+                @if (!string.IsNullOrWhiteSpace(_detalle.FotoUrl))
+                {
+                    <img src="@_detalle.FotoUrl" class="medico-profile-img shadow-sm mb-2" alt="Foto" />
+                }
+                else
+                {
+                    <div class="medico-profile-circle shadow-sm mb-2">
+                        <span>@_detalle.NombreCompleto[0].ToString().ToUpper()</span>
+                    </div>
+                }
+                <h5 class="fw-bold text-dark mb-0">@_detalle.NombreCompleto</h5>
+                <span class="badge bg-light text-muted border mt-1">ID Usuario: @_detalle.UsuarioId</span>
+                @if (!string.IsNullOrWhiteSpace(_detalle.Email))
+                {
+                    <span class="small text-muted mt-1">@_detalle.Email</span>
+                }
+            </div>
+
+            <EditForm Model="_editar" OnValidSubmit="GuardarAsync">
+                <DataAnnotationsValidator />
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted">Especialidad</label>
+                    <div class="input-group input-elevated">
+                        <span class="input-group-text bg-transparent border-0">
+                            <i class="bi bi-journal-medical"></i>
+                        </span>
+                        <InputSelect class="form-select border-0 bg-transparent" @bind-Value="_editar.EspecialidadId">
+                            <option value="">Seleccione...</option>
+                            @foreach (var esp in _especialidades)
+                            {
+                                <option value="@esp.IdEspecialidad">@esp.Nombre</option>
+                            }
+                        </InputSelect>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted">Biografía</label>
+                    <div class="input-elevated p-2" style="height: auto;">
+                        <InputTextArea class="form-control border-0 bg-transparent"
+                                       rows="3"
+                                       placeholder="Breve descripción profesional..."
+                                       @bind-Value="_editar.Bio" />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted">URL de Foto</label>
+                    <div class="input-group input-elevated">
+                        <span class="input-group-text bg-transparent border-0">
+                            <i class="bi bi-image"></i>
+                        </span>
+                        <InputText class="form-control border-0 bg-transparent"
+                                   placeholder="https://..."
+                                   @bind-Value="_editar.FotoUrl" />
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label small fw-bold text-muted">Duración Turno (min)</label>
+                    <div class="input-group input-elevated">
+                        <span class="input-group-text bg-transparent border-0">
+                            <i class="bi bi-clock"></i>
+                        </span>
+                        <InputNumber class="form-control border-0 bg-transparent" @bind-Value="_editar.DefaultSlotMin" />
+                    </div>
+                </div>
+
+                <button type="submit"
+                        class="btn btn-primary btn-pill w-100 shadow-sm py-2"
+                        disabled="@_guardando">
+                    @if (_guardando)
+                    {
+                        <span>
+                            <span class="spinner-border spinner-border-sm me-2"></span>
+                            Guardando...
+                        </span>
+                    }
+                    else
+                    {
+                        <span>Guardar Cambios</span>
+                    }
+                </button>
+
+                @if (!string.IsNullOrWhiteSpace(_error))
+                {
+                    <div class="alert alert-danger mt-3 small text-center border-0 bg-danger-subtle text-danger">
+                        <i class="bi bi-exclamation-circle me-1"></i> @_error
+                    </div>
+                }
+            </EditForm>
+
+            <hr class="my-4 opacity-25" />
+
+            <button type="button"
+                    class="btn btn-outline-danger btn-pill w-100"
+                    @onclick="ToggleEstadoAsync">
+                <i class="bi @(_detalle.IsActive ? "bi-x-circle" : "bi-check-circle") me-2"></i>
+                @(_detalle.IsActive ? "Desactivar Médico" : "Activar Médico")
+            </button>
+        </div>
+
+        <div class="spacer-bottom"></div>
+    </div>
+}
+
+<div class="bottom-nav shadow-soft">
+    <button class="bottom-nav-item" @onclick="IrInicio">
+        <i class="bi bi-house-door"></i>
+        <span>Inicio</span>
+    </button>
+
+    <button class="bottom-nav-item active">
+        <i class="bi bi-person-badge-fill"></i>
+        <span>Médicos</span>
+    </button>
+
+    <button class="bottom-nav-item text-danger" @onclick="CerrarSesion">
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Salir</span>
+    </button>
+</div>
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private MedicoDetalleDTO? _detalle;
+    private MedicoEditarDTO _editar = new();
+    private List<EspecialidadDTO> _especialidades = new();
+    private bool _cargando = true;
+    private bool _guardando = false;
+    private string? _error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var me = await Auth.MeAsync();
+            // Admin o Secretario pueden ver el detalle
+            if (me is null || (me.Rol != "Administrador" && me.Rol != "Secretario"))
+            {
+                Nav.NavigateTo("/", true);
+                return;
+            }
+
+            _detalle = await MedicoService.ObtenerAsync(Id);
+            _especialidades = await EspecialidadService.ListarAsync() ?? new();
+
+            if (_detalle != null)
+            {
+                _editar = new MedicoEditarDTO
+                {
+                    Bio = _detalle.Bio,
+                    FotoUrl = _detalle.FotoUrl,
+                    DefaultSlotMin = _detalle.DefaultSlotMin,
+                    EspecialidadId = _detalle.EspecialidadId
+                };
+            }
+        }
+        catch
+        {
+            // manejo silencioso
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    private async Task GuardarAsync()
+    {
+        _error = null;
+        _guardando = true;
+
+        var res = await MedicoService.EditarAsync(Id, _editar);
+
+        if (res is null)
+        {
+            _error = "No se pudieron guardar los cambios.";
+            _guardando = false;
+            return;
+        }
+
+        _detalle = res;
+        _guardando = false;
+        Nav.NavigateTo("/admin/medicos", true);
+    }
+
+    private async Task ToggleEstadoAsync()
+    {
+        if (_detalle is null) return;
+
+        var nuevo = !_detalle.IsActive;
+        var ok = await MedicoService.CambiarEstadoAsync(Id, nuevo);
+
+        if (ok)
+            _detalle.IsActive = nuevo;
+    }
+
+    private void IrInicio() => Nav.NavigateTo("/admin/home");
+
+    private async Task CerrarSesion()
+    {
+        await Auth.LogoutAsync();
+        Nav.NavigateTo("/", true);
+    }
+}

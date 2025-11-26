@@ -1,0 +1,352 @@
+﻿@page "/admin/medicos/{Id:int}/horarios"
+@page "/admin/medicos/horarios" 
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+
+@using CliniPlus.Shared.DTOs
+@using CliniPlus.Movil.Services.Contrato
+@using CliniPlus.Shared
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Globalization
+
+@inject IMedicoService MedicoService
+@inject IAuthService Auth
+@inject NavigationManager Nav
+
+@if (_cargando)
+{
+    <div class="home-loading d-flex flex-column align-items-center justify-content-center" style="height: 60vh;">
+        <div class="spinner-border text-primary mb-3"></div>
+        <span>Cargando agenda...</span>
+    </div>
+}
+else if (!_permitido)
+{
+    <RedirectToLogin />
+}
+else
+{
+    <div class="home-page">
+        <div class="home-header mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <BotonVolver />
+                <div class="home-greeting">
+                    <p class="home-hello">Agenda</p>
+                    <h4 class="home-name mb-0">Disponibilidad</h4>
+                </div>
+            </div>
+            <div class="medico-mini-avatar">
+                <span>@GetInicial(_medico?.NombreCompleto)</span>
+            </div>
+        </div>
+
+        <div class="home-card p-3 mb-3 d-flex align-items-center gap-3">
+            <div class="icon-box bg-purple-light flex-shrink-0" style="width: 45px; height: 45px;">
+                <i class="bi bi-calendar-week text-purple fs-5"></i>
+            </div>
+            <div>
+                <h6 class="fw-bold text-dark mb-0">Disponibilidad Medica</h6>
+                <small class="text-muted">Configurar horarios de atencion.</small>
+            </div>
+        </div>
+
+        @if (_medicos.Any())
+        {
+            <div class="home-card p-3 mb-3">
+                <label class="form-label small fw-bold text-muted mb-1">Seleccionar médico</label>
+                <div class="input-group input-elevated">
+                    <span class="input-group-text bg-transparent border-0">
+                        <i class="bi bi-person-badge"></i>
+                    </span>
+                    <select class="form-select border-0 bg-transparent"
+                            value="@_medicoSeleccionadoId"
+                            @onchange="OnMedicoChange">
+                        @foreach (var m in _medicos)
+                        {
+                            <option value="@m.IdMedico">@m.NombreCompleto</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        }
+
+        <div class="d-flex flex-column gap-3">
+            @foreach (var dia in _semana)
+            {
+                <div class="home-card p-3 border-0 shadow-sm transition-card @(dia.Habilitado ? "border-purple" : "")">
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="form-check form-switch custom-switch">
+                                <input class="form-check-input" type="checkbox"
+                                       id="switch-@dia.DiaIndex"
+                                       @bind="dia.Habilitado" />
+                            </div>
+                            <label class="fw-bold text-dark mb-0 user-select-none fs-6" for="switch-@dia.DiaIndex">
+                                @dia.NombreDia
+                            </label>
+                        </div>
+
+                        @if (dia.Habilitado)
+                        {
+                            <button class="btn btn-sm btn-icon-light text-muted"
+                                    title="Copiar a todos los días"
+                                    @onclick="() => CopiarHorario(dia)">
+                                <i class="bi bi-copy"></i>
+                            </button>
+                        }
+                    </div>
+
+                    @if (dia.Habilitado)
+                    {
+                        <div class="row g-2 fade-in">
+                            <div class="col-4">
+                                <label class="label-mini">Hora inicio</label>
+                                <div class="input-group input-elevated-sm">
+                                    <input type="time" class="form-control border-0 bg-transparent px-1 text-center p-0"
+                                           value="@dia.HoraInicio"
+                                           @onchange="@(e => dia.HoraInicio = e.Value?.ToString() ?? "09:00")" />
+                                </div>
+                            </div>
+
+                            <div class="col-4">
+                                <label class="label-mini">Hora fin</label>
+                                <div class="input-group input-elevated-sm">
+                                    <input type="time" class="form-control border-0 bg-transparent px-1 text-center p-0"
+                                           value="@dia.HoraFin"
+                                           @onchange="@(e => dia.HoraFin = e.Value?.ToString() ?? "17:00")" />
+                                </div>
+                            </div>
+
+                            <div class="col-4">
+                                <label class="label-mini">Intervalo</label>
+                                <div class="input-group input-elevated-sm">
+                                    <select class="form-select border-0 bg-transparent px-1 py-0 text-center small"
+                                            @bind="dia.Intervalo"
+                                            style="font-size: 0.85rem;">
+                                        <option value="10">10 min</option>
+                                        <option value="15">15 min</option>
+                                        <option value="20">20 min</option>
+                                        <option value="25">25 min</option>
+                                        <option value="30">30 min</option>
+                                        <option value="35">35 min</option>
+                                        <option value="40">40 min</option>
+                                        <option value="45">45 min</option>
+                                        <option value="60">60 min</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-2 bg-light rounded-3">
+                            <small class="text-muted fst-italic">No atiende este día</small>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="fixed-bottom-action p-3 bg-white shadow-lg border-top">
+            @if (!string.IsNullOrWhiteSpace(_error))
+            {
+                <div class="alert alert-danger small py-2 mb-2 text-center border-0 bg-danger-subtle text-danger">
+                    <i class="bi bi-exclamation-circle me-1"></i> @_error
+                </div>
+            }
+
+            <button class="btn btn-primary btn-pill w-100 py-3 shadow-soft fw-bold d-flex justify-content-center align-items-center gap-2"
+                    @onclick="GuardarCambiosAsync"
+                    disabled="@_guardando">
+                @if (_guardando)
+                {
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                    <span>Guardando...</span>
+                }
+                else
+                {
+                    <i class="bi bi-check-lg"></i>
+                    <span>Guardar Disponibilidad</span>
+                }
+            </button>
+        </div>
+
+        <div class="spacer-bottom-large"></div>
+    </div>
+}
+
+@code {
+    // Parámetro opcional. Si entras por /admin/medicos/horarios, Id será 0
+    [Parameter] public int Id { get; set; }
+
+    private MedicoDetalleDTO? _medico;
+    private List<DiaAgendaVm> _semana = new();
+    private List<MedicoListadoDTO> _medicos = new();
+    private int _medicoSeleccionadoId;
+
+    private bool _cargando = true;
+    private bool _guardando = false;
+    private bool _permitido = false;
+    private string? _error;
+
+    public class DiaAgendaVm
+    {
+        public string NombreDia { get; set; } = "";
+        public int DiaIndex { get; set; }
+        public bool Habilitado { get; set; }
+        public string HoraInicio { get; set; } = "09:00";
+        public string HoraFin { get; set; } = "17:00";
+        public int Intervalo { get; set; } = 30;
+        public int? DbId { get; set; }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var me = await Auth.MeAsync();
+            if (me is null || (me.Rol != "Administrador" && me.Rol != "Secretario"))
+            {
+                _permitido = false;
+                Nav.NavigateTo("/", true);
+                return;
+            }
+
+            _permitido = true;
+
+            // 1. Cargar lista de médicos primero
+            _medicos = await MedicoService.ListarAsync() ?? new();
+
+            // 2. Si no hay ID en la URL (es 0) o el ID no existe en la lista, seleccionamos el primero
+            if (Id == 0 && _medicos.Any())
+            {
+                Id = _medicos.First().IdMedico;
+            }
+            else if (!_medicos.Any())
+            {
+                // No hay médicos en el sistema
+                _cargando = false;
+                return; 
+            }
+
+            _medicoSeleccionadoId = Id;
+
+            // 3. Ahora cargamos los datos del médico seleccionado
+            _medico = await MedicoService.ObtenerAsync(Id);
+            await CargarHorarios();
+        }
+        catch
+        {
+            _permitido = false;
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    private async Task CargarHorarios()
+    {
+        // Se asegura de usar _medicoSeleccionadoId en lugar de Id por si hubo cambios dinámicos
+        var idParaCargar = _medicoSeleccionadoId > 0 ? _medicoSeleccionadoId : Id;
+        
+        var horariosBd = await MedicoService.ListarHorariosAsync(idParaCargar) ?? new();
+        var cultura = new CultureInfo("es-ES");
+        _semana = new List<DiaAgendaVm>();
+
+        int[] ordenDias = { 1, 2, 3, 4, 5, 6, 0 };
+
+        foreach (var diaIndex in ordenDias)
+        {
+            var diaNombre = cultura.DateTimeFormat.GetDayName((DayOfWeek)diaIndex);
+            diaNombre = char.ToUpper(diaNombre[0]) + diaNombre.Substring(1);
+
+            var h = horariosBd.FirstOrDefault(x => x.DiaSemana == diaIndex);
+
+            _semana.Add(new DiaAgendaVm
+            {
+                DiaIndex = diaIndex,
+                NombreDia = diaNombre,
+                Habilitado = h != null && h.Activo,
+                HoraInicio = h?.HoraInicio ?? "09:00",
+                HoraFin = h?.HoraFin ?? "17:00",
+                Intervalo = h?.SlotMinOverride ?? _medico?.DefaultSlotMin ?? 30,
+                DbId = h?.IdHorario
+            });
+        }
+    }
+
+    private void CopiarHorario(DiaAgendaVm origen)
+    {
+        foreach (var dia in _semana.Where(d => d.DiaIndex != origen.DiaIndex))
+        {
+            dia.Habilitado = true;
+            dia.HoraInicio = origen.HoraInicio;
+            dia.HoraFin = origen.HoraFin;
+            dia.Intervalo = origen.Intervalo;
+        }
+    }
+
+    private async Task GuardarCambiosAsync()
+    {
+        _guardando = true;
+        _error = null;
+
+        try
+        {
+            foreach (var dia in _semana)
+            {
+                if (dia.Habilitado)
+                {
+                    if (!TimeSpan.TryParse(dia.HoraInicio, out var ini) ||
+                        !TimeSpan.TryParse(dia.HoraFin, out var fin))
+                        continue;
+
+                    if (fin <= ini) continue;
+
+                    var dto = new MedicoHorarioDTO
+                    {
+                        IdHorario = dia.DbId ?? 0,
+                        MedicoId = _medicoSeleccionadoId, // Usar el ID seleccionado
+                        DiaSemana = (byte)dia.DiaIndex,
+                        HoraInicio = ini.ToString(@"hh\:mm"),
+                        HoraFin = fin.ToString(@"hh\:mm"),
+                        SlotMinOverride = dia.Intervalo,
+                        Activo = true
+                    };
+
+                    if (dia.DbId.HasValue)
+                        await MedicoService.EditarHorarioAsync(_medicoSeleccionadoId, dia.DbId.Value, dto);
+                    else
+                        await MedicoService.CrearHorarioAsync(_medicoSeleccionadoId, dto);
+                }
+                else if (!dia.Habilitado && dia.DbId.HasValue)
+                {
+                    await MedicoService.EliminarHorarioAsync(_medicoSeleccionadoId, dia.DbId.Value);
+                }
+            }
+
+            await CargarHorarios();
+        }
+        catch (Exception ex)
+        {
+            _error = "Error al guardar: " + ex.Message;
+        }
+        finally
+        {
+            _guardando = false;
+        }
+    }
+
+    private void OnMedicoChange(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var nuevoId))
+        {
+            // Navegamos a la ruta completa para actualizar la URL
+            Nav.NavigateTo($"/admin/medicos/{nuevoId}/horarios", true);
+        }
+    }
+
+    private string GetInicial(string? nombre) =>
+        string.IsNullOrWhiteSpace(nombre) ? "?" : nombre[0].ToString().ToUpper();
+}

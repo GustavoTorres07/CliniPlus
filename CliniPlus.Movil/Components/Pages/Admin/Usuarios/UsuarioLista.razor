@@ -1,0 +1,161 @@
+﻿@page "/admin/usuarios"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+@using CliniPlus.Shared.DTOs
+@using CliniPlus.Movil.Services.Contrato
+@using CliniPlus.Shared
+@inject IUsuarioService UsuarioService
+@inject IAuthService Auth
+@inject NavigationManager Nav
+
+@if (_cargando)
+{
+    <div class="home-loading d-flex flex-column align-items-center justify-content-center" style="height: 60vh;">
+        <div class="spinner-border text-primary mb-3"></div>
+        <span>Cargando usuarios...</span>
+    </div>
+}
+else
+{
+    <div class="home-page">
+        <div class="home-header mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <BotonVolver />
+                <div class="home-greeting">
+                    <p class="home-hello">Gestión</p>
+                    <h4 class="home-name mb-0">Usuarios</h4>
+                </div>
+            </div>
+
+            <button class="btn btn-primary btn-sm btn-pill shadow-sm" @onclick="IrCrear">
+                <i class="bi bi-plus-lg"></i> Nuevo
+            </button>
+        </div>
+
+        <div class="mb-4">
+            <div class="input-group input-elevated">
+                <span class="input-group-text bg-transparent border-0">
+                    <i class="bi bi-funnel"></i>
+                </span>
+                <select class="form-select border-0 bg-transparent" @bind="_rolFiltro">
+                    <option value="">Todos los roles</option>
+                    <option value="Administrador">Administradores</option>
+                    <option value="Medico">Médicos</option>
+                    <option value="Paciente">Pacientes</option>
+                    <option value="Secretario">Secretarios</option>
+                </select>
+            </div>
+        </div>
+
+        @if (!ListaFiltrada.Any())
+        {
+            <div class="home-card text-center py-5">
+                <div class="icon-box bg-blue-light mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                    <i class="bi bi-people text-primary"></i>
+                </div>
+                <p class="text-muted mb-3">No se encontraron usuarios.</p>
+                @if (string.IsNullOrEmpty(_rolFiltro))
+                {
+                    <button class="btn btn-primary btn-pill px-4" @onclick="IrCrear">
+                        Crear el primero
+                    </button>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="d-flex flex-column gap-3">
+                @foreach (var u in ListaFiltrada)
+                {
+                    <div class="home-card p-3 user-card border-0 shadow-sm position-relative"
+                         @onclick="() => IrDetalle(u.IdUsuario)">
+
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="user-avatar-circle">
+                                <span>@(!string.IsNullOrEmpty(u.NombreCompleto) ? u.NombreCompleto[0].ToString().ToUpper() : "?")</span>
+                            </div>
+
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0 fw-bold text-dark">@u.NombreCompleto</h6>
+                                <p class="mb-1 small text-muted text-truncate" style="max-width: 160px;">
+                                    @u.Email
+                                </p>
+                                <span class="badge bg-light text-dark border border-secondary-subtle rounded-pill fw-normal" style="font-size: 0.65rem;">
+                                    @u.Rol
+                                </span>
+                            </div>
+
+                            <div class="d-flex flex-column align-items-end gap-1">
+                                @if (u.IsActive)
+                                {
+                                    <span class="badge bg-success-subtle text-success rounded-pill" style="font-size: 0.65rem;">Activo</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary-subtle text-secondary rounded-pill" style="font-size: 0.65rem;">Inactivo</span>
+                                }
+                                <i class="bi bi-chevron-right text-muted small mt-2"></i>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        <div class="spacer-bottom"></div>
+    </div>
+}
+
+<div class="bottom-nav shadow-soft">
+    <button class="bottom-nav-item" @onclick="IrInicio">
+        <i class="bi bi-house-door"></i>
+        <span>Inicio</span>
+    </button>
+
+    <button class="bottom-nav-item active">
+        <i class="bi bi-people-fill"></i>
+        <span>Usuarios</span>
+    </button>
+
+    <button class="bottom-nav-item text-danger" @onclick="CerrarSesion">
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Salir</span>
+    </button>
+</div>
+
+@code {
+    private List<UsuarioListDTO> _lista = new();
+    private bool _cargando = true;
+    private string _rolFiltro = "";
+
+    // Propiedad computada para filtrar en tiempo real
+    private IEnumerable<UsuarioListDTO> ListaFiltrada =>
+        string.IsNullOrWhiteSpace(_rolFiltro)
+            ? _lista
+            : _lista.Where(u => u.Rol == _rolFiltro);
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _lista = await UsuarioService.ListarAsync() ?? new();
+        }
+        catch
+        {
+            // Manejo de error
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    private void IrInicio() => Nav.NavigateTo("/admin/home");
+    private void IrCrear() => Nav.NavigateTo("/admin/usuarios/crear");
+    private void IrDetalle(int id) => Nav.NavigateTo($"/admin/usuarios/{id}");
+
+    private async Task CerrarSesion()
+    {
+        await Auth.LogoutAsync();
+        Nav.NavigateTo("/", true);
+    }
+}

@@ -9,26 +9,16 @@ namespace CliniPlus.Shared.DTOs
 {
     public class MedicoCrearDTO
     {
-        // Usuario
+        // Usuario ya creado con Rol = "Medico"
         [Required]
-        public string Nombre { get; set; } = null!;
+        public int UsuarioId { get; set; }
 
-        [Required]
-        public string Apellido { get; set; } = null!;
-
-        [Required, EmailAddress]
-        public string Email { get; set; } = null!;
-
-        [Required]
-        public string Password { get; set; } = null!;
-
-        // Médico
         public string? Bio { get; set; }
         public string? FotoUrl { get; set; }
+
         public int DefaultSlotMin { get; set; } = 30;
 
-        // UNA sola especialidad
-        [Required]
-        public int EspecialidadId { get; set; }
+        // Puede quedar sin especialidad al crearlo
+        public int? EspecialidadId { get; set; }
     }
 }

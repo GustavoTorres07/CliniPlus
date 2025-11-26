@@ -16,36 +16,40 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var me = await Auth.MeAsync();
+        try
+        {
+            var me = await Auth.MeAsync();
 
-        if (me is null)
+            if (me is null)
+            {
+                Nav.NavigateTo("/", true);
+                return;
+            }
+
+            switch (me.Rol)
+            {
+                case "Administrador":
+                    Nav.NavigateTo("/admin/home", true);
+                    break;
+
+                case "Medico":
+                    Nav.NavigateTo("/medico/home", true);
+                    break;
+
+                case "Secretario":
+                case "Secretaria":
+                    Nav.NavigateTo("/secretaria/home", true);
+                    break;
+
+                case "Paciente":
+                default:
+                    Nav.NavigateTo("/paciente/home", true);
+                    break;
+            }
+        }
+        catch
         {
             Nav.NavigateTo("/", true);
-            return;
         }
-
-        // Redirección según rol
-        switch (me.Rol)
-        {
-            case "Administrador":
-                Nav.NavigateTo("/admin/home", true);
-                break;
-
-            case "Medico":
-                Nav.NavigateTo("/medico/home", true);
-                break;
-
-            case "Secretario":
-            case "Secretaria":
-                Nav.NavigateTo("/secretaria/home", true);
-                break;
-
-            case "Paciente":
-            default:
-                Nav.NavigateTo("/paciente/home", true);
-                break;
-        }
-
-        _cargando = false;
     }
 }

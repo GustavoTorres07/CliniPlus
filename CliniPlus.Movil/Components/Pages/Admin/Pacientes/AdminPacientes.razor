@@ -1,0 +1,245 @@
+﻿@page "/admin/pacientes"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+@using CliniPlus.Shared.DTOs
+@using CliniPlus.Movil.Services.Contrato
+@using CliniPlus.Shared
+@inject IAuthService Auth
+@inject IPacienteService PacienteSrv
+@inject NavigationManager Nav
+
+@if (_cargando)
+{
+    <div class="home-loading d-flex flex-column align-items-center justify-content-center" style="height: 60vh;">
+        <div class="spinner-border text-success mb-3"></div>
+        <span>Cargando pacientes...</span>
+    </div>
+}
+else if (!_permitido)
+{
+    <RedirectToLogin />
+}
+else
+{
+    <div class="home-page">
+        <!-- HEADER -->
+        <div class="home-header mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <BotonVolver />
+                <div class="home-greeting">
+                    <p class="home-hello">Gestión</p>
+                    <h4 class="home-name mb-0">Pacientes</h4>
+                </div>
+            </div>
+
+            <button class="btn btn-primary btn-sm btn-pill shadow-sm" @onclick="IrCrear">
+                <i class="bi bi-plus-lg"></i> Nuevo
+            </button>
+        </div>
+
+        <!-- FILTROS -->
+        <div class="d-flex flex-column gap-3 mb-4">
+            <!-- Filtro Tipo -->
+            <div class="input-group input-elevated">
+                <span class="input-group-text bg-transparent border-0">
+                    <i class="bi bi-funnel"></i>
+                </span>
+                <select class="form-select border-0 bg-transparent" @bind="_filtroTipo">
+                    <option value="">Todos los tipos</option>
+                    <option value="provisional">Solo provisionales</option>
+                    <option value="completo">Solo con cuenta App</option>
+                </select>
+            </div>
+
+            <!-- Buscador -->
+            <div class="input-group input-elevated">
+                <span class="input-group-text bg-transparent border-0">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input class="form-control border-0 bg-transparent"
+                       placeholder="Buscar por DNI o nombre..."
+                       @bind="_busqueda"
+                       @bind:event="oninput" />
+            </div>
+        </div>
+
+        <!-- LISTA -->
+        @if (!ListaFiltrada.Any())
+        {
+            <div class="home-card text-center py-5">
+                <div class="icon-box bg-green-light mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                    <i class="bi bi-person-lines-fill text-success"></i>
+                </div>
+                <p class="text-muted mb-3">No se encontraron pacientes.</p>
+                @if (string.IsNullOrEmpty(_busqueda) && string.IsNullOrEmpty(_filtroTipo))
+                {
+                    <button class="btn btn-primary btn-pill px-4" @onclick="IrCrear">
+                        Crear paciente
+                    </button>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="d-flex flex-column gap-3">
+                @foreach (var p in ListaFiltrada)
+                {
+                    <div class="home-card p-3 patient-card border-0 shadow-sm position-relative"
+                         @onclick="() => IrDetalle(p.IdPaciente)">
+
+                        <div class="d-flex align-items-center gap-3">
+                            <!-- Avatar Circular Verde -->
+                            <div class="patient-avatar-circle">
+                                <span>@(GetInicial(p))</span>
+                            </div>
+
+                            <!-- Info Principal -->
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0 fw-bold text-dark">
+                                    @(string.IsNullOrWhiteSpace(p.NombreCompleto)
+                                                            ? $"Paciente {p.DNI}"
+                                                            : p.NombreCompleto)
+                    </h6>
+
+                                <div class="d-flex align-items-center text-muted small mb-1">
+                                    <i class="bi bi-credit-card-2-front me-1"></i> @p.DNI
+                                </div>
+
+                                @if (!string.IsNullOrWhiteSpace(p.ObraSocialNombre))
+                                {
+                                    <span class="badge bg-light text-dark border border-secondary-subtle rounded-pill fw-normal mt-1" style="font-size: 0.65rem;">
+                                        @p.ObraSocialNombre
+                                    </span>
+                                }
+                            </div>
+
+                            <!-- Badges de Estado -->
+                            <div class="d-flex flex-column align-items-end gap-1">
+                                @if (p.IsProvisional)
+                                {
+                                    <span class="badge bg-warning-subtle text-warning rounded-pill" style="font-size: 0.6rem;">Prov.</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-info-subtle text-info rounded-pill" style="font-size: 0.6rem;">App</span>
+                                }
+
+                                @if (p.IsActive)
+                                {
+                                    <span class="badge bg-success-subtle text-success rounded-pill" style="font-size: 0.6rem;">Activo</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary-subtle text-secondary rounded-pill" style="font-size: 0.6rem;">Inactivo</span>
+                                }
+
+                                <i class="bi bi-chevron-right text-muted small mt-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        <div class="spacer-bottom"></div>
+    </div>
+}
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav shadow-soft">
+    <button class="bottom-nav-item" @onclick="IrInicio">
+        <i class="bi bi-house-door"></i>
+        <span>Inicio</span>
+    </button>
+
+    <!-- Activo -->
+    <button class="bottom-nav-item active">
+        <i class="bi bi-person-lines-fill"></i>
+        <span>Pacientes</span>
+    </button>
+
+    <!-- Botón Salir -->
+    <button class="bottom-nav-item text-danger" @onclick="CerrarSesion">
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Salir</span>
+    </button>
+</div>
+
+@code {
+    private List<PacienteListDTO> _lista = new();
+    private bool _cargando = true;
+    private bool _permitido = false;
+
+    private string _filtroTipo = "";
+    private string _busqueda = "";
+
+    // Filtro dinámico en memoria
+    private IEnumerable<PacienteListDTO> ListaFiltrada =>
+        _lista
+            .Where(p => FiltraPorTipo(p))
+            .Where(p => FiltraPorBusqueda(p));
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var me = await Auth.MeAsync();
+            if (me is null || (me.Rol != "Administrador" && me.Rol != "Secretario"))
+            {
+                _permitido = false;
+                Nav.NavigateTo("/", true);
+                return;
+            }
+
+            _permitido = true;
+            _cargando = true;
+            _lista = await PacienteSrv.ListarAsync(incluirInactivos: true) ?? new();
+        }
+        catch
+        {
+            _permitido = false;
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    private bool FiltraPorTipo(PacienteListDTO p)
+    {
+        return _filtroTipo switch
+        {
+            "provisional" => p.IsProvisional,
+            "completo" => !p.IsProvisional,
+            _ => true
+        };
+    }
+
+    private bool FiltraPorBusqueda(PacienteListDTO p)
+    {
+        if (string.IsNullOrWhiteSpace(_busqueda)) return true;
+        var term = _busqueda.Trim().ToLower();
+
+        return p.DNI.ToLower().Contains(term)
+            || (p.NombreCompleto?.ToLower().Contains(term) ?? false)
+            || (p.Email?.ToLower().Contains(term) ?? false);
+    }
+
+    private string GetInicial(PacienteListDTO p)
+    {
+        if (!string.IsNullOrWhiteSpace(p.NombreCompleto))
+            return p.NombreCompleto[0].ToString().ToUpper();
+
+        return !string.IsNullOrWhiteSpace(p.DNI)
+            ? p.DNI[0].ToString().ToUpper()
+            : "?";
+    }
+
+    private void IrInicio() => Nav.NavigateTo("/admin/home");
+    private void IrCrear() => Nav.NavigateTo("/admin/pacientes/crear");
+    private void IrDetalle(int id) => Nav.NavigateTo($"/admin/pacientes/{id}");
+    private async Task CerrarSesion()
+    {
+        await Auth.LogoutAsync();
+        Nav.NavigateTo("/", true);
+    }
+}

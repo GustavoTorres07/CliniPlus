@@ -1,0 +1,133 @@
+﻿@page "/admin/obras-sociales"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+@using CliniPlus.Movil.Services.Contrato
+@using CliniPlus.Shared.DTOs
+@using CliniPlus.Shared
+@inject IObraSocialService ObraSocialService
+@inject IAuthService Auth
+@inject NavigationManager Nav
+
+@if (_cargando)
+{
+    <div class="home-loading d-flex flex-column align-items-center justify-content-center" style="height: 60vh;">
+        <div class="spinner-border text-warning mb-3"></div> <span>Cargando obras sociales...</span>
+    </div>
+}
+else
+{
+    <div class="home-page">
+        <div class="home-header mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <BotonVolver />
+                <div class="home-greeting">
+                    <p class="home-hello">Configuración</p>
+                    <h4 class="home-name mb-0">Obras Sociales</h4>
+                </div>
+            </div>
+
+            <button class="btn btn-primary btn-sm btn-pill shadow-sm" @onclick="IrCrear">
+                <i class="bi bi-plus-lg"></i> Nueva
+            </button>
+        </div>
+
+        @if (_lista == null || !_lista.Any())
+        {
+            <div class="home-card text-center py-5">
+                <div class="icon-box bg-orange-light mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                    <i class="bi bi-heart-pulse text-orange"></i>
+                </div>
+                <p class="text-muted mb-3">No hay obras sociales registradas.</p>
+                <button class="btn btn-primary btn-pill px-4" @onclick="IrCrear">
+                    Agregar la primera
+                </button>
+            </div>
+        }
+        else
+        {
+            <div class="d-flex flex-column gap-3">
+                @foreach (var o in _lista)
+                {
+                    <div class="home-card p-3 os-card border-0 shadow-sm position-relative"
+                         @onclick="() => IrDetalle(o.IdObraSocial)">
+
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="icon-box bg-orange-light flex-shrink-0">
+                                <i class="bi bi-heart-pulse text-orange"></i>
+                            </div>
+
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1 fw-bold text-dark">@o.Nombre</h6>
+                                <p class="mb-0 small text-muted text-truncate" style="max-width: 180px;">
+                                    @(string.IsNullOrEmpty(o.Descripcion) ? "Sin descripción" : o.Descripcion)
+                                </p>
+                            </div>
+
+                            <div class="d-flex flex-column align-items-end gap-1">
+                                @if (o.IsActive)
+                                {
+                                    <span class="badge bg-success-subtle text-success rounded-pill" style="font-size: 0.65rem;">Activa</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger-subtle text-danger rounded-pill" style="font-size: 0.65rem;">Inactiva</span>
+                                }
+                                <i class="bi bi-chevron-right text-muted small mt-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        <div class="spacer-bottom"></div>
+    </div>
+}
+
+<div class="bottom-nav shadow-soft">
+    <button class="bottom-nav-item" @onclick="IrInicio">
+        <i class="bi bi-house-door"></i>
+        <span>Inicio</span>
+    </button>
+
+    <button class="bottom-nav-item active">
+        <i class="bi bi-heart-pulse-fill"></i>
+        <span>O. Soc.</span>
+    </button>
+
+    <button class="bottom-nav-item text-danger" @onclick="CerrarSesion">
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Salir</span>
+    </button>
+</div>
+
+@code {
+    private List<ObraSocialDTO>? _lista;
+    private bool _cargando = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _cargando = true;
+            _lista = await ObraSocialService.ListarAsync();
+        }
+        catch
+        {
+            // Manejo de error
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    private void IrCrear() => Nav.NavigateTo("/admin/obras-sociales/crear");
+    private void IrDetalle(int id) => Nav.NavigateTo($"/admin/obras-sociales/{id}");
+    private void IrInicio() => Nav.NavigateTo("/admin/home");
+
+    private async Task CerrarSesion()
+    {
+        await Auth.LogoutAsync();
+        Nav.NavigateTo("/", true);
+    }
+}

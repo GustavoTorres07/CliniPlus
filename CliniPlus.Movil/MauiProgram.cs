@@ -31,7 +31,8 @@ public static class MauiProgram
         // HttpClient nombrado para la API (Somee)
         builder.Services.AddHttpClient("ApiCliniPlus", c =>
         {
-            c.BaseAddress = new Uri("https://CliniPlus.somee.com/");
+            //c.BaseAddress = new Uri("https://CliniPlus.somee.com/");
+            c.BaseAddress = new Uri("https://cliniplus.runasp.net");
             c.Timeout = TimeSpan.FromSeconds(30);
         })
         .AddHttpMessageHandler<TokenMessageHandler>();
@@ -41,6 +42,12 @@ public static class MauiProgram
         builder.Services.AddScoped<ITokenService, TokenService>();
         builder.Services.AddScoped<IMedicoService, MedicoService>();
         builder.Services.AddScoped<IEspecialidadService, EspecialidadService>();
+        builder.Services.AddScoped<IObraSocialService, ObraSocialService>();
+        builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+        builder.Services.AddScoped<IPacienteService, PacienteService>();
+        builder.Services.AddScoped<ICie10Service, Cie10Service>();
+
+
 
 
         return builder.Build();

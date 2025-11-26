@@ -1,0 +1,303 @@
+﻿/* -------------------------------------------------------------------------- */
+/* DISEÑO GLOBAL                                */
+/* (Basado en tu nuevo sistema de diseño - Nunito / #6e7bff)          */
+/* -------------------------------------------------------------------------- */
+
+/* --- ESTRUCTURA GLOBAL --- */
+.home-page {
+    padding: 24px 20px;
+    font-family: 'Nunito', sans-serif;
+    background-color: #f8f9fc;
+    min-height: 100vh;
+    padding-bottom: 100px; /* Espacio extra para el botón flotante */
+}
+
+.spacer-bottom {
+    height: 80px;
+}
+
+/* --- HEADER --- */
+.home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.home-hello {
+    font-size: 0.85rem;
+    color: #9ba0b8;
+    margin: 0;
+}
+
+.home-name {
+    font-weight: 800;
+    color: #15161b;
+    margin: 0;
+}
+
+/* --- FILTROS (CHIPS) --- */
+.filter-chip {
+    border: 1px solid #e0e0e0;
+    background-color: white;
+    color: #6c757d;
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+    .filter-chip.active {
+        background-color: #6e7bff;
+        color: white;
+        border-color: #6e7bff;
+        box-shadow: 0 4px 10px rgba(110, 123, 255, 0.3);
+    }
+
+.filter-chip-secondary {
+    border: 1px solid #f0f2f5;
+    background-color: #f8f9fc;
+    color: #6c757d;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+    .filter-chip-secondary.active-secondary {
+        background-color: #e2e6ff;
+        color: #6e7bff;
+        border-color: #dbe0ff;
+        font-weight: 700;
+    }
+
+/* Ocultar scrollbar en filtros */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* --- TARJETAS --- */
+.home-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    transition: all 0.3s ease;
+}
+
+.medico-card {
+    border: 1px solid #f0f2f5;
+    transition: transform 0.1s ease, background-color 0.2s;
+    cursor: pointer;
+}
+
+    .medico-card:active {
+        transform: scale(0.98);
+        background-color: #fbfbfc;
+    }
+
+/* --- AVATARES --- */
+/* Mapeamos tu clase 'medico-mini-avatar' al nuevo estilo 'medico-avatar-circle' */
+.medico-avatar-circle,
+.medico-mini-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+    color: #8e24aa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    border: 1px solid #f3e5f5;
+}
+
+.medico-avatar-img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #f0f0f0;
+}
+
+/* --- ESTADOS VACÍOS & ICONOS --- */
+.icon-box {
+    width: 45px; /* Ajustado para que no sea tan grande en la lista compacta */
+    height: 45px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+}
+
+.bg-purple-light {
+    background-color: #f3e5f5;
+}
+
+.text-purple {
+    color: #8e24aa;
+}
+
+/* --- BOTONES Y BADGES --- */
+.btn-pill {
+    border-radius: 99px;
+}
+
+.btn-primary {
+    background-color: #6e7bff;
+    border: none;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(110, 123, 255, 0.2);
+    transition: all 0.2s;
+}
+
+    .btn-primary:active {
+        transform: scale(0.98);
+        box-shadow: 0 2px 5px rgba(110, 123, 255, 0.2);
+    }
+
+.badge {
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* ESTILOS ESPECÍFICOS PARA 'MEDICOHORARIOS'               */
+/* (Adaptados para usar los colores y formas de tu nuevo diseño)        */
+/* -------------------------------------------------------------------------- */
+
+/* Input Elevado (Selector de Médico) */
+.input-elevated {
+    background-color: #f8f9fc; /* Fondo claro del tema */
+    border: 1px solid #f0f2f5;
+    border-radius: 16px;
+    padding: 4px;
+}
+
+/* Inputs Pequeños (Selectores de Hora) */
+.input-elevated-sm {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 2px;
+    transition: border-color 0.2s;
+}
+
+    .input-elevated-sm:focus-within {
+        border-color: #6e7bff;
+    }
+
+/* Limpieza de inputs nativos */
+.form-select, .form-control {
+    box-shadow: none !important;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #15161b;
+}
+
+/* Botones de Icono (Copiar) */
+.btn-icon-light {
+    background: transparent;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ba0b8;
+    transition: all 0.2s;
+}
+
+    .btn-icon-light:hover, .btn-icon-light:active {
+        background-color: #e2e6ff;
+        color: #6e7bff !important;
+        border-color: #dbe0ff;
+    }
+
+/* Switches (Toggle) - Adaptado al color #6e7bff */
+.custom-switch .form-check-input {
+    width: 2.6em;
+    height: 1.3em;
+    cursor: pointer;
+    background-color: #e0e0e0;
+    border-color: #e0e0e0;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
+}
+
+    .custom-switch .form-check-input:checked {
+        background-color: #6e7bff;
+        border-color: #6e7bff;
+    }
+
+/* Borde activo para la tarjeta del día */
+.border-purple {
+    border: 1px solid #6e7bff !important;
+    background-color: #fbfbfc; /* Un fondo muy sutil */
+}
+
+.transition-card {
+    border: 1px solid transparent;
+}
+
+/* Etiquetas pequeñas */
+.label-mini {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #9ba0b8;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    display: block;
+    text-align: center;
+}
+
+/* --- BOTTOM ACTION (Botón Guardar Flotante) --- */
+/* Adaptamos tu clase 'fixed-bottom-action' para que se vea como el 'bottom-nav' del diseño */
+.fixed-bottom-action {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+    background: white;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    box-shadow: 0 -5px 30px rgba(0,0,0,0.05);
+    padding: 20px;
+}
+
+.spacer-bottom-large {
+    height: 110px;
+}
+
+/* Animaciones */
+.fade-in {
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.home-loading {
+    color: #9ba0b8;
+}

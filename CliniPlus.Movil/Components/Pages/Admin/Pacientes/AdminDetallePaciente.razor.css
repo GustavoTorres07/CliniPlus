@@ -1,0 +1,132 @@
+﻿/* --- ESTRUCTURA GLOBAL --- */
+.home-page {
+    padding: 24px 20px;
+    font-family: 'Nunito', sans-serif;
+    background-color: #f8f9fc;
+    min-height: 100vh;
+}
+
+.spacer-bottom {
+    height: 80px;
+}
+
+/* --- HEADER --- */
+.home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.home-hello {
+    font-size: 0.85rem;
+    color: #9ba0b8;
+    margin: 0;
+}
+
+.home-name {
+    font-weight: 800;
+    color: #15161b;
+    margin: 0;
+}
+
+/* --- TARJETAS --- */
+.home-card {
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    border: 1px solid #f0f2f5;
+}
+
+/* Iconos Cuadrados */
+.icon-box {
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.bg-blue-light {
+    background-color: #eff1ff;
+}
+
+.bg-light {
+    background-color: #f8f9fc !important;
+}
+
+/* --- BOTONES Y BADGES --- */
+.btn-pill {
+    border-radius: 99px;
+    font-weight: 700;
+}
+
+.btn-primary {
+    background-color: #6e7bff;
+    border: none;
+    box-shadow: 0 4px 10px rgba(110, 123, 255, 0.2);
+}
+
+.btn-outline-danger {
+    border: 1px solid #ffe5e5;
+    color: #ff6b6b;
+    background: #fff5f5;
+    font-weight: 600;
+}
+
+    .btn-outline-danger:hover {
+        background: #ff4c4c;
+        color: white;
+        border-color: #ff4c4c;
+    }
+
+.badge {
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+/* --- BOTTOM NAV --- */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    box-shadow: 0 -5px 30px rgba(0,0,0,0.05);
+    z-index: 1000;
+}
+
+.bottom-nav-item {
+    background: none;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #b1b6c9;
+    gap: 4px;
+    flex: 1;
+    height: 100%;
+}
+
+    .bottom-nav-item i {
+        font-size: 1.4rem;
+    }
+
+    .bottom-nav-item span {
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+
+    .bottom-nav-item.active {
+        color: #6e7bff;
+    }
+
+    .bottom-nav-item.text-danger {
+        color: #ff6b6b;
+    }

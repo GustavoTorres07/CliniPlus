@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace CliniPlus.Shared.DTOs
 {
-    public class CIE10ItemDTO
+    public class UsuarioEstadoDTO
     {
-        public string Codigo { get; set; } = null!;
-        public string Descripcion { get; set; } = null!;
+        public bool IsActive { get; set; }
     }
 }

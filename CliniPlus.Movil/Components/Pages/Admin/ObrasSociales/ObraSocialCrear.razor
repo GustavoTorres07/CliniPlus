@@ -1,0 +1,119 @@
+﻿@page "/admin/obras-sociales/crear"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+@using CliniPlus.Movil.Services.Contrato
+@using CliniPlus.Shared
+@using CliniPlus.Shared.DTOs
+@inject IObraSocialService ObraSocialService
+@inject IAuthService Auth
+@inject NavigationManager Nav
+
+<div class="home-page">
+    <div class="home-header mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <BotonVolver />
+            <div class="home-greeting">
+                <p class="home-hello">Configuración</p>
+                <h4 class="home-name mb-0">Nueva OS</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="home-card p-4">
+        <EditForm Model="modelo" OnValidSubmit="Guardar">
+            <DataAnnotationsValidator />
+
+            <div class="mb-3">
+                <label class="form-label small fw-bold text-muted">Nombre</label>
+                <div class="input-group input-elevated">
+                    <span class="input-group-text bg-transparent border-0">
+                        <i class="bi bi-card-heading"></i>
+                    </span>
+                    <InputText class="form-control border-0 bg-transparent"
+                               placeholder="Ej. OSDE, Swiss Medical"
+                               @bind-Value="modelo.Nombre" />
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label small fw-bold text-muted">Descripción (Opcional)</label>
+                <div class="input-elevated p-2" style="height: auto;">
+                    <InputTextArea class="form-control border-0 bg-transparent"
+                                   rows="3"
+                                   placeholder="Información adicional..."
+                                   @bind-Value="modelo.Descripcion"></InputTextArea>
+                </div>
+            </div>
+
+            <div class="form-check form-switch mb-4">
+                <InputCheckbox class="form-check-input" id="activeSwitch" @bind-Value="modelo.IsActive" />
+                <label class="form-check-label" for="activeSwitch">
+                    Habilitar inmediatamente
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-pill w-100 shadow-sm py-2">
+                Guardar Obra Social
+            </button>
+
+            @if (!string.IsNullOrWhiteSpace(_error))
+            {
+                <div class="alert alert-danger mt-3 small text-center border-0 bg-danger-subtle text-danger">
+                    <i class="bi bi-exclamation-circle me-1"></i> @_error
+                </div>
+            }
+        </EditForm>
+    </div>
+
+    <div class="spacer-bottom"></div>
+</div>
+
+<div class="bottom-nav shadow-soft">
+    <button class="bottom-nav-item" @onclick="IrInicio">
+        <i class="bi bi-house-door"></i>
+        <span>Inicio</span>
+    </button>
+
+    <button class="bottom-nav-item active">
+        <i class="bi bi-heart-pulse-fill"></i>
+        <span>O. Soc.</span>
+    </button>
+
+    <button class="bottom-nav-item text-danger" @onclick="CerrarSesion">
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Salir</span>
+    </button>
+</div>
+
+@code {
+    private ObraSocialDTO modelo = new() { IsActive = true };
+    private string? _error;
+
+    private async Task Guardar()
+    {
+        _error = null;
+        // Pequeña validación manual si no usas DataAnnotations en el DTO
+        if (string.IsNullOrWhiteSpace(modelo.Nombre))
+        {
+            _error = "El nombre es obligatorio.";
+            return;
+        }
+
+        var res = await ObraSocialService.CrearAsync(modelo);
+
+        if (res is null)
+        {
+            _error = "No se pudo crear. Verifique si ya existe.";
+            return;
+        }
+
+        Nav.NavigateTo("/admin/obras-sociales", true);
+    }
+
+    private void IrInicio() => Nav.NavigateTo("/admin/home");
+
+    private async Task CerrarSesion()
+    {
+        await Auth.LogoutAsync();
+        Nav.NavigateTo("/", true);
+    }
+}

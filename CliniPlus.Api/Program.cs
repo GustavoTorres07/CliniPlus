@@ -78,6 +78,7 @@ builder.Services.AddAuthorization(opt =>
 {
     opt.AddPolicy("AdminOnly", p => p.RequireRole("Administrador"));
     opt.AddPolicy("SoloMedico", p => p.RequireRole("Medico"));
+    opt.AddPolicy("PacienteOnly", p => p.RequireRole("Paciente"));
     opt.AddPolicy("MedicoOAdmin", p => p.RequireRole("Medico", "Administrador"));
     opt.AddPolicy("SecretariaOAdmin", p => p.RequireRole("Secretario", "Administrador"));
 });
@@ -87,8 +88,11 @@ builder.Services.AddControllers();
 // Servicios propios
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<IMedicoRepository, MedicoRepository>();
-builder.Services.AddScoped<IEspecialidadRepository, EspecialidadRepository>(); 
-
+builder.Services.AddScoped<IEspecialidadRepository, EspecialidadRepository>();
+builder.Services.AddScoped<IObraSocialRepository, ObraSocialRepository>();
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();    
+builder.Services.AddScoped<IPacienteRepository, PacienteRepository>();
+builder.Services.AddScoped<ICie10Repository, Cie10Repository>();
 
 
 var app = builder.Build();

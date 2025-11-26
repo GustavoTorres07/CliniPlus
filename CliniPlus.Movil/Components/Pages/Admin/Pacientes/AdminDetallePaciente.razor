@@ -1,0 +1,272 @@
+﻿@page "/admin/pacientes/{Id:int}"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+
+@using CliniPlus.Shared.DTOs
+@using CliniPlus.Movil.Services.Contrato
+@using CliniPlus.Shared
+@using Microsoft.AspNetCore.Components.Forms
+@using CliniPlus.Movil.Components
+@inject IAuthService Auth
+@inject IPacienteService PacientesSrv
+@inject NavigationManager Nav
+
+@if (_cargando)
+{
+    <div class="home-loading d-flex flex-column align-items-center justify-content-center" style="height: 60vh;">
+        <div class="spinner-border text-success mb-3"></div>
+        <span>Cargando paciente...</span>
+    </div>
+}
+else if (!_accesoPermitido || _paciente is null)
+{
+    <div class="home-page text-center pt-5">
+        <BotonVolver />
+        <p class="text-danger mt-4">Paciente no encontrado.</p>
+    </div>
+}
+else
+{
+    <div class="home-page">
+        <!-- HEADER -->
+        <div class="home-header mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <BotonVolver />
+                <div class="home-greeting">
+                    <p class="home-hello">Gestión</p>
+                    <h4 class="home-name mb-0 text-truncate" style="max-width: 200px;">
+                        @(
+                                            !string.IsNullOrWhiteSpace(_paciente?.NombreCompleto)
+                                            ? _paciente!.NombreCompleto
+                                            : $"Paciente {_paciente?.DNI}"
+                                            )
+                </h4>
+                </div>
+            </div>
+
+            <!-- Botón Editar Header (Opcional o duplicado abajo) -->
+            <button class="btn btn-light btn-sm btn-pill border shadow-sm" @onclick="IrEditar">
+                <i class="bi bi-pencil text-muted"></i>
+            </button>
+        </div>
+
+        <!-- TARJETA PRINCIPAL: DATOS -->
+        <div class="home-card p-4 mb-3 position-relative overflow-hidden">
+            <!-- Decoración de fondo suave -->
+            <div class="position-absolute top-0 end-0 p-3 opacity-10">
+                <i class="bi bi-person-vcard text-success" style="font-size: 5rem;"></i>
+            </div>
+
+            <h6 class="fw-bold text-dark mb-3">Datos Personales</h6>
+
+            <div class="mb-3">
+                <label class="small text-muted fw-bold d-block mb-1">DNI</label>
+                <span class="fs-5 fw-semibold text-dark">@_paciente.DNI</span>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-6">
+                    <label class="small text-muted fw-bold d-block mb-1">Estado</label>
+                    @if (_paciente.IsActive)
+                    {
+                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">Activo</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill">Inactivo</span>
+                    }
+                </div>
+                <div class="col-6">
+                    <label class="small text-muted fw-bold d-block mb-1">Tipo</label>
+                    @if (_paciente.IsProvisional)
+                    {
+                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill">Provisional</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill">Cuenta App</span>
+                    }
+                </div>
+            </div>
+
+            <div class="mb-2">
+                <label class="small text-muted fw-bold d-block mb-1">Usuario Vinculado</label>
+                @if (_paciente.UsuarioId.HasValue)
+                {
+                    <div class="d-flex align-items-center gap-2 p-2 bg-light rounded-3 border border-light">
+                        <div class="icon-box bg-blue-light" style="width: 32px; height: 32px; font-size: 1rem;">
+                            <i class="bi bi-person-badge text-primary"></i>
+                        </div>
+                        <span class="small fw-semibold">ID: @_paciente.UsuarioId</span>
+                    </div>
+                }
+                else
+                {
+                    <span class="small text-muted fst-italic">No vinculado a un usuario de la app.</span>
+                }
+            </div>
+        </div>
+
+        <!-- TARJETA: OBRA SOCIAL -->
+        <div class="home-card p-4 mb-3">
+            <h6 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+                <i class="bi bi-heart-pulse text-danger"></i> Cobertura
+            </h6>
+            
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-muted small">Obra Social</span>
+                <span class="fw-bold text-dark">@(_paciente.ObraSocialNombre ?? "Particular")</span>
+            </div>
+            <hr class="my-2 opacity-10" />
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="text-muted small">Nro. Afiliado</span>
+                <span class="fw-semibold text-dark">@(_paciente.NumeroAfiliado ?? "—")</span>
+            </div>
+        </div>
+
+        <!-- TARJETA: CONTACTO -->
+        <div class="home-card p-4 mb-3">
+            <h6 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+                <i class="bi bi-chat-square-text text-primary"></i> Contacto
+            </h6>
+
+            <div class="d-flex flex-column gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="icon-box bg-light text-muted" style="width: 40px; height: 40px;">
+                        <i class="bi bi-envelope"></i>
+                    </div>
+                    <div class="d-flex flex-column">
+                        <span class="small text-muted fw-bold">Email</span>
+                        <span class="text-dark small text-break">@(_paciente.Email ?? "No informado")</span>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-3">
+                    <div class="icon-box bg-light text-muted" style="width: 40px; height: 40px;">
+                        <i class="bi bi-telephone"></i>
+                    </div>
+                    <div class="d-flex flex-column">
+                        <span class="small text-muted fw-bold">Teléfono</span>
+                        <span class="text-dark small">@(_paciente.Telefono ?? "No informado")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TARJETA: ACCIONES -->
+        <div class="home-card p-4 mb-3">
+            <h6 class="fw-bold text-dark mb-3">Acciones</h6>
+            
+            <div class="d-flex flex-column gap-2">
+                <button class="btn btn-primary btn-pill w-100 shadow-sm" @onclick="IrEditar">
+                    <i class="bi bi-pencil-square me-2"></i> Editar datos completos
+                </button>
+
+                <button class="btn btn-outline-danger btn-pill w-100" @onclick="ToggleEstado">
+                    @if (_paciente.IsActive)
+                    {
+                        <span><i class="bi bi-person-slash me-2"></i> Desactivar Paciente</span>
+                    }
+                    else
+                    {
+                        <span><i class="bi bi-person-check me-2"></i> Reactivar Paciente</span>
+                    }
+                </button>
+            </div>
+            
+            @if (!string.IsNullOrWhiteSpace(_error))
+            {
+                <div class="alert alert-danger mt-3 small text-center border-0 bg-danger-subtle text-danger mb-0">
+                    <i class="bi bi-exclamation-triangle me-1"></i> @_error
+                </div>
+            }
+        </div>
+
+        <div class="spacer-bottom"></div>
+    </div>
+}
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav shadow-soft">
+    <button class="bottom-nav-item" @onclick="IrInicio">
+        <i class="bi bi-house-door"></i>
+        <span>Inicio</span>
+    </button>
+    
+    <button class="bottom-nav-item active">
+        <i class="bi bi-person-lines-fill"></i>
+        <span>Pacientes</span>
+    </button>
+
+    <button class="bottom-nav-item text-danger" @onclick="CerrarSesion">
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Salir</span>
+    </button>
+</div>
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private PacienteDetalleDTO? _paciente;
+    private bool _cargando = true;
+    private bool _accesoPermitido = false;
+    private string? _error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _cargando = true;
+            var me = await Auth.MeAsync();
+            if (me is null || (me.Rol != "Administrador" && me.Rol != "Secretario"))
+            {
+                _accesoPermitido = false;
+                Nav.NavigateTo("/", true);
+                return;
+            }
+
+            _accesoPermitido = true;
+            _paciente = await PacientesSrv.ObtenerAsync(Id);
+        }
+        catch (Exception ex)
+        {
+            _error = "Error al cargar: " + ex.Message;
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    private void IrInicio() => Nav.NavigateTo("/admin/home");
+    private void IrPacientes() => Nav.NavigateTo("/admin/pacientes"); // Usado si quieres volver a la lista
+    
+    private void IrEditar()
+    {
+        if (_paciente is null) return;
+        // IMPORTANTE: Coincide con la ruta que definimos antes
+        Nav.NavigateTo($"/admin/pacientes/editar/{_paciente.IdPaciente}");
+    }
+
+    private async Task ToggleEstado()
+    {
+        if (_paciente is null) return;
+
+        var nuevoEstado = !_paciente.IsActive;
+        var ok = await PacientesSrv.CambiarEstadoAsync(_paciente.IdPaciente, nuevoEstado);
+
+        if (ok)
+        {
+            _paciente.IsActive = nuevoEstado;
+        }
+        else
+        {
+            _error = "No se pudo actualizar el estado.";
+        }
+    }
+    
+    private async Task CerrarSesion()
+    {
+        await Auth.LogoutAsync();
+        Nav.NavigateTo("/", true);
+    }
+}

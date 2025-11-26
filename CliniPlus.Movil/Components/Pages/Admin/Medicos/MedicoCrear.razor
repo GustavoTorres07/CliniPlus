@@ -1,0 +1,209 @@
+﻿@page "/admin/medicos/crear"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+@using CliniPlus.Shared.DTOs
+@using CliniPlus.Movil.Services.Contrato
+@using CliniPlus.Shared
+@using Microsoft.AspNetCore.Components.Forms
+@inject IMedicoService MedicoService
+@inject IEspecialidadService EspecialidadService
+@inject IAuthService Auth
+@inject NavigationManager Nav
+
+<div class="home-page">
+    <div class="home-header mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <BotonVolver />
+            <div class="home-greeting">
+                <p class="home-hello">Gestión</p>
+                <h4 class="home-name mb-0">Nuevo Médico</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="home-card p-4">
+        <EditForm Model="_modelo" OnValidSubmit="GuardarAsync">
+            <DataAnnotationsValidator />
+
+            <div class="mb-3">
+                <label class="form-label small fw-bold text-muted">ID Usuario (Rol Médico)</label>
+                <div class="input-group input-elevated">
+                    <span class="input-group-text bg-transparent border-0">
+                        <i class="bi bi-person-badge"></i>
+                    </span>
+                    <InputNumber class="form-control border-0 bg-transparent"
+                                 placeholder="Ej. 15"
+                                 @bind-Value="_modelo.UsuarioId" />
+                </div>
+                <small class="text-muted small ms-2 mt-1 d-block">
+                    <i class="bi bi-info-circle me-1"></i> Debe ser un usuario existente con rol <strong>Médico</strong>.
+                </small>
+                <ValidationMessage For="@(() => _modelo.UsuarioId)" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label small fw-bold text-muted">Especialidad</label>
+                <div class="input-group input-elevated">
+                    <span class="input-group-text bg-transparent border-0">
+                        <i class="bi bi-journal-medical"></i>
+                    </span>
+                    <InputSelect class="form-select border-0 bg-transparent" @bind-Value="_modelo.EspecialidadId">
+                        <option value="">Selecciona una especialidad...</option>
+                        @foreach (var esp in _especialidades)
+                        {
+                            <option value="@esp.IdEspecialidad">@esp.Nombre</option>
+                        }
+                    </InputSelect>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label small fw-bold text-muted">Biografía</label>
+                <div class="input-elevated p-2" style="height: auto;">
+                    <InputTextArea class="form-control border-0 bg-transparent"
+                                   rows="3"
+                                   placeholder="Breve descripción profesional..."
+                                   @bind-Value="_modelo.Bio" />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label small fw-bold text-muted">URL de Foto (Opcional)</label>
+                <div class="input-group input-elevated">
+                    <span class="input-group-text bg-transparent border-0">
+                        <i class="bi bi-image"></i>
+                    </span>
+                    <InputText class="form-control border-0 bg-transparent"
+                               placeholder="https://..."
+                               @bind-Value="_modelo.FotoUrl" />
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label small fw-bold text-muted">Duración Turno (min)</label>
+                <div class="input-group input-elevated">
+                    <span class="input-group-text bg-transparent border-0">
+                        <i class="bi bi-clock"></i>
+                    </span>
+                    <InputNumber class="form-control border-0 bg-transparent"
+                                 @bind-Value="_modelo.DefaultSlotMin" />
+                </div>
+            </div>
+
+            <button type="submit"
+                    class="btn btn-primary btn-pill w-100 shadow-sm py-2"
+                    disabled="@_guardando">
+                @if (_guardando)
+                {
+                    <span>
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        Guardando...
+                    </span>
+                }
+                else
+                {
+                    <span>Crear Médico</span>
+                }
+            </button>
+
+            @if (!string.IsNullOrWhiteSpace(_error))
+            {
+                <div class="alert alert-danger mt-3 small text-center border-0 bg-danger-subtle text-danger">
+                    <i class="bi bi-exclamation-circle me-1"></i> @_error
+                </div>
+            }
+        </EditForm>
+    </div>
+
+    <div class="spacer-bottom"></div>
+</div>
+
+<div class="bottom-nav shadow-soft">
+    <button class="bottom-nav-item" @onclick="IrInicio">
+        <i class="bi bi-house-door"></i>
+        <span>Inicio</span>
+    </button>
+
+    <button class="bottom-nav-item active">
+        <i class="bi bi-person-badge-fill"></i>
+        <span>Médicos</span>
+    </button>
+
+    <button class="bottom-nav-item text-danger" @onclick="CerrarSesion">
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Salir</span>
+    </button>
+</div>
+
+@code {
+    private MedicoCrearDTO _modelo = new() { DefaultSlotMin = 30 };
+    private List<EspecialidadDTO> _especialidades = new();
+    private bool _guardando = false;
+    private string? _error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var me = await Auth.MeAsync();
+            // Solo Admin puede crear médicos
+            if (me is null || me.Rol != "Administrador")
+            {
+                Nav.NavigateTo("/", true);
+                return;
+            }
+
+            _especialidades = await EspecialidadService.ListarAsync() ?? new();
+        }
+        catch
+        {
+            // silencioso
+        }
+    }
+
+    private async Task GuardarAsync()
+    {
+        _error = null;
+        _guardando = true;
+
+        if (_modelo.UsuarioId <= 0)
+        {
+            _error = "Debes indicar un ID de usuario válido.";
+            _guardando = false;
+            return;
+        }
+
+        if (_modelo.EspecialidadId is null)
+        {
+            _error = "Debes seleccionar una especialidad.";
+            _guardando = false;
+            return;
+        }
+
+        try
+        {
+            var res = await MedicoService.CrearAsync(_modelo);
+
+            if (res is null)
+            {
+                _error = "No se pudo crear. Verifica que el ID Usuario exista y tenga rol Médico.";
+                _guardando = false;
+                return;
+            }
+
+            Nav.NavigateTo("/admin/medicos", true);
+        }
+        catch (Exception ex)
+        {
+            _error = "Error: " + ex.Message;
+            _guardando = false;
+        }
+    }
+
+    private void IrInicio() => Nav.NavigateTo("/admin/home");
+
+    private async Task CerrarSesion()
+    {
+        await Auth.LogoutAsync();
+        Nav.NavigateTo("/", true);
+    }
+}

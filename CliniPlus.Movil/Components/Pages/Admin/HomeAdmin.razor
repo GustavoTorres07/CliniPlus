@@ -2,6 +2,7 @@
 @layout CliniPlus.Movil.Components.Layout.EmptyLayout
 @using CliniPlus.Shared.DTOs
 @using CliniPlus.Shared
+@using CliniPlus.Movil.Components
 @inject CliniPlus.Movil.Services.Contrato.IAuthService Auth
 @inject NavigationManager Nav
 
@@ -19,6 +20,7 @@ else if (_usuario is null)
 else
 {
     <div class="home-page">
+        <!-- HEADER -->
         <div class="home-header mb-4">
             <div class="home-greeting">
                 <p class="home-hello">Bienvenido,</p>
@@ -38,6 +40,7 @@ else
             </div>
         </div>
 
+        <!-- GESTIÓN PRINCIPAL -->
         <h6 class="section-title">Gestión Principal</h6>
         <div class="home-quick-actions mb-4">
             <button class="quick-card" @onclick="IrUsuarios">
@@ -60,6 +63,7 @@ else
             </button>
         </div>
 
+        <!-- CONFIGURACIÓN MÉDICA -->
         <h6 class="section-title">Configuración Médica</h6>
         <div class="home-quick-actions mb-4">
             <button class="quick-card" @onclick="IrObrasSociales">
@@ -74,14 +78,33 @@ else
                 </div>
                 <span>Espec.</span>
             </button>
-            <button class="quick-card disabled-card">
-                <div class="icon-box bg-gray-light">
-                    <i class="bi bi-sliders text-muted"></i>
+
+<button class="quick-card" @onclick="IrCie10">
+    <div class="icon-box bg-gray-light">
+        <i class="bi bi-journal-medical text-primary"></i>
+    </div>
+    <span>CIE-10</span>
+</button>
+        </div>
+
+        <!-- AGENDA Y TURNOS (ACCESO A HORARIOS/BLOQUEOS) -->
+        <h6 class="section-title">Agenda y Turnos</h6>
+        <div class="home-quick-actions mb-4">
+            <button class="quick-card" @onclick="IrAgendaMedicos">
+                <div class="icon-box bg-purple-light">
+                    <i class="bi bi-calendar-week text-purple"></i>
                 </div>
-                <span>Ajustes</span>
+                <span>Horarios &amp; Bloqueos</span>
+            </button>
+            <button class="quick-card disabled-card">
+                <div class="icon-box bg-blue-light">
+                    <i class="bi bi-calendar-check text-primary"></i>
+                </div>
+                <span>Turnos (próx.)</span>
             </button>
         </div>
 
+        <!-- RESUMEN -->
         <div class="home-card mb-2">
             <div class="home-card-header">
                 <span class="home-card-title">Resumen del Sistema</span>
@@ -90,7 +113,7 @@ else
             <div class="admin-metrics">
                 <div class="metric-row">
                     <span class="metric-label"><i class="bi bi-calendar-check me-2"></i>Turnos hoy</span>
-                    <span class="metric-value">0</span>
+                    <span class="metric-value">0</span> @* TODO: conectar con API de turnos *@
                 </div>
                 <div class="metric-divider"></div>
                 <div class="metric-row">
@@ -134,7 +157,6 @@ else
         {
             _cargando = true;
             _usuario = await Auth.MeAsync();
-            // Verificación de seguridad básica
             if (_usuario is null || _usuario.Rol != "Administrador")
             {
                 Nav.NavigateTo("/", true);
@@ -151,7 +173,6 @@ else
         }
     }
 
-    // Lógica cerrar sesión
     private async Task CerrarSesion()
     {
         await Auth.LogoutAsync();
@@ -165,4 +186,9 @@ else
     private void IrObrasSociales() => Nav.NavigateTo("/admin/obras-sociales");
     private void IrEspecialidades() => Nav.NavigateTo("/admin/especialidades");
     private void IrConfiguracion() => Nav.NavigateTo("/admin/configuracion");
+    private void IrCie10() => Nav.NavigateTo("/admin/cie10");
+
+
+    // Acceso central a horarios / bloqueos (entra por listado de médicos)
+    private void IrAgendaMedicos() => Nav.NavigateTo("/admin/medicos/horarios");
 }
