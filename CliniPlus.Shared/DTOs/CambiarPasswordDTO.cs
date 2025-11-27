@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace CliniPlus.Shared.DTOs
 {
-    public class TurnoCambiarEstadoDTO
+    public class CambiarPasswordDTO
     {
-        public TurnoEstadoDTO Estado { get; set; }
+        public string PasswordActual { get; set; } = "";
+        public string PasswordNueva { get; set; } = "";
     }
 }

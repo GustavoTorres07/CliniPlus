@@ -1,0 +1,173 @@
+﻿@page "/medico/turnos-hoy"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+
+@using CliniPlus.Shared.DTOs
+@inject CliniPlus.Movil.Services.Contrato.IAuthService Auth
+@inject CliniPlus.Movil.Services.Contrato.ITurnoService TurnoService
+@inject NavigationManager Nav
+
+@if (_cargando)
+{
+    <div class="home-loading d-flex flex-column justify-content-center align-items-center" style="height:70vh;">
+        <div class="spinner-border text-primary mb-3"></div>
+        <span class="text-muted small">Cargando turnos de hoy...</span>
+    </div>
+}
+else if (_usuario is null)
+{
+    <RedirectToLogin />
+}
+else
+{
+    <div class="home-page">
+
+        <!-- HEADER -->
+        <div class="home-header mb-3">
+            <div class="home-greeting">
+                <p class="home-hello">Agenda de hoy</p>
+                <h4 class="home-name">@_usuario.NombreCompleto</h4>
+                <span class="badge badge-medico px-3 py-1">Médico</span>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn-logout" @onclick="CerrarSesion">
+                    <i class="bi bi-box-arrow-right"></i>
+                </button>
+
+                <div class="home-avatar">
+                    <span>@_usuario.NombreCompleto[0].ToString().ToUpper()</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- FECHA DE HOY -->
+        <div class="px-3 mb-2">
+            <span class="text-muted small">
+                <i class="bi bi-calendar-event me-1"></i>
+                Hoy — @DateTime.Now.ToString("dd/MM/yyyy")
+            </span>
+        </div>
+
+        <!-- LISTADO DE TURNOS -->
+        <div class="p-3">
+
+            @if (_turnos == null || _turnos.Count == 0)
+            {
+                <div class="alert alert-info small text-center">
+                    <i class="bi bi-info-circle me-1"></i>
+                    No tienes turnos programados para hoy.
+                </div>
+            }
+            else
+            {
+                foreach (var t in _turnos)
+                {
+                    var horaLocal = t.ScheduledAtUtc.ToLocalTime().ToString("HH:mm");
+
+                    <div class="home-card p-3 mb-3 shadow-sm" @onclick="() => AbrirTurno(t.IdTurno)">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <h6 class="fw-bold text-dark mb-1">
+                                @horaLocal
+                            </h6>
+
+                            @if (t.EsPacienteActual)
+                            {
+                                <span class="badge bg-success-subtle text-success small">
+                                    En curso
+                                </span>
+                            }
+                            else if (!string.IsNullOrEmpty(t.PacienteNombre))
+                            {
+                                <span class="badge bg-primary-subtle text-primary small">
+                                    Reservado
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary-subtle text-secondary small">
+                                    Disponible
+                                </span>
+                            }
+                        </div>
+
+                        <div class="small text-muted mb-1">
+                            <i class="bi bi-person me-1"></i>
+                            @((string.IsNullOrEmpty(t.PacienteNombre)) ? "Sin paciente" : t.PacienteNombre)
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(t.TipoTurnoNombre))
+                        {
+                            <div class="small text-muted">
+                                <i class="bi bi-tag me-1"></i>
+                                @t.TipoTurnoNombre
+                            </div>
+                        }
+                    </div>
+                }
+            }
+
+        </div>
+
+        <div class="spacer-bottom"></div>
+    </div>
+}
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav shadow-soft">
+    <button class="bottom-nav-item" @onclick="IrInicio">
+        <i class="bi bi-house-door"></i>
+        <span>Inicio</span>
+    </button>
+
+    <button class="bottom-nav-item active">
+        <i class="bi bi-calendar3"></i>
+        <span>Turnos</span>
+    </button>
+
+    <button class="bottom-nav-item" @onclick="IrPerfil">
+        <i class="bi bi-person-badge"></i>
+        <span>Perfil</span>
+    </button>
+</div>
+
+@code {
+    private AuthMeResponse? _usuario;
+    private List<TurnoAgendaMedicoDTO>? _turnos;
+    private bool _cargando = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _usuario = await Auth.MeAsync();
+
+            if (_usuario is null || _usuario.Rol != "Medico")
+            {
+                Nav.NavigateTo("/", true);
+                return;
+            }
+
+            _turnos = await TurnoService.ObtenerAgendaHoyAsync();
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    private void AbrirTurno(int turnoId)
+    {
+        // Más adelante podemos hacer la pantalla de detalle:
+        // /medico/turno/{id}
+        Nav.NavigateTo($"/medico/turno/{turnoId}");
+    }
+
+    private async Task CerrarSesion()
+    {
+        await Auth.LogoutAsync();
+        Nav.NavigateTo("/", true);
+    }
+
+    private void IrInicio() => Nav.NavigateTo("/medico/home", true);
+    private void IrPerfil() => Nav.NavigateTo("/medico/perfil", true);
+}

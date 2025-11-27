@@ -1,0 +1,350 @@
+﻿@page "/paciente/agenda"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+
+@using CliniPlus.Shared.DTOs
+@using CliniPlus.Movil.Components.Calendar
+
+@inject CliniPlus.Movil.Services.Contrato.IAuthService Auth
+@inject CliniPlus.Movil.Services.Contrato.ITurnoService TurnoService
+@inject CliniPlus.Movil.Services.Contrato.IMedicoService MedicoService
+@inject CliniPlus.Movil.Services.Contrato.IEspecialidadService EspecialidadService
+@inject NavigationManager Nav
+
+@if (_cargando)
+{
+    <div class="home-loading d-flex flex-column align-items-center justify-content-center" style="height:60vh;">
+        <div class="spinner-border text-primary mb-3"></div>
+        <span>Cargando agenda...</span>
+    </div>
+}
+else if (_usuario is null)
+{
+    <RedirectToLogin />
+}
+else
+{
+    <div class="home-page">
+
+        <!-- HEADER -->
+        <div class="home-header mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn-back" @onclick="IrHomePaciente">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <div class="home-greeting">
+                    <p class="home-hello">Agenda</p>
+                    <h4 class="home-name">Reservar Turno</h4>
+                </div>
+            </div>
+        </div>
+
+        <!-- TARJETA: FILTROS DE BÚSQUEDA -->
+        <div class="home-card p-4 mb-3">
+            <h6 class="section-title mb-3">Selección Profesional</h6>
+
+            <!-- ESPECIALIDAD -->
+            <div class="mb-3">
+                <label class="label-mini">Especialidad</label>
+                <select class="form-select input-modern" @onchange="OnEspecialidadChanged">
+                    <option value="">-- Todas --</option>
+                    @foreach (var e in _especialidades)
+                    {
+                        <option value="@e.IdEspecialidad"
+                                selected="@(e.IdEspecialidad == _especialidadIdSeleccionada)">
+                            @e.Nombre
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <!-- MÉDICO -->
+            <div class="mb-2">
+                <label class="label-mini">Médico</label>
+                <select class="form-select input-modern" 
+                        @onchange="OnMedicoChanged"
+                        disabled="@(_medicos.Count == 0)">
+                    <option value="">-- Seleccionar Médico --</option>
+                    @foreach (var m in _medicos)
+                    {
+                        <option value="@m.IdMedico" selected="@(m.IdMedico == _medicoIdSeleccionado)">
+                            @m.NombreCompleto
+                        </option>
+                    }
+                </select>
+                @if (_medicos.Count == 0 && _especialidadIdSeleccionada > 0)
+                {
+                    <span class="text-danger small mt-1 d-block">No hay médicos para esta especialidad.</span>
+                }
+            </div>
+        </div>
+
+        <!-- TARJETA: CALENDARIO -->
+        <div class="home-card p-4 mb-3">
+            <h6 class="section-title mb-3">Fecha</h6>
+            <div class="calendar-wrapper">
+                <!-- Se asume que FullCalendar renderiza bien dentro del contenedor -->
+                <FullCalendar CalendarId="pac-cal" OnDateSelected="OnFechaSeleccionada" />
+            </div>
+            <div class="text-center mt-2">
+                <small class="text-muted fw-bold">@_fechaSeleccionada.ToString("D")</small>
+            </div>
+        </div>
+
+        <!-- TARJETA: SLOTS (HORARIOS) -->
+        <div class="home-card p-4 mb-4">
+            <h6 class="section-title mb-3">Horarios Disponibles</h6>
+
+            @if (_medicoIdSeleccionado <= 0)
+            {
+                <div class="text-center py-3">
+                    <i class="bi bi-person-exclamation text-muted fs-3 mb-2"></i>
+                    <p class="text-muted small mb-0">Seleccioná un médico para ver su disponibilidad.</p>
+                </div>
+            }
+            else if (_slots is null)
+            {
+                <div class="text-center py-3">
+                    <div class="spinner-border spinner-border-sm text-secondary mb-2"></div>
+                    <p class="text-muted small mb-0">Cargando horarios...</p>
+                </div>
+            }
+            else if (_slots.Count == 0)
+            {
+                <div class="text-center py-3 bg-light rounded-3 border border-dashed">
+                    <p class="text-muted small mb-0 fw-bold">No hay turnos disponibles para esta fecha.</p>
+                    <small class="text-muted">Intenta seleccionar otro día en el calendario.</small>
+                </div>
+            }
+            else
+            {
+                <div class="row g-2 fade-in">
+                    @foreach (var slot in _slots)
+                    {
+                        var isSelected = _slotSeleccionado != null &&
+                                         slot.ScheduledAtUtc == _slotSeleccionado.ScheduledAtUtc;
+
+                        var classes = "btn w-100 slot-btn";
+
+                        if (!slot.EsReservable)
+                            classes += " slot-disabled";
+                        else if (isSelected)
+                            classes += " slot-selected";
+                        else
+                            classes += " slot-available";
+
+                        <div class="col-4">
+                            <button class="@classes"
+                                    @onclick="() => SeleccionarSlot(slot)"
+                                    disabled="@(slot.EsReservable == false)">
+                                <div class="small fw-bold">@slot.HoraLocalTexto</div>
+                                <div class="small text-muted" style="font-size: 0.65rem;">
+                                    @(slot.EsReservable ? "Libre" : "Ocupado")
+                                </div>
+                            </button>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- BOTÓN CONFIRMAR (FLOTANTE) -->
+        <div class="fixed-bottom-action p-3 bg-white shadow-lg border-top">
+            @if (!string.IsNullOrWhiteSpace(_mensaje))
+            {
+                <div class="alert alert-info small py-2 mb-2 text-center border-0 bg-info-subtle text-info fw-bold rounded-3 fade-in">
+                    <i class="bi bi-info-circle me-1"></i> @_mensaje
+                </div>
+            }
+
+            <button class="btn btn-primary btn-pill w-100 py-3 shadow-soft fw-bold d-flex justify-content-center align-items-center gap-2"
+                    disabled="@(_slotSeleccionado is null || _confirmando)"
+                    @onclick="ConfirmarReserva">
+                @if (_confirmando)
+                {
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                    <span>Procesando...</span>
+                }
+                else
+                {
+                    <i class="bi bi-check-lg"></i>
+                    <span>Confirmar Reserva</span>
+                }
+            </button>
+        </div>
+
+        <div class="spacer-bottom-large"></div>
+    </div>
+}
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav shadow-soft">
+    <button class="bottom-nav-item" @onclick="IrHomePaciente">
+        <i class="bi bi-house-door"></i>
+        <span>Inicio</span>
+    </button>
+    <button class="bottom-nav-item active">
+        <i class="bi bi-calendar3-fill"></i>
+        <span>Agenda</span>
+    </button>
+    <button class="bottom-nav-item" @onclick="IrMisTurnos">
+        <i class="bi bi-clock-history"></i>
+        <span>Turnos</span>
+    </button>
+</div>
+
+@code {
+    private AuthMeResponse? _usuario;
+
+    private List<EspecialidadDTO> _especialidades = new();
+    private int _especialidadIdSeleccionada;
+
+    private List<MedicoListadoDTO> _medicos = new();
+    private int _medicoIdSeleccionado;
+
+    private DateTime _fechaSeleccionada = DateTime.Today;
+    private List<TurnoSlotDTO>? _slots;
+
+    private TurnoSlotDTO? _slotSeleccionado;
+    private string _mensaje = "";
+    private bool _cargando = true;
+    private bool _confirmando = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _usuario = await Auth.MeAsync();
+
+            if (_usuario is null || _usuario.Rol != "Paciente")
+            {
+                Nav.NavigateTo("/", true);
+                return;
+            }
+
+            _especialidades = await EspecialidadService.ListarAsync() ?? new();
+            // Cargar todos los médicos inicialmente
+            _medicos = await MedicoService.ListarAsync(null) ?? new();
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    private async Task CargarMedicos()
+    {
+        _medicos = await MedicoService.ListarAsync(_especialidadIdSeleccionada == 0 ? null : _especialidadIdSeleccionada)
+                   ?? new List<MedicoListadoDTO>();
+
+        // Reset
+        _medicoIdSeleccionado = 0;
+        _slots = null;
+        _slotSeleccionado = null;
+    }
+
+    private async Task CargarSlots()
+    {
+        _slots = null;
+        _slotSeleccionado = null;
+        _mensaje = "";
+
+        if (_medicoIdSeleccionado > 0)
+        {
+            // Pequeña carga visual
+            await Task.Delay(200); 
+            _slots = await TurnoService.ObtenerSlotsDiaAsync(_medicoIdSeleccionado, _fechaSeleccionada)
+                     ?? new List<TurnoSlotDTO>();
+        }
+    }
+
+    private async void OnEspecialidadChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var id))
+            _especialidadIdSeleccionada = id;
+        else
+            _especialidadIdSeleccionada = 0;
+
+        await CargarMedicos();
+        StateHasChanged();
+    }
+
+    private async void OnMedicoChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var id))
+        {
+            _medicoIdSeleccionado = id;
+            await CargarSlots();
+            StateHasChanged();
+        }
+        else
+        {
+            _medicoIdSeleccionado = 0;
+            _slots = null;
+            _slotSeleccionado = null;
+        }
+    }
+
+    private async Task OnFechaSeleccionada(string dateStr)
+    {
+        if (DateTime.TryParse(dateStr, out var fecha))
+        {
+            _fechaSeleccionada = fecha;
+            await CargarSlots();
+            StateHasChanged();
+        }
+    }
+
+    private void SeleccionarSlot(TurnoSlotDTO slot)
+    {
+        if (slot.EsReservable)
+            _slotSeleccionado = slot;
+    }
+
+    private async Task ConfirmarReserva()
+    {
+        if (_slotSeleccionado is null || _medicoIdSeleccionado <= 0)
+            return;
+
+        _confirmando = true;
+        _mensaje = "";
+
+        bool ok;
+
+        if (_slotSeleccionado.IdTurno > 0)
+        {
+            var dto = new TurnoReservarDTO
+            {
+                TurnoId = _slotSeleccionado.IdTurno,
+                TipoTurnoId = 1 
+            };
+            ok = await TurnoService.ReservarAsync(dto);
+        }
+        else
+        {
+            var dtoSlot = new TurnoReservarSlotDTO
+            {
+                MedicoId = _medicoIdSeleccionado,
+                ScheduledAtUtc = _slotSeleccionado.ScheduledAtUtc,
+                TipoTurnoId = 1 
+            };
+            ok = await TurnoService.ReservarSlotAsync(dtoSlot);
+        }
+
+        _confirmando = false;
+
+        if (ok)
+        {
+            _mensaje = "¡Turno reservado con éxito!";
+            // Redirigir después de un momento
+            await Task.Delay(1500);
+            Nav.NavigateTo("/paciente/turnos");
+        }
+        else
+        {
+            _mensaje = "No se pudo reservar el turno. Intenta nuevamente.";
+        }
+    }
+
+    private void IrHomePaciente() => Nav.NavigateTo("/paciente/home", true);
+    private void IrMisTurnos()    => Nav.NavigateTo("/paciente/turnos");
+}

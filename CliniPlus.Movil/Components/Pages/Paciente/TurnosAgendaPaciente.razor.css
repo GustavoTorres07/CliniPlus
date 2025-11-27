@@ -1,0 +1,272 @@
+﻿/* -------------------------------------------------------------------------- */
+/* ESTILOS PARA AGENDA DE PACIENTE (RESERVA DE TURNOS)          */
+/* Fuente: Nunito | Color primario: #6e7bff                   */
+/* -------------------------------------------------------------------------- */
+
+/* Global */
+.home-page {
+    padding: 24px 20px;
+    font-family: 'Nunito', sans-serif;
+    background-color: #f8f9fc;
+    min-height: 100vh;
+    padding-bottom: 100px;
+}
+
+/* --- HEADER --- */
+.home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.home-hello {
+    font-size: 0.85rem;
+    color: #9ba0b8;
+    margin: 0;
+}
+
+.home-name {
+    font-weight: 800;
+    color: #15161b;
+    margin: 0;
+    font-size: 1.4rem;
+}
+
+/* Botón Volver */
+.btn-back {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: white;
+    border: 1px solid #f0f2f5;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 1.1rem;
+}
+
+    .btn-back:active {
+        transform: scale(0.95);
+        background-color: #f1f3f5;
+    }
+
+/* --- TARJETAS --- */
+.home-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    border: 1px solid transparent;
+}
+
+.section-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #15161b;
+    letter-spacing: 0.3px;
+}
+
+.label-mini {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #9ba0b8;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    display: block;
+}
+
+/* --- FORMULARIOS (Inputs Modernos) --- */
+.input-modern {
+    background-color: #f8f9fc;
+    border: 1px solid #f0f2f5;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    color: #2c3e50;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+    .input-modern:focus {
+        background-color: white;
+        border-color: #6e7bff;
+        box-shadow: 0 0 0 3px rgba(110, 123, 255, 0.1);
+        outline: none;
+    }
+
+/* --- CALENDARIO (Ajustes para quitar scroll) --- */
+.calendar-wrapper {
+    position: relative;
+    /* Asegura que el contenedor no corte el contenido */
+    overflow: visible;
+}
+
+/* Forzar que FullCalendar use altura automática */
+.fc {
+    height: auto !important;
+    font-family: 'Nunito', sans-serif !important;
+}
+
+    .fc .fc-view-harness {
+        height: auto !important; /* Permite que el área de vista crezca */
+    }
+
+    .fc .fc-scroller {
+        overflow: visible !important; /* Desactiva el scroll interno */
+        height: auto !important;
+    }
+
+/* Estilos visuales opcionales para que combine mejor */
+.fc-theme-standard td,
+.fc-theme-standard th {
+    border-color: #f0f2f5 !important;
+}
+
+.fc .fc-daygrid-day-number {
+    color: #6c757d;
+    font-size: 0.85rem;
+    text-decoration: none;
+}
+
+/* --- GRILLA DE SLOTS (HORARIOS) --- */
+.slot-btn {
+    border: 1px solid #f0f2f5;
+    background-color: white;
+    border-radius: 14px;
+    padding: 12px 5px;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+}
+
+/* Estado Disponible */
+.slot-available {
+    color: #2c3e50;
+}
+
+    .slot-available:active {
+        transform: scale(0.95);
+        background-color: #f8f9fc;
+    }
+
+/* Estado Seleccionado */
+.slot-selected {
+    background-color: #6e7bff !important;
+    color: white !important;
+    border-color: #6e7bff !important;
+    box-shadow: 0 4px 12px rgba(110, 123, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+    .slot-selected .text-muted {
+        color: rgba(255,255,255,0.8) !important;
+    }
+
+/* Estado Deshabilitado */
+.slot-disabled {
+    background-color: #f8f9fc;
+    color: #adb5bd;
+    border-color: transparent;
+    box-shadow: none;
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* --- ACCIÓN FLOTANTE (Botón Confirmar) --- */
+.fixed-bottom-action {
+    position: fixed;
+    bottom: 70px; /* Encima del bottom nav */
+    left: 0;
+    width: 100%;
+    z-index: 90;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+}
+
+.spacer-bottom-large {
+    height: 160px;
+}
+
+.btn-pill {
+    border-radius: 50px;
+}
+
+.btn-primary {
+    background-color: #6e7bff;
+    border: none;
+}
+
+    .btn-primary:active {
+        background-color: #5a66d1;
+    }
+
+/* --- BOTTOM NAV --- */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    box-shadow: 0 -5px 30px rgba(0,0,0,0.05);
+    z-index: 1000;
+}
+
+.bottom-nav-item {
+    background: none;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #b1b6c9;
+    gap: 4px;
+    flex: 1;
+    height: 100%;
+}
+
+    .bottom-nav-item i {
+        font-size: 1.4rem;
+    }
+
+    .bottom-nav-item span {
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+
+    .bottom-nav-item.active {
+        color: #6e7bff;
+    }
+
+/* Utilidades */
+.fade-in {
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+.home-loading {
+    color: #9ba0b8;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

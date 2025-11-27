@@ -1,0 +1,255 @@
+﻿@page "/paciente/turnos"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+
+@using CliniPlus.Shared.DTOs
+@inject CliniPlus.Movil.Services.Contrato.IAuthService Auth
+@inject CliniPlus.Movil.Services.Contrato.ITurnoService TurnoService
+@inject NavigationManager Nav
+
+@if (_cargando)
+{
+    <div class="home-loading d-flex flex-column align-items-center justify-content-center" style="height: 60vh;">
+        <div class="spinner-border text-primary me-2"></div>
+        <p class="mt-2 text-muted small">Cargando tus turnos...</p>
+    </div>
+}
+else if (_usuario is null)
+{
+    <RedirectToLogin />
+}
+else
+{
+    <div class="home-page">
+
+        <!-- HEADER -->
+        <div class="home-header mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn-back" @onclick="IrInicio">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <div class="home-greeting">
+                    <p class="home-hello">Mis Turnos</p>
+                    <h4 class="home-name">Agenda</h4>
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <div class="home-avatar">
+                    <span>@GetInicial(_usuario.NombreCompleto)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- PRÓXIMOS TURNOS -->
+        <h6 class="section-title">Próximos Turnos</h6>
+
+        @if (_proximos.Count == 0)
+        {
+            <div class="empty-state-card mb-4">
+                <div class="icon-box-empty">
+                    <i class="bi bi-calendar-x"></i>
+                </div>
+                <p class="text-muted small fw-bold mb-2">
+                    No tienes turnos programados.
+                </p>
+                <button class="btn btn-primary btn-pill btn-sm px-4 shadow-sm" @onclick="IrNuevoTurno">
+                    <i class="bi bi-plus-lg me-1"></i> Reservar Ahora
+                </button>
+            </div>
+        }
+        else
+        {
+            <div class="d-flex flex-column gap-3 mb-4 fade-in">
+                @foreach (var t in _proximos)
+                {
+                    <div class="turn-card">
+                        <!-- Header de la tarjeta -->
+                        <div class="turn-header">
+                            <div class="turn-date-box">
+                                <div class="icon-box bg-blue-light text-blue rounded-3" style="width:40px; height:40px;">
+                                    <i class="bi bi-calendar-event"></i>
+                                </div>
+                                <div>
+                                    <div class="turn-day">@t.ScheduledAtUtc.ToLocalTime().ToString("dd MMM")</div>
+                                    <div class="turn-time">@t.ScheduledAtUtc.ToLocalTime().ToString("HH:mm") hs</div>
+                                </div>
+                            </div>
+                            <span class="badge-status reserved">
+                                Confirmado
+                            </span>
+                        </div>
+
+                        <!-- Info Médico -->
+                        <div class="doctor-info">
+                            <div class="doctor-avatar-small">
+                                @GetInicial(t.MedicoNombre)
+                            </div>
+                            <div class="doctor-details">
+                                <span class="doctor-name">Dr. @t.MedicoNombre</span>
+                                <span class="turn-type">
+                                    <i class="bi bi-clipboard2-pulse me-1"></i>
+                                    @(string.IsNullOrWhiteSpace(t.TipoTurnoNombre) ? "Consulta General" : t.TipoTurnoNombre)
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Botones -->
+                        @if (PuedeCancelar(t))
+                        {
+                            <button class="btn-cancel" @onclick="() => CancelarTurno(t.IdTurno)">
+                                <i class="bi bi-x-circle"></i> Cancelar Turno
+                            </button>
+                        }
+                    </div>
+                }
+            </div>
+        }
+
+        <!-- HISTORIAL -->
+        <h6 class="section-title">Historial</h6>
+
+        @if (_historial.Count == 0)
+        {
+            <div class="text-center py-4">
+                <p class="text-muted small fst-italic">No hay historial disponible.</p>
+            </div>
+        }
+        else
+        {
+            <div class="d-flex flex-column gap-2 pb-4 fade-in">
+                @foreach (var t in _historial)
+                {
+                    <div class="turn-card p-3 border-0 bg-white shadow-sm" style="opacity: 0.8;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-clock-history text-muted"></i>
+                                <span class="fw-bold text-dark small">@t.ScheduledAtUtc.ToLocalTime().ToString("dd/MM/yyyy")</span>
+                            </div>
+                            <span class="@GetBadgeClass(t.Estado)">
+                                @t.Estado
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="small text-muted">Dr. @t.MedicoNombre</span>
+                            <span class="small text-muted">@t.TipoTurnoNombre</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        <div class="spacer-bottom-large"></div>
+    </div>
+}
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav shadow-soft">
+    <button class="bottom-nav-item" @onclick="IrInicio">
+        <i class="bi bi-house-door"></i>
+        <span>Inicio</span>
+    </button>
+    <button class="bottom-nav-item active">
+        <i class="bi bi-calendar-check-fill"></i> <!-- Icono lleno para activo -->
+        <span>Turnos</span>
+    </button>
+    <button class="bottom-nav-item" @onclick="IrPerfilPaciente">
+        <i class="bi bi-person"></i>
+        <span>Perfil</span>
+    </button>
+</div>
+
+@code {
+    private AuthMeResponse? _usuario;
+    private List<TurnoListadoPacienteDTO> _proximos = new();
+    private List<TurnoListadoPacienteDTO> _historial = new();
+    private bool _cargando = true;
+    private bool _cancelando = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _usuario = await Auth.MeAsync();
+            if (_usuario is null || _usuario.Rol != "Paciente")
+            {
+                Nav.NavigateTo("/", true);
+                return;
+            }
+
+            var lista = await TurnoService.ObtenerMisTurnosAsync() ?? new List<TurnoListadoPacienteDTO>();
+            var ahoraUtc = DateTime.UtcNow;
+
+            foreach (var t in lista.OrderBy(t => t.ScheduledAtUtc))
+            {
+                // Filtramos 'Reservado' y futuro como Próximo
+                if (t.ScheduledAtUtc >= ahoraUtc && string.Equals(t.Estado, "Reservado", StringComparison.OrdinalIgnoreCase))
+                {
+                    _proximos.Add(t);
+                }
+                else
+                {
+                    // Todo lo demás (pasado, cancelado, completado) va a historial
+                    _historial.Add(t);
+                }
+            }
+            // Ordenar historial del más reciente al más antiguo
+            _historial = _historial.OrderByDescending(x => x.ScheduledAtUtc).ToList();
+        }
+        catch
+        {
+            Nav.NavigateTo("/", true);
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    private bool PuedeCancelar(TurnoListadoPacienteDTO t)
+    {
+        // Solo permitir cancelar si es futuro y está reservado
+        return t.ScheduledAtUtc > DateTime.UtcNow && 
+               string.Equals(t.Estado, "Reservado", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private async Task CancelarTurno(int idTurno)
+    {
+        if (_cancelando) return;
+        _cancelando = true;
+
+        var ok = await TurnoService.CancelarAsync(idTurno);
+
+        if (ok)
+        {
+            // Recarga completa para simplificar estado
+            Nav.NavigateTo(Nav.Uri, forceLoad: true);
+        }
+        
+        _cancelando = false;
+    }
+
+    private string GetBadgeClass(string estado)
+    {
+        return estado.ToLower() switch
+        {
+            "reservado" => "badge-status reserved",
+            "completado" => "badge-status completed",
+            "cancelado" => "badge-status cancelled",
+            "inasistencia" => "badge-status absent",
+            _ => "badge-status"
+        };
+    }
+
+    private string GetInicial(string? nombre) => 
+        string.IsNullOrWhiteSpace(nombre) ? "?" : nombre[0].ToString().ToUpper();
+
+    private async Task CerrarSesion()
+    {
+        await Auth.LogoutAsync();
+        Nav.NavigateTo("/", true);
+    }
+
+    private void IrInicio() => Nav.NavigateTo("/paciente/home", true);
+    private void IrNuevoTurno() => Nav.NavigateTo("/paciente/agenda"); // Ajustar ruta según corresponda
+    private void IrPerfilPaciente() => Nav.NavigateTo("/paciente/perfil");
+}

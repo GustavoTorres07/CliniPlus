@@ -7,11 +7,12 @@ namespace CliniPlus.Movil.Services.Contrato
     public interface IMedicoService
     {
         // MÉDICOS
-        Task<List<MedicoListadoDTO>?> ListarAsync();
+        Task<List<MedicoListadoDTO>?> ListarAsync(int? especialidadId = null);
         Task<MedicoDetalleDTO?> ObtenerAsync(int id);
         Task<MedicoDetalleDTO?> CrearAsync(MedicoCrearDTO dto);
         Task<MedicoDetalleDTO?> EditarAsync(int id, MedicoEditarDTO dto);
         Task<bool> CambiarEstadoAsync(int id, bool activo);
+
 
         // HORARIOS
         Task<List<MedicoHorarioDTO>?> ListarHorariosAsync(int medicoId);

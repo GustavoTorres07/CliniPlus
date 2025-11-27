@@ -1,0 +1,37 @@
+﻿@using Microsoft.JSInterop
+@inject IJSRuntime JS
+
+<div id="@CalendarId" style="width:100%; min-height:350px;"></div>
+
+@code {
+    [Parameter] public string CalendarId { get; set; } = "cliniplus-calendar";
+    [Parameter] public EventCallback<string> OnDateSelected { get; set; }
+
+    private DotNetObjectReference<FullCalendar>? _ref;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _ref = DotNetObjectReference.Create(this);
+
+            await JS.InvokeVoidAsync(
+                "CliniPlusCalendar.init",
+                CalendarId,
+                _ref,
+                null
+            );
+        }
+    }
+
+    [JSInvokable]
+    public async Task NotifyDateSelected(string date)
+    {
+        await OnDateSelected.InvokeAsync(date);
+    }
+
+    public void Dispose()
+    {
+        _ref?.Dispose();
+    }
+}

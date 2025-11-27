@@ -9,7 +9,7 @@ namespace CliniPlus.Shared.DTOs
     public class TipoTurnoDTO
     {
         public int IdTipoTurno { get; set; }
-        public string Nombre { get; set; } = null!;
+        public string Nombre { get; set; } = "";
         public int DuracionMin { get; set; }
     }
 }

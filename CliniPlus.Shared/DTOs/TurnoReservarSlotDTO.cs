@@ -6,15 +6,10 @@ using System.Threading.Tasks;
 
 namespace CliniPlus.Shared.DTOs
 {
-    public class TurnoCrearDTO
+    public class TurnoReservarSlotDTO
     {
         public int MedicoId { get; set; }
-        public int? PacienteId { get; set; } // null = disponible público
-        public int? TipoTurnoId { get; set; }
-
         public DateTime ScheduledAtUtc { get; set; }
-        public int DuracionMin { get; set; }
-
-        public string Estado { get; set; } = "Disponible";
+        public int TipoTurnoId { get; set; }
     }
 }

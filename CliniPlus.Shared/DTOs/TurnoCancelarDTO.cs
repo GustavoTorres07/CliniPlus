@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace CliniPlus.Shared.DTOs
 {
-    public class TurnoCambiarEstadoDTO
+    public class TurnoCancelarDTO
     {
-        public TurnoEstadoDTO Estado { get; set; }
+        public int TurnoId { get; set; }
+
     }
 }

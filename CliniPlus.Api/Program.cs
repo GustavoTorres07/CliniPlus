@@ -33,7 +33,7 @@ builder.Services.AddCors(opt =>
 
 
 // ---------------------------------------------------------------
-// 2. AÑADIDA LÍNEA PARA EVITAR EL RENOMBRAMIENTO DE CLAIMS
+// 2. EVITAR EL RENOMBRAMIENTO AUTOMÁTICO DE CLAIMS
 //    Debe ir ANTES de AddAuthentication
 // ---------------------------------------------------------------
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
@@ -50,7 +50,7 @@ builder.Services
         options.SaveToken = true;
 
         // ---------------------------------------------------------------
-        // 3. AÑADIDA OPCIÓN PARA EVITAR EL MAPEADO (redundante pero claro)
+        // 3. EVITAR EL MAPEADO EXTRA DE CLAIMS
         // ---------------------------------------------------------------
         options.MapInboundClaims = false;
 
@@ -65,12 +65,17 @@ builder.Services
             IssuerSigningKey = key,
             ClockSkew = TimeSpan.FromMinutes(2),
 
-            // ---------------------------------------------------------------
-            // 4. AÑADIDAS LÍNEAS PARA INDICAR DÓNDE LEER EL NOMBRE Y ROL
-            //    Esto es clave para que [Authorize(Role = "...")] funcione.
-            // ---------------------------------------------------------------
-            NameClaimType = ClaimTypes.Name,
-            RoleClaimType = ClaimTypes.Role
+            // -----------------------------------------------------------
+            // 4. MUY IMPORTANTE:
+            //    LE DECIMOS QUE USE TUS CLAIMS PERSONALIZADOS:
+            //    - "email" para el nombre
+            //    - "role" para el rol
+            //    Esto hace que [Authorize(Roles="Paciente")] funcione bien
+            //    y que User.IsInRole(...) vea el valor de Usuario.Rol.
+            // -----------------------------------------------------------
+            NameClaimType = "email",
+            RoleClaimType = "role"
+
         };
     });
 
@@ -85,15 +90,18 @@ builder.Services.AddAuthorization(opt =>
 
 builder.Services.AddControllers();
 
-// Servicios propios
+// Repositories propios
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<IMedicoRepository, MedicoRepository>();
 builder.Services.AddScoped<IEspecialidadRepository, EspecialidadRepository>();
 builder.Services.AddScoped<IObraSocialRepository, ObraSocialRepository>();
-builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();    
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IPacienteRepository, PacienteRepository>();
 builder.Services.AddScoped<ICie10Repository, Cie10Repository>();
-
+builder.Services.AddScoped<IMedicoPerfilRepository, MedicoPerfilRepository>();
+builder.Services.AddScoped<IAdminPerfilRepository, AdminPerfilRepository>();
+builder.Services.AddScoped<IPacientePerfilRepository, PacientePerfilRepository>();
+builder.Services.AddScoped<ITurnoRepository, TurnoRepository>();
 
 var app = builder.Build();
 

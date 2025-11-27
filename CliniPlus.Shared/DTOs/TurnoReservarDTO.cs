@@ -10,6 +10,9 @@ namespace CliniPlus.Shared.DTOs
     public class TurnoReservarDTO
     {
         [Required]
-        public int PacienteId { get; set; }
+        public int TurnoId { get; set; }
+
+        [Required]
+        public int TipoTurnoId { get; set; }
     }
 }

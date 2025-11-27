@@ -168,5 +168,29 @@ namespace CliniPlus.Api.Controllers
             if (!ok) return NotFound();
             return Ok();
         }
+
+        [HttpGet("publico")]
+        [Authorize(Roles = "Paciente,Administrador,Secretaria")]
+        public async Task<ActionResult<List<MedicoListadoDTO>>> ListarPublico(
+            [FromQuery] int? especialidadId = null)
+        {
+            List<MedicoListadoDTO> lista;
+
+            if (especialidadId.HasValue)
+            {
+                lista = await _repo.ListarPorEspecialidadAsync(especialidadId.Value);
+            }
+            else
+            {
+                lista = await _repo.ListarAsync();
+            }
+
+            var activos = lista
+                .Where(m => m.IsActive)
+                .ToList();
+
+            return Ok(activos);
+        }
+
     }
 }

@@ -1,0 +1,324 @@
+﻿/* -------------------------------------------------------------------------- */
+/* ESTILOS PARA GESTIÓN DE TURNOS (PACIENTE)                    */
+/* Fuente: Nunito | Color primario: #6e7bff                   */
+/* -------------------------------------------------------------------------- */
+
+/* Global */
+.home-page {
+    padding: 24px 20px;
+    font-family: 'Nunito', sans-serif;
+    background-color: #f8f9fc;
+    min-height: 100vh;
+    padding-bottom: 100px;
+}
+
+/* --- HEADER --- */
+.home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.home-hello {
+    font-size: 0.85rem;
+    color: #9ba0b8;
+    margin: 0;
+}
+
+.home-name {
+    font-weight: 800;
+    color: #15161b;
+    margin: 0;
+    font-size: 1.4rem;
+}
+
+/* Botón Volver */
+.btn-back {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: white;
+    border: 1px solid #f0f2f5;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 1.1rem;
+}
+
+    .btn-back:active {
+        transform: scale(0.95);
+        background-color: #f1f3f5;
+    }
+
+/* Avatar */
+.home-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #009688, #80cbc4);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 10px rgba(0, 150, 136, 0.3);
+}
+
+.btn-logout {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: white;
+    border: 1px solid #f0f2f5;
+    color: #ff6b6b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- TARJETAS DE TURNO --- */
+.turn-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    border: 1px solid transparent;
+    padding: 16px;
+    transition: all 0.2s;
+    margin-bottom: 12px;
+}
+
+    .turn-card:active {
+        transform: scale(0.99);
+        background-color: #fafafa;
+    }
+
+/* Encabezado de la tarjeta (Fecha y Estado) */
+.turn-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.turn-date-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.turn-day {
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: #15161b;
+    line-height: 1;
+}
+
+.turn-time {
+    font-size: 0.85rem;
+    color: #6c757d;
+    font-weight: 600;
+}
+
+/* Badges de Estado */
+.badge-status {
+    padding: 6px 12px;
+    border-radius: 50px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+    .badge-status.reserved {
+        background-color: #e3f2fd;
+        color: #2196f3;
+    }
+
+    .badge-status.completed {
+        background-color: #e8f5e9;
+        color: #4caf50;
+    }
+
+    .badge-status.cancelled {
+        background-color: #ffebee;
+        color: #f44336;
+    }
+
+    .badge-status.absent {
+        background-color: #fff3e0;
+        color: #ff9800;
+    }
+
+/* Info del Médico */
+.doctor-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f8f9fc;
+}
+
+.doctor-avatar-small {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background-color: #f3e5f5;
+    color: #8e24aa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.doctor-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.doctor-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0;
+}
+
+.turn-type {
+    font-size: 0.75rem;
+    color: #9ba0b8;
+}
+
+/* Botones de Acción dentro de tarjeta */
+.btn-cancel {
+    width: 100%;
+    border: 1px solid #ffebee;
+    background-color: #fff;
+    color: #ef5350;
+    border-radius: 12px;
+    padding: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+    .btn-cancel:active {
+        background-color: #ffebee;
+    }
+
+/* --- ESTADOS VACÍOS --- */
+.empty-state-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px 20px;
+    text-align: center;
+    border: 1px dashed #e0e0e0;
+}
+
+.icon-box-empty {
+    width: 50px;
+    height: 50px;
+    background-color: #f1f3f5;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+    color: #adb5bd;
+    font-size: 1.5rem;
+}
+
+.btn-pill {
+    border-radius: 50px;
+    padding: 10px 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.btn-primary {
+    background-color: #6e7bff;
+    border: none;
+    color: white;
+}
+
+    .btn-primary:active {
+        background-color: #5a66d1;
+    }
+
+.section-title {
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #15161b;
+    margin: 20px 0 10px 4px;
+}
+
+/* --- BOTTOM NAV --- */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    box-shadow: 0 -5px 30px rgba(0,0,0,0.05);
+    z-index: 1000;
+}
+
+.bottom-nav-item {
+    background: none;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #b1b6c9;
+    gap: 4px;
+    flex: 1;
+    height: 100%;
+}
+
+    .bottom-nav-item i {
+        font-size: 1.4rem;
+    }
+
+    .bottom-nav-item span {
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+
+    .bottom-nav-item.active {
+        color: #6e7bff;
+    }
+
+/* Utilidades */
+.fade-in {
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+.home-loading {
+    color: #9ba0b8;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

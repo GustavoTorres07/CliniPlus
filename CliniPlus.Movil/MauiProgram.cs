@@ -46,7 +46,10 @@ public static class MauiProgram
         builder.Services.AddScoped<IUsuarioService, UsuarioService>();
         builder.Services.AddScoped<IPacienteService, PacienteService>();
         builder.Services.AddScoped<ICie10Service, Cie10Service>();
-
+        builder.Services.AddScoped<IMedicoPerfilService, MedicoPerfilService>();
+        builder.Services.AddScoped<IAdminPerfilService, AdminPerfilService>();
+        builder.Services.AddScoped<IPacientePerfilService, PacientePerfilService>();
+        builder.Services.AddScoped<ITurnoService, TurnoService>();
 
 
 

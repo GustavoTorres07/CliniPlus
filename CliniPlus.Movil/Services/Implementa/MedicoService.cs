@@ -19,10 +19,16 @@ namespace CliniPlus.Movil.Services.Implementa
 
         // ================= MÉDICOS =================
 
-        public async Task<List<MedicoListadoDTO>?> ListarAsync()
+        public async Task<List<MedicoListadoDTO>?> ListarAsync(int? especialidadId = null)
         {
             var cli = CreateClient();
-            var res = await cli.GetAsync("api/medicos");
+
+            string url = "api/medicos/publico";
+
+            if (especialidadId.HasValue && especialidadId.Value > 0)
+                url += $"?especialidadId={especialidadId.Value}";
+
+            var res = await cli.GetAsync(url);
 
             if (!res.IsSuccessStatusCode)
                 return null;

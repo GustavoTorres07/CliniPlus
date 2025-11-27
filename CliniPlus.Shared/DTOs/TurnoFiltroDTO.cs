@@ -11,8 +11,10 @@ namespace CliniPlus.Shared.DTOs
         public int? MedicoId { get; set; }
         public int? PacienteId { get; set; }
         public TurnoEstadoDTO? Estado { get; set; }
+
         public DateTime? DesdeUtc { get; set; }
         public DateTime? HastaUtc { get; set; }
+
         public int? TipoTurnoId { get; set; }
 
         // Paginación

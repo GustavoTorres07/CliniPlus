@@ -75,9 +75,8 @@ namespace CliniPlus.Api.Controllers
                 User.FindFirstValue(ClaimTypes.Email) ??
                 User.FindFirstValue("email");
 
-            string? rol =
-                User.FindFirstValue(ClaimTypes.Role) ??
-                User.FindFirstValue("role");
+            string? rol = User.FindFirstValue("role");
+
 
             if (id is null)
                 return Unauthorized("No se pudo obtener el usuario desde el token.");

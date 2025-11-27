@@ -1,5 +1,6 @@
 ﻿@page "/paciente/home"
 @layout CliniPlus.Movil.Components.Layout.EmptyLayout
+
 @using CliniPlus.Shared
 @using CliniPlus.Shared.DTOs
 @inject CliniPlus.Movil.Services.Contrato.IAuthService Auth
@@ -9,7 +10,7 @@
 {
     <div class="home-loading d-flex flex-column align-items-center justify-content-center" style="height: 60vh;">
         <div class="spinner-border text-success me-2"></div>
-        <p class="mt-2 text-muted small">Cargando inicio del paciente...</p>
+        <p class="mt-2 text-muted small">Cargando inicio...</p>
     </div>
 }
 else if (_usuario is null)
@@ -24,7 +25,7 @@ else
             <div class="home-greeting">
                 <p class="home-hello">Hola,</p>
                 <h4 class="home-name">@_usuario.NombreCompleto</h4>
-                <span class="badge bg-green-light text-green px-3 py-1 rounded-pill">
+                <span class="badge badge-paciente mt-1">
                     Paciente
                 </span>
             </div>
@@ -34,59 +35,64 @@ else
                     <i class="bi bi-box-arrow-right"></i>
                 </button>
                 <div class="home-avatar">
-                    <span>@_usuario.NombreCompleto[0].ToString().ToUpper()</span>
+                    <span>@GetInicial(_usuario.NombreCompleto)</span>
                 </div>
             </div>
         </div>
 
-        <!-- ACCIONES RÁPIDAS -->
-        <h6 class="section-title">Turnos</h6>
+        <!-- ACCIONES RÁPIDAS: TURNOS -->
+        <h6 class="section-title">Gestión de Turnos</h6>
         <div class="home-quick-actions mb-4">
             <button class="quick-card" @onclick="IrNuevoTurno">
                 <div class="icon-box bg-blue-light">
-                    <i class="bi bi-plus-circle text-primary"></i>
+                    <i class="bi bi-plus-lg text-blue"></i>
                 </div>
-                <span>Reservar turno</span>
+                <span>Reservar Turno</span>
             </button>
             <button class="quick-card" @onclick="IrMisTurnos">
                 <div class="icon-box bg-purple-light">
-                    <i class="bi bi-calendar-check text-purple"></i>
+                    <i class="bi bi-calendar2-check text-purple"></i>
                 </div>
-                <span>Mis turnos</span>
+                <span>Mis Turnos</span>
             </button>
         </div>
 
-        <h6 class="section-title">Mi salud</h6>
+        <!-- ACCIONES RÁPIDAS: MI SALUD -->
+        <h6 class="section-title">Mi Salud</h6>
         <div class="home-quick-actions mb-4">
             <button class="quick-card" @onclick="IrHistorial">
                 <div class="icon-box bg-orange-light">
-                    <i class="bi bi-journal-medical text-orange"></i>
+                    <i class="bi bi-file-earmark-medical text-orange"></i>
                 </div>
-                <span>Historial clínico</span>
+                <span>Historial</span>
             </button>
             <button class="quick-card" @onclick="IrPerfilPaciente">
                 <div class="icon-box bg-green-light">
-                    <i class="bi bi-person-circle text-green"></i>
+                    <i class="bi bi-person-vcard text-green"></i>
                 </div>
-                <span>Mi perfil</span>
+                <span>Mi Perfil</span>
             </button>
         </div>
 
-        <!-- RESUMEN -->
+        <!-- PRÓXIMO TURNO (Resumen) -->
         <div class="home-card mb-2">
             <div class="home-card-header">
-                <span class="home-card-title">Próximo turno</span>
-                <i class="bi bi-clock text-muted"></i>
+                <span class="home-card-title">Próximo Turno</span>
+                <i class="bi bi-clock-history text-muted fs-5"></i>
             </div>
             <div class="admin-metrics">
                 <div class="metric-row">
-                    <span class="metric-label"><i class="bi bi-calendar-event me-2"></i>Fecha</span>
-                    <span class="metric-value">—</span>
+                    <span class="metric-label">
+                        <i class="bi bi-calendar-event me-2 text-primary"></i>Fecha
+                    </span>
+                    <span class="metric-value text-muted small fw-bold">Sin turnos</span>
                 </div>
                 <div class="metric-divider"></div>
                 <div class="metric-row">
-                    <span class="metric-label"><i class="bi bi-person-badge me-2"></i>Médico</span>
-                    <span class="metric-value">—</span>
+                    <span class="metric-label">
+                        <i class="bi bi-person-badge me-2 text-success"></i>Médico
+                    </span>
+                    <span class="metric-value text-muted small fw-bold">—</span>
                 </div>
             </div>
         </div>
@@ -95,6 +101,7 @@ else
     </div>
 }
 
+<!-- BOTTOM NAV -->
 <div class="bottom-nav shadow-soft">
     <button class="bottom-nav-item active" @onclick="IrInicio">
         <i class="bi bi-house-door-fill"></i>
@@ -105,7 +112,7 @@ else
         <span>Turnos</span>
     </button>
     <button class="bottom-nav-item" @onclick="IrPerfilPaciente">
-        <i class="bi bi-person-circle"></i>
+        <i class="bi bi-person"></i>
         <span>Perfil</span>
     </button>
 </div>
@@ -143,9 +150,12 @@ else
         Nav.NavigateTo("/", true);
     }
 
-    private void IrInicio()          => Nav.NavigateTo("/paciente/home", true);
-    private void IrNuevoTurno()      => Nav.NavigateTo("/paciente/turnos/nuevo");
-    private void IrMisTurnos()       => Nav.NavigateTo("/paciente/turnos");
-    private void IrHistorial()       => Nav.NavigateTo("/paciente/historial");
-    private void IrPerfilPaciente()  => Nav.NavigateTo("/paciente/perfil");
+    private string GetInicial(string? nombre) =>
+        string.IsNullOrWhiteSpace(nombre) ? "?" : nombre[0].ToString().ToUpper();
+
+    private void IrInicio() => Nav.NavigateTo("/paciente/home", true);
+    private void IrNuevoTurno() => Nav.NavigateTo("/paciente/agenda");
+    private void IrMisTurnos() => Nav.NavigateTo("/paciente/turnos");
+    private void IrHistorial() => Nav.NavigateTo("/paciente/historial");
+    private void IrPerfilPaciente() => Nav.NavigateTo("/paciente/perfil");
 }
