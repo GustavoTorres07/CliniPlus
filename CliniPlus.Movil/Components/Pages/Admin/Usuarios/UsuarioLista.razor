@@ -1,4 +1,4 @@
-﻿@page "/admin/usuarios"
+﻿@page "/Administrador/usuarios"
 @layout CliniPlus.Movil.Components.Layout.EmptyLayout
 @using CliniPlus.Shared.DTOs
 @using CliniPlus.Movil.Services.Contrato
@@ -41,7 +41,7 @@ else
                     <option value="Administrador">Administradores</option>
                     <option value="Medico">Médicos</option>
                     <option value="Paciente">Pacientes</option>
-                    <option value="Secretario">Secretarios</option>
+                    <option value="Secretaria">Secretarios</option>
                 </select>
             </div>
         </div>
@@ -149,9 +149,9 @@ else
         }
     }
 
-    private void IrInicio() => Nav.NavigateTo("/admin/home");
-    private void IrCrear() => Nav.NavigateTo("/admin/usuarios/crear");
-    private void IrDetalle(int id) => Nav.NavigateTo($"/admin/usuarios/{id}");
+    private void IrInicio() => Nav.NavigateTo("/Administrador/home");
+    private void IrCrear() => Nav.NavigateTo("/Administrador/usuarios/crear");
+    private void IrDetalle(int id) => Nav.NavigateTo($"/Administrador/usuarios/{id}");
 
     private async Task CerrarSesion()
     {

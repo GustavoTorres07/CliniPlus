@@ -1,0 +1,333 @@
+﻿/* -------------------------------------------------------------------------- */
+/* ESTILOS PARA AGENDA GENERAL (MÉDICO)                         */
+/* Fuente: Nunito | Color primario: #6e7bff                   */
+/* -------------------------------------------------------------------------- */
+
+/* Global */
+.home-page {
+    padding: 24px 20px;
+    font-family: 'Nunito', sans-serif;
+    background-color: #f8f9fc;
+    min-height: 100vh;
+    padding-bottom: 100px;
+}
+
+/* --- HEADER --- */
+.home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.home-hello {
+    font-size: 0.85rem;
+    color: #9ba0b8;
+    margin: 0;
+}
+
+.home-name {
+    font-weight: 800;
+    color: #15161b;
+    margin: 0;
+    font-size: 1.4rem;
+}
+
+.badge-medico {
+    background-color: #e2e6ff;
+    color: #6e7bff;
+    font-weight: 700;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    padding: 4px 10px;
+}
+
+/* Avatar Header */
+.home-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #6e7bff, #b3baff);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 10px rgba(110, 123, 255, 0.3);
+}
+
+.btn-logout {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: white;
+    border: 1px solid #f0f2f5;
+    color: #ff6b6b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+    .btn-logout:active {
+        transform: scale(0.95);
+        background-color: #fff5f5;
+    }
+
+/* --- CONTROLES DE FECHA (Card) --- */
+.date-controls-card {
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    border: 1px solid #f0f2f5;
+    padding: 16px;
+}
+
+.btn-date-nav {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #f8f9fc;
+    border: none;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+    .btn-date-nav:active {
+        background-color: #e2e6ff;
+        color: #6e7bff;
+    }
+
+.current-date-display {
+    text-align: center;
+}
+
+.day-name {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #15161b;
+    line-height: 1.2;
+    text-transform: capitalize;
+}
+
+.full-date {
+    font-size: 0.8rem;
+    color: #9ba0b8;
+    font-weight: 600;
+}
+
+/* Input de fecha estilizado */
+.input-date-custom {
+    border: 1px solid #f0f2f5;
+    background-color: #f8f9fc;
+    border-radius: 12px;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    color: #6e7bff;
+    font-weight: 600;
+    outline: none;
+    width: auto;
+}
+
+/* Botón Hoy */
+.btn-today {
+    border: 1px solid #6e7bff;
+    color: #6e7bff;
+    background: transparent;
+    border-radius: 50px;
+    padding: 6px 16px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    transition: all 0.2s;
+}
+
+    .btn-today:active {
+        background-color: #6e7bff;
+        color: white;
+    }
+
+/* --- TARJETAS DE TURNO --- */
+.turn-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    border: 1px solid transparent;
+    padding: 16px;
+    transition: all 0.2s;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+    .turn-card:active {
+        transform: scale(0.98);
+        background-color: #fbfbfc;
+    }
+
+    /* Barra lateral de estado */
+    .turn-card::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 6px;
+        background-color: #e0e0e0;
+    }
+
+    .turn-card.status-active::before {
+        background-color: #4caf50;
+    }
+
+    .turn-card.status-reserved::before {
+        background-color: #6e7bff;
+    }
+
+    .turn-card.status-free::before {
+        background-color: #e0e0e0;
+    }
+
+.turn-content {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    padding-left: 8px;
+}
+
+/* Hora */
+.time-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 50px;
+}
+
+.time-text {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #15161b;
+    line-height: 1;
+}
+
+/* Info */
+.info-box {
+    flex-grow: 1;
+}
+
+.patient-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #2c3e50;
+    margin-bottom: 2px;
+    display: block;
+}
+
+.turn-type {
+    font-size: 0.75rem;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Badge Estado */
+.badge-status {
+    padding: 4px 10px;
+    border-radius: 50px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.bg-success-subtle {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.bg-primary-subtle {
+    background-color: #e2e6ff;
+    color: #6e7bff;
+}
+
+.bg-light-subtle {
+    background-color: #f8f9fc;
+    color: #9ba0b8;
+}
+
+/* --- EMPTY STATE --- */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    background: white;
+    border-radius: 24px;
+    border: 1px dashed #e0e0e0;
+}
+
+/* --- BOTTOM NAV --- */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    box-shadow: 0 -5px 30px rgba(0,0,0,0.05);
+    z-index: 1000;
+}
+
+.bottom-nav-item {
+    background: none;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #b1b6c9;
+    gap: 4px;
+    flex: 1;
+    height: 100%;
+}
+
+    .bottom-nav-item i {
+        font-size: 1.4rem;
+    }
+
+    .bottom-nav-item span {
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+
+    .bottom-nav-item.active {
+        color: #6e7bff;
+    }
+
+/* Utilidades */
+.home-loading {
+    color: #9ba0b8;
+}
+
+.fade-in {
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

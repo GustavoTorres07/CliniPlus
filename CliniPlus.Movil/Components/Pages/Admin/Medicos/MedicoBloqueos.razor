@@ -1,4 +1,4 @@
-﻿@page "/admin/medicos/{Id:int}/bloqueos"
+﻿@page "/Administrador/medicos/{Id:int}/bloqueos"
 @layout CliniPlus.Movil.Components.Layout.EmptyLayout
 
 @using CliniPlus.Shared.DTOs
@@ -213,7 +213,7 @@ else
         try
         {
             var me = await Auth.MeAsync();
-            if (me is null || (me.Rol != "Administrador" && me.Rol != "Secretario"))
+            if (me is null || (me.Rol != "Administrador" && me.Rol != "Secretaria"))
             {
                 _permitido = false;
                 Nav.NavigateTo("/", true);
@@ -302,8 +302,8 @@ else
 
     private string GetInicial(string? nombre) => string.IsNullOrWhiteSpace(nombre) ? "?" : nombre[0].ToString().ToUpper();
 
-    private void IrInicio() => Nav.NavigateTo("/admin/home");
-    private void IrMedicos() => Nav.NavigateTo("/admin/medicos");
+    private void IrInicio() => Nav.NavigateTo("/Administrador/home");
+    private void IrMedicos() => Nav.NavigateTo("/Administrador/medicos");
 
     private async Task CerrarSesion()
     {

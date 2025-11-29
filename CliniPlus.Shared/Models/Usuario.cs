@@ -27,7 +27,6 @@ namespace CliniPlus.Shared.Models
         [Required, MaxLength(200)]
         public string PasswordHash { get; set; } = null!;
 
-        /// <summary>Administrador | Secretario | Medico | Paciente</summary>
         [Required, MaxLength(20)]
         public string Rol { get; set; } = null!;
 
@@ -36,9 +35,10 @@ namespace CliniPlus.Shared.Models
 
         [Required]
         public DateTime FechaRegistro { get; set; } = DateTime.UtcNow;
-
-        // Relaciones 1:1 (dependiente define la FK)
         public virtual Medico? Medico { get; set; }
         public virtual Paciente? Paciente { get; set; }
+
+        public bool RecuperarContrasena { get; set; } = false;
+
     }
 }

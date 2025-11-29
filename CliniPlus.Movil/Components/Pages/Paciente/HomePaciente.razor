@@ -49,11 +49,19 @@ else
                 </div>
                 <span>Reservar Turno</span>
             </button>
+
             <button class="quick-card" @onclick="IrMisTurnos">
                 <div class="icon-box bg-purple-light">
                     <i class="bi bi-calendar2-check text-purple"></i>
                 </div>
                 <span>Mis Turnos</span>
+            </button>
+
+            <button class="quick-card" @onclick="IrMedicosDisponibles">
+                <div class="icon-box bg-teal-light"> 
+                <i class="bi bi-person"></i>
+                </div>
+                <span>Médicos disponibles</span>
             </button>
         </div>
 
@@ -66,6 +74,11 @@ else
                 </div>
                 <span>Historial</span>
             </button>
+        </div>
+
+        <!-- ACCIONES RÁPIDAS: DATOS PERSONALES -->
+        <h6 class="section-title">Datos Personales</h6>
+        <div class="home-quick-actions mb-4">
             <button class="quick-card" @onclick="IrPerfilPaciente">
                 <div class="icon-box bg-green-light">
                     <i class="bi bi-person-vcard text-green"></i>
@@ -150,7 +163,7 @@ else
         Nav.NavigateTo("/", true);
     }
 
-    private string GetInicial(string? nombre) =>
+    private string GetInicial(string? nombre) => 
         string.IsNullOrWhiteSpace(nombre) ? "?" : nombre[0].ToString().ToUpper();
 
     private void IrInicio() => Nav.NavigateTo("/paciente/home", true);
@@ -158,4 +171,7 @@ else
     private void IrMisTurnos() => Nav.NavigateTo("/paciente/turnos");
     private void IrHistorial() => Nav.NavigateTo("/paciente/historial");
     private void IrPerfilPaciente() => Nav.NavigateTo("/paciente/perfil");
+    
+    // NUEVO: navegación a la lista de médicos
+    private void IrMedicosDisponibles() => Nav.NavigateTo("/paciente/medicos");
 }

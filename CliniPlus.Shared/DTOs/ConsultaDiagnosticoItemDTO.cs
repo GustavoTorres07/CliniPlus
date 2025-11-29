@@ -14,7 +14,6 @@ namespace CliniPlus.Shared.DTOs
 
         [MaxLength(500)]
         public string? Comentario { get; set; }
-
         public bool Principal { get; set; } = false;
     }
 }

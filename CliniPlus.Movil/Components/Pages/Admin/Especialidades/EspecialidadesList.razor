@@ -1,4 +1,4 @@
-﻿@page "/admin/especialidades"
+﻿@page "/Administrador/especialidades"
 @layout CliniPlus.Movil.Components.Layout.EmptyLayout
 @using CliniPlus.Movil.Services.Contrato
 @using CliniPlus.Shared.DTOs
@@ -121,10 +121,10 @@ else
         }
     }
 
-    private void Crear() => Nav.NavigateTo("/admin/especialidades/crear");
-    private void Editar(int id) => Nav.NavigateTo($"/admin/especialidades/{id}");
+    private void Crear() => Nav.NavigateTo("/Administrador/especialidades/crear");
+    private void Editar(int id) => Nav.NavigateTo($"/Administrador/especialidades/{id}");
 
-    private void IrInicio() => Nav.NavigateTo("/admin/home");
+    private void IrInicio() => Nav.NavigateTo("/Administrador/home");
 
     private async Task CerrarSesion()
     {

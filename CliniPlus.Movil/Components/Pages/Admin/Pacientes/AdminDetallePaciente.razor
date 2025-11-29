@@ -1,4 +1,4 @@
-﻿@page "/admin/pacientes/{Id:int}"
+﻿@page "/Administrador/pacientes/{Id:int}"
 @layout CliniPlus.Movil.Components.Layout.EmptyLayout
 
 @using CliniPlus.Shared.DTOs
@@ -60,7 +60,7 @@ else
 
             <div class="mb-3">
                 <label class="small text-muted fw-bold d-block mb-1">DNI</label>
-                <span class="fs-5 fw-semibold text-dark">@_paciente.DNI</span>
+                <span class="fs-5 fw-semibold text-dark">@_paciente!.DNI</span>
             </div>
 
             <div class="row mb-3">
@@ -217,7 +217,7 @@ else
         {
             _cargando = true;
             var me = await Auth.MeAsync();
-            if (me is null || (me.Rol != "Administrador" && me.Rol != "Secretario"))
+            if (me is null || (me.Rol != "Administrador" && me.Rol != "Secretaria"))
             {
                 _accesoPermitido = false;
                 Nav.NavigateTo("/", true);
@@ -237,14 +237,14 @@ else
         }
     }
 
-    private void IrInicio() => Nav.NavigateTo("/admin/home");
-    private void IrPacientes() => Nav.NavigateTo("/admin/pacientes"); // Usado si quieres volver a la lista
+    private void IrInicio() => Nav.NavigateTo("/Administrador/home");
+    private void IrPacientes() => Nav.NavigateTo("/Administrador/pacientes"); // Usado si quieres volver a la lista
     
     private void IrEditar()
     {
         if (_paciente is null) return;
         // IMPORTANTE: Coincide con la ruta que definimos antes
-        Nav.NavigateTo($"/admin/pacientes/editar/{_paciente.IdPaciente}");
+        Nav.NavigateTo($"/Administrador/pacientes/editar/{_paciente.IdPaciente}");
     }
 
     private async Task ToggleEstado()

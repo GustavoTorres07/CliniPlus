@@ -1,4 +1,4 @@
-﻿@page "/admin/home"
+﻿@page "/Administrador/home"
 @layout CliniPlus.Movil.Components.Layout.EmptyLayout
 @using CliniPlus.Shared.DTOs
 @using CliniPlus.Shared
@@ -197,16 +197,16 @@ else
         Nav.NavigateTo("/", forceLoad: true);
     }
 
-    private void IrInicio() => Nav.NavigateTo("/admin/home", true);
-    private void IrUsuarios() => Nav.NavigateTo("/admin/usuarios");
-    private void IrMedicos() => Nav.NavigateTo("/admin/medicos");
-    private void IrPacientes() => Nav.NavigateTo("/admin/pacientes");
-    private void IrObrasSociales() => Nav.NavigateTo("/admin/obras-sociales");
-    private void IrEspecialidades() => Nav.NavigateTo("/admin/especialidades");
-    private void IrCie10() => Nav.NavigateTo("/admin/cie10");
+    private void IrInicio() => Nav.NavigateTo("/Administrador/home", true);
+    private void IrUsuarios() => Nav.NavigateTo("/Administrador/usuarios");
+    private void IrMedicos() => Nav.NavigateTo("/Administrador/medicos");
+    private void IrPacientes() => Nav.NavigateTo("/Administrador/pacientes");
+    private void IrObrasSociales() => Nav.NavigateTo("/Administrador/obras-sociales");
+    private void IrEspecialidades() => Nav.NavigateTo("/Administrador/especialidades");
+    private void IrCie10() => Nav.NavigateTo("/Administrador/cie10");
 
     // Acceso central a horarios / bloqueos (entra por listado de médicos)
-    private void IrAgendaMedicos() => Nav.NavigateTo("/admin/medicos/horarios");
+    private void IrAgendaMedicos() => Nav.NavigateTo("/Administrador/medicos/horarios");
 
-    private void IrPerfilAdmin() => Nav.NavigateTo("/admin/perfil", true);
+    private void IrPerfilAdmin() => Nav.NavigateTo("/Administrador/perfil", true);
 }

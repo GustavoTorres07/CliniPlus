@@ -1,4 +1,4 @@
-﻿@page "/admin/especialidades/{Id:int}"
+﻿@page "/Administrador/especialidades/{Id:int}"
 @layout CliniPlus.Movil.Components.Layout.EmptyLayout
 @using CliniPlus.Movil.Services.Contrato
 @using CliniPlus.Shared.DTOs
@@ -121,7 +121,7 @@ else
     {
         if (_model is null) return;
         await SpecialService.EditarAsync(Id, _model);
-        Nav.NavigateTo("/admin/especialidades", true); // O volver atrás
+        Nav.NavigateTo("/Administrador/especialidades", true); // O volver atrás
     }
 
     private async Task ToggleEstado()
@@ -132,7 +132,7 @@ else
         _model.IsActive = nuevoEstado;
     }
 
-    private void IrInicio() => Nav.NavigateTo("/admin/home");
+    private void IrInicio() => Nav.NavigateTo("/Administrador/home");
     
     private async Task CerrarSesion()
     {

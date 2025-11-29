@@ -8,6 +8,7 @@
 @inject CliniPlus.Movil.Services.Contrato.ITurnoService TurnoService
 @inject CliniPlus.Movil.Services.Contrato.IMedicoService MedicoService
 @inject CliniPlus.Movil.Services.Contrato.IEspecialidadService EspecialidadService
+@inject CliniPlus.Movil.Services.Contrato.ITipoTurnoService TipoTurnoService   
 @inject NavigationManager Nav
 
 @if (_cargando)
@@ -58,7 +59,7 @@ else
             </div>
 
             <!-- MÉDICO -->
-            <div class="mb-2">
+            <div class="mb-3">
                 <label class="label-mini">Médico</label>
                 <select class="form-select input-modern" 
                         @onchange="OnMedicoChanged"
@@ -76,13 +77,27 @@ else
                     <span class="text-danger small mt-1 d-block">No hay médicos para esta especialidad.</span>
                 }
             </div>
+
+            <!-- TIPO DE TURNO (NUEVO) -->
+            <div class="mb-2">
+                <label class="label-mini">Tipo de turno</label>
+                <select class="form-select input-modern"
+                        @bind="_tipoTurnoSeleccionadoId">
+                    <option value="0">-- Seleccionar Tipo --</option>
+                    @foreach (var t in _tiposTurno)
+                    {
+                        <option value="@t.IdTipoTurno">
+                            @t.Nombre (@t.DuracionMin min)
+                        </option>
+                    }
+                </select>
+            </div>
         </div>
 
         <!-- TARJETA: CALENDARIO -->
         <div class="home-card p-4 mb-3">
             <h6 class="section-title mb-3">Fecha</h6>
             <div class="calendar-wrapper">
-                <!-- Se asume que FullCalendar renderiza bien dentro del contenedor -->
                 <FullCalendar CalendarId="pac-cal" OnDateSelected="OnFechaSeleccionada" />
             </div>
             <div class="text-center mt-2">
@@ -120,8 +135,8 @@ else
                 <div class="row g-2 fade-in">
                     @foreach (var slot in _slots)
                     {
-                        var isSelected = _slotSeleccionado != null &&
-                                         slot.ScheduledAtUtc == _slotSeleccionado.ScheduledAtUtc;
+                        // ✅ Solo se marca seleccionado exactamente el objeto que guardamos en _slotSeleccionado
+                        var isSelected = object.ReferenceEquals(slot, _slotSeleccionado);
 
                         var classes = "btn w-100 slot-btn";
 
@@ -157,7 +172,7 @@ else
             }
 
             <button class="btn btn-primary btn-pill w-100 py-3 shadow-soft fw-bold d-flex justify-content-center align-items-center gap-2"
-                    disabled="@(_slotSeleccionado is null || _confirmando)"
+                    disabled="@(_slotSeleccionado is null || _confirmando || _tipoTurnoSeleccionadoId <= 0)"
                     @onclick="ConfirmarReserva">
                 @if (_confirmando)
                 {
@@ -201,6 +216,10 @@ else
     private List<MedicoListadoDTO> _medicos = new();
     private int _medicoIdSeleccionado;
 
+    // 👉 NUEVO: tipos de turno
+    private List<TipoTurnoDTO> _tiposTurno = new();
+    private int _tipoTurnoSeleccionadoId;
+
     private DateTime _fechaSeleccionada = DateTime.Today;
     private List<TurnoSlotDTO>? _slots;
 
@@ -222,8 +241,14 @@ else
             }
 
             _especialidades = await EspecialidadService.ListarAsync() ?? new();
-            // Cargar todos los médicos inicialmente
-            _medicos = await MedicoService.ListarAsync(null) ?? new();
+            _medicos        = await MedicoService.ListarAsync(null)   ?? new();
+
+            // 👉 Cargar tipos de turno
+            _tiposTurno = await TipoTurnoService.ListarAsync() ?? new();
+
+            // Si hay solo uno, lo dejamos seleccionado para simplificar
+            if (_tiposTurno.Count == 1)
+                _tipoTurnoSeleccionadoId = _tiposTurno[0].IdTipoTurno;
         }
         finally
         {
@@ -236,7 +261,6 @@ else
         _medicos = await MedicoService.ListarAsync(_especialidadIdSeleccionada == 0 ? null : _especialidadIdSeleccionada)
                    ?? new List<MedicoListadoDTO>();
 
-        // Reset
         _medicoIdSeleccionado = 0;
         _slots = null;
         _slotSeleccionado = null;
@@ -250,8 +274,7 @@ else
 
         if (_medicoIdSeleccionado > 0)
         {
-            // Pequeña carga visual
-            await Task.Delay(200); 
+            await Task.Delay(200);
             _slots = await TurnoService.ObtenerSlotsDiaAsync(_medicoIdSeleccionado, _fechaSeleccionada)
                      ?? new List<TurnoSlotDTO>();
         }
@@ -305,6 +328,12 @@ else
         if (_slotSeleccionado is null || _medicoIdSeleccionado <= 0)
             return;
 
+        if (_tipoTurnoSeleccionadoId <= 0)
+        {
+            _mensaje = "Tenés que seleccionar el tipo de turno.";
+            return;
+        }
+
         _confirmando = true;
         _mensaje = "";
 
@@ -314,8 +343,8 @@ else
         {
             var dto = new TurnoReservarDTO
             {
-                TurnoId = _slotSeleccionado.IdTurno,
-                TipoTurnoId = 1 
+                TurnoId     = _slotSeleccionado.IdTurno,
+                TipoTurnoId = _tipoTurnoSeleccionadoId   // 👈 usamos lo elegido
             };
             ok = await TurnoService.ReservarAsync(dto);
         }
@@ -323,9 +352,9 @@ else
         {
             var dtoSlot = new TurnoReservarSlotDTO
             {
-                MedicoId = _medicoIdSeleccionado,
+                MedicoId       = _medicoIdSeleccionado,
                 ScheduledAtUtc = _slotSeleccionado.ScheduledAtUtc,
-                TipoTurnoId = 1 
+                TipoTurnoId    = _tipoTurnoSeleccionadoId  // 👈 también acá
             };
             ok = await TurnoService.ReservarSlotAsync(dtoSlot);
         }
@@ -335,7 +364,6 @@ else
         if (ok)
         {
             _mensaje = "¡Turno reservado con éxito!";
-            // Redirigir después de un momento
             await Task.Delay(1500);
             Nav.NavigateTo("/paciente/turnos");
         }

@@ -11,10 +11,7 @@ namespace CliniPlus.Shared.DTOs
     {
         public string? Bio { get; set; }
         public string? FotoUrl { get; set; }
-
         public int DefaultSlotMin { get; set; }
-
-        // Puede ser null si todavía no se asignó especialidad
         public int? EspecialidadId { get; set; }
     }
 }

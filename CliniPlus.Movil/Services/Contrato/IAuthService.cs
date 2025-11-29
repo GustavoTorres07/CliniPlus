@@ -7,12 +7,15 @@ using System.Threading.Tasks;
 
 namespace CliniPlus.Movil.Services.Contrato
 {
-    internal interface IAuthService
+    public interface IAuthService
     {
         Task<AuthLoginResponseDTO?> LoginAsync(AuthLoginRequest req, bool recordar);
         Task LogoutAsync();
         Task<AuthMeResponse?> MeAsync();   
 
-        Task<bool> PingAsync(); 
+        Task<bool> PingAsync();
+
+        Task<bool> RecuperarPasswordAsync(string email);
+
     }
 }

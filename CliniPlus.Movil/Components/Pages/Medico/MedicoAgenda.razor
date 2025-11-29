@@ -1,0 +1,296 @@
+﻿@page "/medico/agenda"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+
+@using CliniPlus.Shared.DTOs
+@using System.Globalization
+@inject CliniPlus.Movil.Services.Contrato.IAuthService Auth
+@inject CliniPlus.Movil.Services.Contrato.ITurnoService TurnoService
+@inject NavigationManager Nav
+
+@if (_cargando)
+{
+    <div class="home-loading d-flex flex-column justify-content-center align-items-center" style="height:70vh;">
+        <div class="spinner-border text-primary mb-3"></div>
+        <span class="text-muted small">Cargando agenda...</span>
+    </div>
+}
+else if (_usuario is null)
+{
+    <RedirectToLogin />
+}
+else
+{
+    <div class="home-page">
+
+        <!-- HEADER -->
+        <div class="home-header mb-4">
+            <div class="home-greeting">
+                <p class="home-hello">Gestión de Turnos</p>
+                <h4 class="home-name">Agenda</h4>
+                <span class="badge badge-medico mt-1">Médico</span>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn-logout" @onclick="CerrarSesion">
+                    <i class="bi bi-box-arrow-right"></i>
+                </button>
+                <div class="home-avatar">
+                    <span>@GetInicial(_usuario.NombreCompleto)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTROLES DE FECHA -->
+        <div class="date-controls-card mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <button class="btn-date-nav" @onclick="DiaAnterior">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+
+                <div class="current-date-display">
+                    <div class="day-name">
+                        @_fechaSeleccionada.ToString("dddd", new CultureInfo("es-AR"))
+                    </div>
+                    <div class="full-date">
+                        @_fechaSeleccionada.ToString("dd MMMM yyyy", new CultureInfo("es-AR"))
+                    </div>
+                </div>
+
+                <button class="btn-date-nav" @onclick="DiaSiguiente">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center px-2">
+                <button class="btn-today" @onclick="Hoy">
+                    <i class="bi bi-calendar-event me-1"></i> Hoy
+                </button>
+
+                <!-- Input de fecha nativo pero estilizado -->
+                <InputDate @bind-Value="_fechaSeleccionada"
+                           @bind-Value:after="OnFechaCambiada"
+                           class="input-date-custom" />
+            </div>
+        </div>
+
+        <!-- LISTADO DE TURNOS -->
+        <div class="d-flex flex-column gap-3">
+
+            @if (_cargandoAgenda)
+            {
+                <div class="text-center py-5">
+                    <div class="spinner-border spinner-border-sm text-primary mb-2"></div>
+                    <p class="small text-muted">Actualizando...</p>
+                </div>
+            }
+            else if (_turnos is null || _turnos.Count == 0)
+            {
+                <div class="empty-state">
+                    <i class="bi bi-calendar-x text-muted fs-1 mb-2"></i>
+                    <p class="text-muted small fw-bold mb-0">Sin actividad</p>
+                    <span class="text-muted small">No hay turnos programados para esta fecha.</span>
+                </div>
+            }
+            else
+            {
+                @foreach (var t in _turnos)
+                {
+                    var estadoClass = GetEstadoCardClass(t);
+
+                    <div class="turn-card @estadoClass fade-in" @onclick="() => AbrirTurno(t.IdTurno)">
+                        <div class="turn-content">
+                            <!-- Hora -->
+                            <div class="time-box">
+                                <span class="time-text">
+                                    @t.ScheduledAtUtc.ToString("HH:mm")
+                                </span>
+                            </div>
+
+                            <!-- Info -->
+                            <div class="info-box">
+                                @if (string.IsNullOrEmpty(t.PacienteNombre))
+                                {
+                                    <span class="patient-name text-muted fst-italic">Disponible</span>
+                                }
+                                else
+                                {
+                                    <span class="patient-name">@t.PacienteNombre</span>
+                                }
+
+                                <span class="turn-type">
+                                    <i class="bi bi-tag-fill text-muted" style="font-size: 0.7rem;"></i>
+                                    @((string.IsNullOrEmpty(t.TipoTurnoNombre)) ? "General" : t.TipoTurnoNombre)
+                                </span>
+                            </div>
+
+                            <!-- Badge Estado -->
+                            <div class="status-box">
+                                @if (!string.IsNullOrEmpty(t.Estado)
+                                     && t.Estado.Equals("Atendido", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <span class="badge-status bg-success-subtle">Atendido</span>
+                                }
+                                else if (!string.IsNullOrEmpty(t.Estado)
+                                         && (t.Estado.Equals("No Asistió", StringComparison.OrdinalIgnoreCase)
+                                             || t.Estado.Equals("Inasistencia", StringComparison.OrdinalIgnoreCase)))
+                                {
+                                    <span class="badge-status bg-warning-subtle text-warning">No asistió</span>
+                                }
+                                else if (t.EsPacienteActual
+                                         && !string.IsNullOrEmpty(t.Estado)
+                                         && t.Estado.Equals("Reservado", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <span class="badge-status bg-success-subtle">En curso</span>
+                                }
+                                else if (!string.IsNullOrEmpty(t.Estado)
+                                         && t.Estado.Equals("Reservado", StringComparison.OrdinalIgnoreCase)
+                                         && !string.IsNullOrEmpty(t.PacienteNombre))
+                                {
+                                    <span class="badge-status bg-primary-subtle">Reservado</span>
+                                }
+                                else if (!string.IsNullOrEmpty(t.Estado)
+                                         && t.Estado.Equals("Cancelado", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <span class="badge-status bg-secondary-subtle text-muted">Cancelado</span>
+                                }
+                                else
+                                {
+                                    <span class="badge-status bg-light-subtle">Libre</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+
+        <div class="spacer-bottom-large" style="height: 80px;"></div>
+    </div>
+}
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav shadow-soft">
+    <button class="bottom-nav-item" @onclick="IrInicio">
+        <i class="bi bi-house-door"></i>
+        <span>Inicio</span>
+    </button>
+    <button class="bottom-nav-item active">
+        <i class="bi bi-calendar3"></i>
+        <span>Agenda</span>
+    </button>
+    <button class="bottom-nav-item" @onclick="IrPerfil">
+        <i class="bi bi-person-badge"></i>
+        <span>Perfil</span>
+    </button>
+</div>
+
+@code {
+    private AuthMeResponse? _usuario;
+    private bool _cargando = true;
+    private bool _cargandoAgenda = false;
+
+    private DateTime _fechaSeleccionada = DateTime.Today;
+    private List<TurnoAgendaMedicoDTO>? _turnos;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _usuario = await Auth.MeAsync();
+
+            if (_usuario is null || _usuario.Rol != "Medico")
+            {
+                Nav.NavigateTo("/", true);
+                return;
+            }
+
+            await CargarAgendaDia(_fechaSeleccionada);
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    private async Task CargarAgendaDia(DateTime fecha)
+    {
+        _cargandoAgenda = true;
+        try
+        {
+            _turnos = await TurnoService.ObtenerAgendaDiaAsync(fecha) ?? new List<TurnoAgendaMedicoDTO>();
+        }
+        finally
+        {
+            _cargandoAgenda = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnFechaCambiada()
+    {
+        await CargarAgendaDia(_fechaSeleccionada);
+    }
+
+    private async Task DiaAnterior()
+    {
+        _fechaSeleccionada = _fechaSeleccionada.AddDays(-1);
+        await CargarAgendaDia(_fechaSeleccionada);
+    }
+
+    private async Task DiaSiguiente()
+    {
+        _fechaSeleccionada = _fechaSeleccionada.AddDays(1);
+        await CargarAgendaDia(_fechaSeleccionada);
+    }
+
+    private async Task Hoy()
+    {
+        _fechaSeleccionada = DateTime.Today;
+        await CargarAgendaDia(_fechaSeleccionada);
+    }
+
+    private string GetEstadoCardClass(TurnoAgendaMedicoDTO t)
+    {
+        if (!string.IsNullOrEmpty(t.Estado)
+            && t.Estado.Equals("Atendido", StringComparison.OrdinalIgnoreCase))
+            return "status-finished";
+
+        if (!string.IsNullOrEmpty(t.Estado)
+            && (t.Estado.Equals("No Asistió", StringComparison.OrdinalIgnoreCase)
+                || t.Estado.Equals("Inasistencia", StringComparison.OrdinalIgnoreCase)))
+            return "status-missed";
+
+        if (t.EsPacienteActual
+            && !string.IsNullOrEmpty(t.Estado)
+            && t.Estado.Equals("Reservado", StringComparison.OrdinalIgnoreCase))
+            return "status-active";
+
+        if (!string.IsNullOrEmpty(t.PacienteNombre)
+            && !string.IsNullOrEmpty(t.Estado)
+            && t.Estado.Equals("Reservado", StringComparison.OrdinalIgnoreCase))
+            return "status-reserved";
+
+        if (!string.IsNullOrEmpty(t.Estado)
+            && t.Estado.Equals("Cancelado", StringComparison.OrdinalIgnoreCase))
+            return "status-cancelled";
+
+        return "status-free";
+    }
+
+    private string GetInicial(string? nombre) =>
+        string.IsNullOrWhiteSpace(nombre) ? "?" : nombre[0].ToString().ToUpper();
+
+    private void AbrirTurno(int turnoId)
+    {
+        Nav.NavigateTo($"/medico/turno/{turnoId}");
+    }
+
+    private async Task CerrarSesion()
+    {
+        await Auth.LogoutAsync();
+        Nav.NavigateTo("/", true);
+    }
+
+    private void IrInicio() => Nav.NavigateTo("/medico/home", true);
+    private void IrPerfil() => Nav.NavigateTo("/medico/perfil", true);
+}

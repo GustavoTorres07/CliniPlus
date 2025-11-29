@@ -7,7 +7,7 @@ namespace CliniPlus.Api.Controllers
 {
     [ApiController]
     [Route("api/usuarios")]
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize(Policy = "AdministradorOnly")]
     public class UsuariosController : ControllerBase
     {
         private readonly IUsuarioRepository _repo;

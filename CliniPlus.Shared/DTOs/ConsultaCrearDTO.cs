@@ -15,12 +15,11 @@ namespace CliniPlus.Shared.DTOs
         [Required]
         public int MedicoId { get; set; }
 
-        public DateTime? FechaHora { get; set; } // default ahora si null
+        public DateTime? FechaHora { get; set; } 
 
         [MaxLength(2000)]
         public string? Notas { get; set; }
 
-        /// <summary>Códigos CIE10 con flag principal opcional</summary>
         public List<ConsultaDiagnosticoItemDTO> Diagnosticos { get; set; } = new();
     }
 }

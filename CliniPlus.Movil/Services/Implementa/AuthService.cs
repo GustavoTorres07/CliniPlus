@@ -53,5 +53,17 @@ namespace CliniPlus.Movil.Services.Implementa
             var res = await cli.GetAsync("api/auth/ping");
             return res.IsSuccessStatusCode;
         }
+
+        public async Task<bool> RecuperarPasswordAsync(string email)
+        {
+            var http = _http.CreateClient("ApiCliniPlus");
+
+            var body = new { Email = email };
+
+            var resp = await http.PostAsJsonAsync("api/auth/recuperar-password", body);
+
+            return resp.IsSuccessStatusCode;
+        }
+
     }
 }

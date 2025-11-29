@@ -62,6 +62,8 @@ else
             <div class="d-flex flex-column gap-3 mb-4 fade-in">
                 @foreach (var t in _proximos)
                 {
+                    var fecha = t.ScheduledAtUtc; // usamos directo, sin ToLocalTime
+
                     <div class="turn-card">
                         <!-- Header de la tarjeta -->
                         <div class="turn-header">
@@ -70,8 +72,8 @@ else
                                     <i class="bi bi-calendar-event"></i>
                                 </div>
                                 <div>
-                                    <div class="turn-day">@t.ScheduledAtUtc.ToLocalTime().ToString("dd MMM")</div>
-                                    <div class="turn-time">@t.ScheduledAtUtc.ToLocalTime().ToString("HH:mm") hs</div>
+                                    <div class="turn-day">@fecha.ToString("dd MMM")</div>
+                                    <div class="turn-time">@fecha.ToString("HH:mm") hs</div>
                                 </div>
                             </div>
                             <span class="badge-status reserved">
@@ -119,11 +121,13 @@ else
             <div class="d-flex flex-column gap-2 pb-4 fade-in">
                 @foreach (var t in _historial)
                 {
+                    var fecha = t.ScheduledAtUtc;
+
                     <div class="turn-card p-3 border-0 bg-white shadow-sm" style="opacity: 0.8;">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <div class="d-flex align-items-center gap-2">
                                 <i class="bi bi-clock-history text-muted"></i>
-                                <span class="fw-bold text-dark small">@t.ScheduledAtUtc.ToLocalTime().ToString("dd/MM/yyyy")</span>
+                                <span class="fw-bold text-dark small">@fecha.ToString("dd/MM/yyyy HH:mm")</span>
                             </div>
                             <span class="@GetBadgeClass(t.Estado)">
                                 @t.Estado
@@ -149,7 +153,7 @@ else
         <span>Inicio</span>
     </button>
     <button class="bottom-nav-item active">
-        <i class="bi bi-calendar-check-fill"></i> <!-- Icono lleno para activo -->
+        <i class="bi bi-calendar-check-fill"></i>
         <span>Turnos</span>
     </button>
     <button class="bottom-nav-item" @onclick="IrPerfilPaciente">
@@ -177,23 +181,25 @@ else
             }
 
             var lista = await TurnoService.ObtenerMisTurnosAsync() ?? new List<TurnoListadoPacienteDTO>();
-            var ahoraUtc = DateTime.UtcNow;
+            var ahora = DateTime.Now; // trabajamos en hora local
 
             foreach (var t in lista.OrderBy(t => t.ScheduledAtUtc))
             {
-                // Filtramos 'Reservado' y futuro como Próximo
-                if (t.ScheduledAtUtc >= ahoraUtc && string.Equals(t.Estado, "Reservado", StringComparison.OrdinalIgnoreCase))
+                // Futuro + reservado => Próximos
+                if (t.ScheduledAtUtc >= ahora &&
+                    string.Equals(t.Estado, "Reservado", StringComparison.OrdinalIgnoreCase))
                 {
                     _proximos.Add(t);
                 }
                 else
                 {
-                    // Todo lo demás (pasado, cancelado, completado) va a historial
                     _historial.Add(t);
                 }
             }
-            // Ordenar historial del más reciente al más antiguo
-            _historial = _historial.OrderByDescending(x => x.ScheduledAtUtc).ToList();
+
+            _historial = _historial
+                .OrderByDescending(x => x.ScheduledAtUtc)
+                .ToList();
         }
         catch
         {
@@ -207,8 +213,7 @@ else
 
     private bool PuedeCancelar(TurnoListadoPacienteDTO t)
     {
-        // Solo permitir cancelar si es futuro y está reservado
-        return t.ScheduledAtUtc > DateTime.UtcNow && 
+        return t.ScheduledAtUtc > DateTime.Now &&
                string.Equals(t.Estado, "Reservado", StringComparison.OrdinalIgnoreCase);
     }
 
@@ -221,10 +226,10 @@ else
 
         if (ok)
         {
-            // Recarga completa para simplificar estado
+            // Recarga la página para refrescar listas
             Nav.NavigateTo(Nav.Uri, forceLoad: true);
         }
-        
+
         _cancelando = false;
     }
 
@@ -240,7 +245,7 @@ else
         };
     }
 
-    private string GetInicial(string? nombre) => 
+    private string GetInicial(string? nombre) =>
         string.IsNullOrWhiteSpace(nombre) ? "?" : nombre[0].ToString().ToUpper();
 
     private async Task CerrarSesion()
@@ -250,6 +255,6 @@ else
     }
 
     private void IrInicio() => Nav.NavigateTo("/paciente/home", true);
-    private void IrNuevoTurno() => Nav.NavigateTo("/paciente/agenda"); // Ajustar ruta según corresponda
+    private void IrNuevoTurno() => Nav.NavigateTo("/paciente/agenda");
     private void IrPerfilPaciente() => Nav.NavigateTo("/paciente/perfil");
 }

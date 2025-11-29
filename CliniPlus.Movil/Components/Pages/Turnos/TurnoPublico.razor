@@ -1,0 +1,355 @@
+﻿@page "/public/turno"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+
+@using CliniPlus.Shared.DTOs
+@using CliniPlus.Movil.Components.Calendar
+
+@inject CliniPlus.Movil.Services.Contrato.ITurnoService TurnoService
+@inject CliniPlus.Movil.Services.Contrato.IMedicoService MedicoService
+@inject CliniPlus.Movil.Services.Contrato.IEspecialidadService EspecialidadService
+@inject CliniPlus.Movil.Services.Contrato.IObraSocialService ObraSocialService
+@inject NavigationManager Nav
+
+@if (_cargando)
+{
+    <div class="home-loading d-flex flex-column align-items-center justify-content-center" style="height:60vh;">
+        <div class="spinner-border text-primary mb-3"></div>
+        <span>Cargando...</span>
+    </div>
+}
+else
+{
+    <div class="home-page">
+
+        <!-- HEADER -->
+        <div class="home-header mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn-back" @onclick="IrLogin">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <div class="home-greeting">
+                    <p class="home-hello">Reserva de Turno</p>
+                    <h4 class="home-name">Invitado</h4>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1) TUS DATOS -->
+        <div class="home-card p-4 mb-3">
+            <h6 class="section-title mb-3">Tus Datos</h6>
+
+            <div class="mb-3">
+                <label class="label-mini">DNI</label>
+                <input class="form-control input-modern" placeholder="Número de documento" @bind="_dni" />
+            </div>
+
+            <div class="mb-3">
+                <label class="label-mini">Nombre</label>
+                <input class="form-control input-modern" placeholder="Tu nombre" @bind="_nombre" />
+            </div>
+
+            <div class="mb-3">
+                <label class="label-mini">Apellido</label>
+                <input class="form-control input-modern" placeholder="Tu apellido" @bind="_apellido" />
+            </div>
+
+            <div class="mb-3">
+                <label class="label-mini">Obra Social</label>
+                <select class="form-select input-modern" @bind="_obraSocialId">
+                    <option value="">-- Seleccionar --</option>
+                    @foreach (var o in _obrasSociales)
+                    {
+                        <option value="@o.IdObraSocial">@o.Nombre</option>
+                    }
+                </select>
+            </div>
+
+            <div class="mb-2">
+                <label class="label-mini">Nro. Afiliado (Opcional)</label>
+                <input class="form-control input-modern" placeholder="Ej: 123456789" @bind="_numeroAfiliado" />
+            </div>
+        </div>
+
+        <!-- 2) SELECCIÓN PROFESIONAL -->
+        <div class="home-card p-4 mb-3">
+            <h6 class="section-title mb-3">Profesional</h6>
+
+            <div class="mb-3">
+                <label class="label-mini">Especialidad</label>
+                <select class="form-select input-modern" @onchange="OnEspecialidadChanged">
+                    <option value="">-- Todas --</option>
+                    @foreach (var e in _especialidades)
+                    {
+                        <option value="@e.IdEspecialidad">@e.Nombre</option>
+                    }
+                </select>
+            </div>
+
+            <div class="mb-2">
+                <label class="label-mini">Médico</label>
+                <select class="form-select input-modern"
+                        @onchange="OnMedicoChanged"
+                        disabled="@(_medicos.Count == 0)">
+                    <option value="">-- Seleccionar Médico --</option>
+                    @foreach (var m in _medicos)
+                    {
+                        <option value="@m.IdMedico">@m.NombreCompleto</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <!-- 3) FECHA -->
+        <div class="home-card p-4 mb-3">
+            <h6 class="section-title mb-3">Fecha</h6>
+            <div class="calendar-wrapper">
+                <FullCalendar CalendarId="pub-cal" OnDateSelected="OnFechaSeleccionada" />
+            </div>
+            <div class="text-center mt-2">
+                <small class="text-muted fw-bold">@_fechaSeleccionada.ToString("D")</small>
+            </div>
+        </div>
+
+        <!-- 4) HORARIOS -->
+        <div class="home-card p-4 mb-4">
+            <h6 class="section-title mb-3">Horarios Disponibles</h6>
+
+            @if (_medicoIdSeleccionado <= 0)
+            {
+                <div class="text-center py-3">
+                    <i class="bi bi-person-exclamation text-muted fs-3 mb-2"></i>
+                    <p class="text-muted small mb-0">Seleccioná un médico para ver la agenda.</p>
+                </div>
+            }
+            else if (_slots is null)
+            {
+                <div class="text-center py-3">
+                    <div class="spinner-border spinner-border-sm text-secondary mb-2"></div>
+                    <p class="text-muted small mb-0">Cargando horarios...</p>
+                </div>
+            }
+            else if (_slots.Count == 0)
+            {
+                <div class="text-center py-3 bg-light rounded-3 border border-dashed">
+                    <p class="text-muted small mb-0 fw-bold">No hay turnos disponibles.</p>
+                    <small class="text-muted">Intenta con otra fecha.</small>
+                </div>
+            }
+            else
+            {
+                <div class="row g-2 fade-in">
+                    @foreach (var slot in _slots)
+                    {
+                        // Solo se marca seleccionado si es exactamente el mismo objeto
+                        var isSelected = _slotSeleccionado == slot;
+
+                        var classes = "btn w-100 slot-btn";
+
+                        if (!slot.EsReservable)
+                            classes += " slot-disabled";
+                        else if (isSelected)
+                            classes += " slot-selected";
+                        else
+                            classes += " slot-available";
+
+                        <div class="col-4">
+                            <button class="@classes"
+                                    @onclick="() => SeleccionarSlot(slot)"
+                                    disabled="@(slot.EsReservable == false)">
+                                <div class="small fw-bold">@slot.HoraLocalTexto</div>
+                                <div class="small text-muted" style="font-size:0.65rem;">
+                                    @(slot.EsReservable ? "Libre" : "Ocupado")
+                                </div>
+                            </button>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- BOTÓN CONFIRMAR FLOTANTE -->
+        <div class="fixed-bottom-action p-3 bg-white shadow-lg border-top">
+            @if (!string.IsNullOrWhiteSpace(_mensaje))
+            {
+                <div class="alert alert-info small py-2 mb-2 text-center border-0 bg-info-subtle text-info fw-bold rounded-3 fade-in">
+                    <i class="bi bi-info-circle me-1"></i> @_mensaje
+                </div>
+            }
+
+            <button class="btn btn-primary btn-pill w-100 py-3 shadow-soft fw-bold d-flex justify-content-center align-items-center gap-2"
+                    disabled="@(!_puedeConfirmar || _confirmando)"
+                    @onclick="ConfirmarReserva">
+                @if (_confirmando)
+                {
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                    <span>Procesando...</span>
+                }
+                else
+                {
+                    <i class="bi bi-check-lg"></i>
+                    <span>Confirmar Reserva</span>
+                }
+            </button>
+        </div>
+
+        <div class="spacer-bottom-large"></div>
+    </div>
+}
+
+@code {
+    private bool _cargando = true;
+
+    // Datos invitado
+    private string _dni = "";
+    private string _nombre = "";
+    private string _apellido = "";
+    private string? _numeroAfiliado;
+    private int? _obraSocialId;
+
+    // Listas
+    private List<EspecialidadDTO> _especialidades = new();
+    private List<ObraSocialDTO> _obrasSociales = new();
+    private List<MedicoListadoDTO> _medicos = new();
+
+    // Selección
+    private int _especialidadIdSeleccionada;
+    private int _medicoIdSeleccionado;
+    private DateTime _fechaSeleccionada = DateTime.Today;
+
+    // Slots
+    private List<TurnoSlotDTO>? _slots;
+    private TurnoSlotDTO? _slotSeleccionado;
+
+    // Estado UI
+    private bool _confirmando = false;
+    private string _mensaje = "";
+
+    private bool _puedeConfirmar =>
+        !string.IsNullOrWhiteSpace(_dni) &&
+        !string.IsNullOrWhiteSpace(_nombre) &&
+        !string.IsNullOrWhiteSpace(_apellido) &&
+        _medicoIdSeleccionado > 0 &&
+        _slotSeleccionado?.EsReservable == true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _especialidades = await EspecialidadService.ListarAsync() ?? new();
+            _obrasSociales = await ObraSocialService.ListarAsync() ?? new();
+            // Cargar todos los médicos al inicio
+            _medicos = await MedicoService.ListarAsync(null) ?? new();
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    private async Task CargarMedicos()
+    {
+        _medicos = await MedicoService.ListarAsync(
+            _especialidadIdSeleccionada == 0 ? null : _especialidadIdSeleccionada
+        ) ?? new List<MedicoListadoDTO>();
+
+        _medicoIdSeleccionado = 0;
+        _slots = null;
+        _slotSeleccionado = null;
+    }
+
+    private async Task CargarSlots()
+    {
+        _slots = null;
+        _slotSeleccionado = null;
+
+        if (_medicoIdSeleccionado > 0)
+        {
+            await Task.Delay(200); // UI feedback
+            _slots = await TurnoService.ObtenerSlotsDiaPublicAsync(_medicoIdSeleccionado, _fechaSeleccionada)
+                     ?? new List<TurnoSlotDTO>();
+        }
+    }
+
+    private async void OnEspecialidadChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var id))
+            _especialidadIdSeleccionada = id;
+        else
+            _especialidadIdSeleccionada = 0;
+
+        await CargarMedicos();
+        StateHasChanged();
+    }
+
+    private async void OnMedicoChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var id))
+        {
+            _medicoIdSeleccionado = id;
+            await CargarSlots();
+            StateHasChanged();
+        }
+        else
+        {
+            _medicoIdSeleccionado = 0;
+            _slots = null;
+            _slotSeleccionado = null;
+        }
+    }
+
+    private async Task OnFechaSeleccionada(string dateStr)
+    {
+        if (DateTime.TryParse(dateStr, out var fecha))
+        {
+            _fechaSeleccionada = fecha;
+            await CargarSlots();
+            StateHasChanged();
+        }
+    }
+
+    private void SeleccionarSlot(TurnoSlotDTO slot)
+    {
+        if (!slot.EsReservable)
+            return;
+
+        _slotSeleccionado = slot;
+        _mensaje = "";   // por si había algún mensaje de error anterior
+    }
+
+    private async Task ConfirmarReserva()
+    {
+        if (!_puedeConfirmar || _slotSeleccionado is null) return;
+
+        _confirmando = true;
+        _mensaje = "";
+
+        var dto = new TurnoPublicoReservarDTO
+        {
+            DNI = _dni.Trim(),
+            Nombre = _nombre.Trim(),
+            Apellido = _apellido.Trim(),
+            ObraSocialId = _obraSocialId,
+            NumeroAfiliado = _numeroAfiliado,
+            MedicoId = _medicoIdSeleccionado,
+            TipoTurnoId = 1,
+            TurnoId = _slotSeleccionado.IdTurno
+        };
+
+        var ok = await TurnoService.ReservarPublicoAsync(dto);
+
+        _confirmando = false;
+
+        if (ok)
+        {
+            _mensaje = "¡Turno reservado correctamente! La secretaría completará tus datos.";
+            await Task.Delay(2000);
+            Nav.NavigateTo("/", true);
+        }
+        else
+        {
+            _mensaje = "No se pudo reservar el turno. Intenta nuevamente.";
+        }
+    }
+
+    private void IrLogin() => Nav.NavigateTo("/", true);
+}

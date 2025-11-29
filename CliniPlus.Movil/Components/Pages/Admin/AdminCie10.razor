@@ -1,4 +1,4 @@
-﻿@page "/admin/cie10"
+﻿@page "/Administrador/cie10"
 @layout CliniPlus.Movil.Components.Layout.EmptyLayout
 
 @using CliniPlus.Shared.DTOs
@@ -16,7 +16,7 @@
         <span>Cargando CIE-10...</span>
     </div>
 }
-else if (_usuario is null || (_usuario.Rol != "Administrador" && _usuario.Rol != "Secretario"))
+else if (_usuario is null || (_usuario.Rol != "Administrador" && _usuario.Rol != "Secretaria"))
 {
     <RedirectToLogin />
 }
@@ -82,9 +82,9 @@ else
         <!-- FORMULARIO ALTA / EDICIÓN -->
         <div class="home-card p-3 mb-3 border-purple-subtle">
             <h6 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2" style="font-size: 0.95rem;">
-                <div class="icon-box-sm @(_editando ? "bg-orange-light text-orange" : "bg-purple-light text-purple")">
+                <span class="icon-box-sm @(_editando ? "bg-orange-light text-orange" : "bg-purple-light text-purple")">
                     <i class="bi @(_editando ? "bi-pencil" : "bi-plus-lg")"></i>
-                </div>
+                </span>
                 @(_editando ? "Editar diagnóstico" : "Nuevo diagnóstico")
             </h6>
 
@@ -234,7 +234,7 @@ else
         try
         {
             _usuario = await Auth.MeAsync();
-            if (_usuario is null || (_usuario.Rol != "Administrador" && _usuario.Rol != "Secretario"))
+            if (_usuario is null || (_usuario.Rol != "Administrador" && _usuario.Rol != "Secretaria"))
             {
                 Nav.NavigateTo("/", true);
                 return;
@@ -372,8 +372,8 @@ else
         Nav.NavigateTo("/", true);
     }
 
-    private void IrInicio() => Nav.NavigateTo("/admin/home");
-    private void IrConfiguracion() => Nav.NavigateTo("/admin/configuracion");
+    private void IrInicio() => Nav.NavigateTo("/Administrador/home");
+    private void IrConfiguracion() => Nav.NavigateTo("/Administrador/configuracion");
 
     private string GetInicial(string? nombre) =>
         string.IsNullOrWhiteSpace(nombre) ? "?" : nombre[0].ToString().ToUpper();

@@ -1,0 +1,348 @@
+﻿@page "/medico/paciente/{Id:int}"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+
+@using CliniPlus.Shared.DTOs
+@inject CliniPlus.Movil.Services.Contrato.IAuthService Auth
+@inject CliniPlus.Movil.Services.Contrato.ITurnoService TurnoService
+@inject NavigationManager Nav
+
+@if (_cargando)
+{
+    <div class="home-loading d-flex flex-column justify-content-center align-items-center" style="height:70vh;">
+        <div class="spinner-border text-primary mb-3"></div>
+        <span class="text-muted small">Cargando paciente...</span>
+    </div>
+}
+else if (_usuario is null)
+{
+    <RedirectToLogin />
+}
+else if (_paciente is null)
+{
+    <div class="home-page">
+        <div class="home-header mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn-back" @onclick="VolverPacientes">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <div class="home-greeting">
+                    <p class="home-hello">Paciente</p>
+                    <h4 class="home-name">No encontrado</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="home-card p-5 text-center">
+            <i class="bi bi-emoji-frown text-muted fs-1 mb-3"></i>
+            <p class="text-muted small mb-0">No se encontró información para este paciente.</p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="home-page">
+
+        <!-- HEADER -->
+        <div class="home-header mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn-back" @onclick="VolverPacientes">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <div class="home-greeting">
+                    <p class="home-hello">Detalle del paciente</p>
+                    <h4 class="home-name text-truncate" style="max-width: 200px;">@_paciente.NombreCompleto</h4>
+                    <span class="badge badge-medico mt-1">Médico</span>
+                </div>
+            </div>
+
+            <div class="home-avatar">
+                <span>@GetInicial(_usuario.NombreCompleto)</span>
+            </div>
+        </div>
+
+        <!-- DATOS BÁSICOS DEL PACIENTE -->
+        <div class="home-card p-4 mb-3">
+            <div class="d-flex align-items-center mb-3">
+                <div class="patient-avatar-large me-3">
+                    @GetInicial(_paciente.NombreCompleto)
+                </div>
+                <div class="flex-grow-1">
+                    <div class="fw-bold text-dark fs-5">@_paciente.NombreCompleto</div>
+                    <div class="text-muted small d-flex align-items-center mt-1">
+                        <i class="bi bi-person-vcard me-2 text-primary"></i> 
+                        <span class="fw-bold">@_paciente.DNI</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex flex-column gap-2 border-top border-light pt-3">
+                @if (!string.IsNullOrWhiteSpace(_paciente.Email))
+                {
+                    <div class="small text-muted d-flex align-items-center">
+                        <i class="bi bi-envelope me-2 text-primary"></i> @_paciente.Email
+                    </div>
+                }
+                @if (!string.IsNullOrWhiteSpace(_paciente.Telefono))
+                {
+                    <div class="small text-muted d-flex align-items-center">
+                        <i class="bi bi-telephone me-2 text-primary"></i> @_paciente.Telefono
+                    </div>
+                }
+                @if (!string.IsNullOrWhiteSpace(_paciente.ObraSocialNombre))
+                {
+                    <div class="small text-muted d-flex align-items-center">
+                        <i class="bi bi-shield-plus me-2 text-primary"></i>
+                        <span>@_paciente.ObraSocialNombre</span>
+                        @if (!string.IsNullOrWhiteSpace(_paciente.NumeroAfiliado))
+                        {
+                            <span class="fst-italic ms-1">(@_paciente.NumeroAfiliado)</span>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- FICHA MÉDICA -->
+        @if (_paciente.Ficha is not null)
+        {
+            <div class="home-card p-4 mb-3">
+                <h6 class="section-title mb-3 d-flex align-items-center">
+                    <i class="bi bi-clipboard2-pulse me-2 text-danger"></i> Ficha Médica
+                </h6>
+
+                <div class="row g-3 small">
+                    @if (!string.IsNullOrWhiteSpace(_paciente.Ficha.GrupoSanguineo))
+                    {
+                        <div class="col-6">
+                            <label class="label-mini text-muted mb-0">Grupo Sanguíneo</label>
+                            <div class="fw-bold text-dark">@_paciente.Ficha.GrupoSanguineo</div>
+                        </div>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(_paciente.Ficha.Alergias))
+                    {
+                        <div class="col-12">
+                            <label class="label-mini text-muted mb-0">Alergias</label>
+                            <div class="text-dark">@_paciente.Ficha.Alergias</div>
+                        </div>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(_paciente.Ficha.EnfermedadesCronicas))
+                    {
+                        <div class="col-12">
+                            <label class="label-mini text-muted mb-0">Enfermedades Crónicas</label>
+                            <div class="text-dark">@_paciente.Ficha.EnfermedadesCronicas</div>
+                        </div>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(_paciente.Ficha.MedicacionHabitual))
+                    {
+                        <div class="col-12">
+                            <label class="label-mini text-muted mb-0">Medicación Habitual</label>
+                            <div class="text-dark">@_paciente.Ficha.MedicacionHabitual</div>
+                        </div>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(_paciente.Ficha.Observaciones))
+                    {
+                        <div class="col-12">
+                            <label class="label-mini text-muted mb-0">Observaciones</label>
+                            <div class="text-muted fst-italic">@_paciente.Ficha.Observaciones</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        <!-- HISTORIA CLÍNICA (FILTROS) -->
+        <div class="home-card p-4 mb-3">
+            <h6 class="section-title mb-3">Historia Clínica</h6>
+
+            <div class="row g-2 align-items-end">
+                <div class="col-5">
+                    <label class="label-mini">Desde</label>
+                    <InputDate @bind-Value="_filtroDesde" class="form-control input-modern p-1 text-center" />
+                </div>
+                <div class="col-5">
+                    <label class="label-mini">Hasta</label>
+                    <InputDate @bind-Value="_filtroHasta" class="form-control input-modern p-1 text-center" />
+                </div>
+                <div class="col-2">
+                    <button class="btn btn-primary w-100 p-1 d-flex align-items-center justify-content-center" 
+                            style="height: 38px; border-radius: 12px;"
+                            @onclick="AplicarFiltrosHistoria">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- LISTA HISTORIA CLÍNICA -->
+        <div class="d-flex flex-column gap-2 mb-4">
+            @if (_historia is null || _historia.Count == 0)
+            {
+                <div class="home-card p-4 text-center border-dashed">
+                    <i class="bi bi-journal-medical text-muted fs-1 mb-2"></i>
+                    <p class="text-muted small mb-0">No hay registros para este período.</p>
+                </div>
+            }
+            else
+            {
+                @foreach (var h in _historia)
+                {
+                    var isSelected = _detalleSeleccionado != null && _detalleSeleccionado.IdEntrada == h.IdEntrada;
+
+                    <div class="history-card @(isSelected ? "selected" : "") fade-in"
+                         @onclick="() => CargarDetalleHistoria(h.IdEntrada)">
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-calendar-event text-muted small"></i>
+                                <span class="small fw-bold text-dark">
+                                    @h.Fecha.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                                </span>
+                            </div>
+                            <span class="badge bg-primary-subtle text-primary" style="font-size:0.65rem;">
+                                @h.CIE10Codigo
+                            </span>
+                        </div>
+                        
+                        <div class="fw-bold text-dark small mb-1">@h.CIE10Descripcion</div>
+                        
+                        @if (!string.IsNullOrWhiteSpace(h.NotasResumen))
+                        {
+                            <div class="small text-muted text-truncate d-flex align-items-center gap-1">
+                                <i class="bi bi-file-text"></i> @h.NotasResumen
+                            </div>
+                        }
+                    </div>
+                }
+            }
+        </div>
+
+        <!-- DETALLE DE LA ENTRADA SELECCIONADA -->
+        @if (_detalleSeleccionado is not null)
+        {
+            <div class="home-card p-4 mb-5 border-primary shadow-sm fade-in">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="section-title mb-0 text-primary">Detalle Consulta</h6>
+                    <button class="btn btn-sm btn-light rounded-circle" @onclick="() => _detalleSeleccionado = null">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+
+                <div class="mb-3">
+                    <div class="small text-muted mb-1">
+                        <i class="bi bi-calendar3 me-1"></i>
+                        @_detalleSeleccionado.Fecha.ToLocalTime().ToString("dd/MM/yyyy HH:mm") hs
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-primary-subtle text-primary">@_detalleSeleccionado.CIE10Codigo</span>
+                        <span class="fw-bold text-dark small">@_detalleSeleccionado.CIE10Descripcion</span>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(_detalleSeleccionado.Notas))
+                {
+                    <div class="detail-box mb-3">
+                        <label class="label-mini text-muted mb-1">Evolución / Notas</label>
+                        <p class="small text-dark mb-0" style="white-space: pre-wrap;">@_detalleSeleccionado.Notas</p>
+                    </div>
+                }
+
+                <div class="small text-muted d-flex flex-column gap-1 border-top border-light pt-2">
+                    @if (_detalleSeleccionado.ConsultaId.HasValue)
+                    {
+                        <div>
+                            <span class="fw-bold">ID Consulta:</span> @_detalleSeleccionado.ConsultaId
+                        </div>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(_detalleSeleccionado.TipoTurnoNombre))
+                    {
+                        <div>
+                            <span class="fw-bold">Tipo:</span> @_detalleSeleccionado.TipoTurnoNombre
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        <div class="spacer-bottom-large" style="height: 80px;"></div>
+    </div>
+}
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav shadow-soft">
+    <button class="bottom-nav-item" @onclick="IrInicio">
+        <i class="bi bi-house-door"></i>
+        <span>Inicio</span>
+    </button>
+    <button class="bottom-nav-item" @onclick="IrAgenda">
+        <i class="bi bi-calendar3"></i>
+        <span>Agenda</span>
+    </button>
+    <button class="bottom-nav-item active">
+        <i class="bi bi-people-fill"></i>
+        <span>Pacientes</span>
+    </button>
+</div>
+
+@code {
+    [Parameter] public int Id { get; set; } // PacienteId
+
+    private AuthMeResponse? _usuario;
+    private bool _cargando = true;
+
+    private PacienteDetalleMedicoDTO? _paciente;
+
+    private DateTime? _filtroDesde;
+    private DateTime? _filtroHasta;
+
+    private List<HistoriaClinicaListadoDTO> _historia = new();
+    private HistoriaClinicaDetalleDTO? _detalleSeleccionado;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _usuario = await Auth.MeAsync();
+
+            if (_usuario is null || _usuario.Rol != "Medico")
+            {
+                Nav.NavigateTo("/", true);
+                return;
+            }
+
+            _paciente = await TurnoService.ObtenerPacienteDetalleAsync(Id);
+
+            await CargarHistoria(); // sin filtros inicialmente
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    private async Task CargarHistoria()
+    {
+        var lista = await TurnoService.ObtenerHistoriaClinicaAsync(Id, _filtroDesde, _filtroHasta);
+        _historia = lista ?? new List<HistoriaClinicaListadoDTO>();
+
+        _detalleSeleccionado = null;
+        StateHasChanged();
+    }
+
+    private async Task AplicarFiltrosHistoria()
+    {
+        await CargarHistoria();
+    }
+
+    private async Task CargarDetalleHistoria(int entradaId)
+    {
+        _detalleSeleccionado = await TurnoService.ObtenerHistoriaClinicaDetalleAsync(entradaId);
+        StateHasChanged();
+    }
+
+    private void VolverPacientes() => Nav.NavigateTo("/medico/pacientes");
+    private void IrInicio() => Nav.NavigateTo("/medico/home", true);
+    private void IrAgenda() => Nav.NavigateTo("/medico/turnos-hoy", true);
+
+    private string GetInicial(string? nombre) =>
+        string.IsNullOrWhiteSpace(nombre) ? "?" : nombre[0].ToString().ToUpper();
+}

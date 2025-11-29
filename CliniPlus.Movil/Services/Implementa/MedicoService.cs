@@ -149,5 +149,29 @@ namespace CliniPlus.Movil.Services.Implementa
             var res = await cli.DeleteAsync($"api/medicos/{medicoId}/bloqueos/{idBloqueo}");
             return res.IsSuccessStatusCode;
         }
+
+        public async Task<List<MedicoDisponiblePacienteDTO>> ObtenerMedicosParaPacienteAsync(
+            int? especialidadId = null,
+            string? q = null)
+        {
+            var cli = CreateClient();         // 👈 cliente real
+
+            var url = "api/medicos/paciente/medicos";
+
+            var queryParams = new List<string>();
+
+            if (especialidadId.HasValue)
+                queryParams.Add($"especialidadId={especialidadId.Value}");
+
+            if (!string.IsNullOrWhiteSpace(q))
+                queryParams.Add($"q={q}");
+
+            if (queryParams.Count > 0)
+                url += "?" + string.Join("&", queryParams);
+
+            // 👇 ahora sí usamos GetFromJsonAsync sobre HttpClient
+            return await cli.GetFromJsonAsync<List<MedicoDisponiblePacienteDTO>>(url)
+                   ?? new List<MedicoDisponiblePacienteDTO>();
+        }
     }
 }

@@ -1,0 +1,552 @@
+﻿@page "/medico/turno/{Id:int}"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+
+@using CliniPlus.Shared.DTOs
+@inject CliniPlus.Movil.Services.Contrato.IAuthService Auth
+@inject CliniPlus.Movil.Services.Contrato.ITurnoService TurnoService
+@inject CliniPlus.Movil.Services.Contrato.ICie10Service Cie10Service
+@inject NavigationManager Nav
+
+@if (_cargando)
+{
+    <div class="home-loading d-flex flex-column justify-content-center align-items-center" style="height:70vh;">
+        <div class="spinner-border text-primary mb-3"></div>
+        <span class="text-muted small">Cargando detalle...</span>
+    </div>
+}
+else if (_usuario is null || _usuario.Rol != "Medico" || _detalle is null)
+{
+    <RedirectToLogin />
+}
+else
+{
+    <div class="home-page">
+
+        <!-- HEADER -->
+        <div class="home-header mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn-back" @onclick="IrTurnosHoy">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <div class="home-greeting">
+                    <p class="home-hello">Detalle del turno</p>
+                    <h4 class="home-name">Consulta</h4>
+                </div>
+            </div>
+
+            <div class="home-avatar">
+                <span>@GetInicial(_usuario.NombreCompleto)</span>
+            </div>
+        </div>
+
+        <!-- INFO DEL TURNO -->
+        <div class="home-card p-3 mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                    <div class="label-mini text-muted mb-0">Fecha y Hora</div>
+                    <div class="fw-bold fs-5">
+                        @_detalle.ScheduledAtUtc.ToLocalTime().ToString("HH:mm") <small class="fs-6 text-muted">hs</small>
+                    </div>
+                    <div class="small text-muted">@_detalle.ScheduledAtUtc.ToLocalTime().ToString("dd/MM/yyyy")</div>
+                </div>
+
+                <span class="@GetBadgeClass(_detalle.Estado)">
+                    @_detalle.Estado
+                </span>
+            </div>
+            
+            <div class="d-flex align-items-center gap-2 mt-2 pt-2 border-top border-light">
+                <i class="bi bi-tag text-primary"></i>
+                <span class="small fw-bold text-muted">@(_detalle.TipoTurnoNombre ?? "Consulta General")</span>
+            </div>
+        </div>
+
+        <!-- DATOS DEL PACIENTE -->
+        <div class="home-card p-3 mb-3">
+            <h6 class="section-title mb-3">Paciente</h6>
+
+            @if (_detalle.PacienteId == 0)
+            {
+                <div class="text-center py-3">
+                    <i class="bi bi-person-x text-muted fs-3"></i>
+                    <p class="text-muted small mb-0 mt-2">Sin paciente asignado.</p>
+                </div>
+            }
+            else
+            {
+                <div class="d-flex align-items-center mb-3">
+                    <div class="patient-avatar-box me-3">
+                        @GetInicial(_detalle.PacienteNombre)
+                    </div>
+                    <div>
+                        <div class="fw-bold text-dark">@_detalle.PacienteNombre</div>
+                        @if (!string.IsNullOrWhiteSpace(_detalle.PacienteDni))
+                        {
+                            <div class="small text-muted">DNI: @_detalle.PacienteDni</div>
+                        }
+                    </div>
+                </div>
+
+                <div class="row g-2">
+                    @if (!string.IsNullOrWhiteSpace(_detalle.PacienteTelefono))
+                    {
+                        <div class="col-12">
+                            <div class="d-flex align-items-center gap-2 small text-muted">
+                                <i class="bi bi-telephone text-primary"></i> @_detalle.PacienteTelefono
+                            </div>
+                        </div>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(_detalle.ObraSocialNombre))
+                    {
+                        <div class="col-12">
+                            <div class="d-flex align-items-center gap-2 small text-muted">
+                                <i class="bi bi-shield-plus text-primary"></i>
+                                <span>@_detalle.ObraSocialNombre</span>
+                                @if(!string.IsNullOrWhiteSpace(_detalle.NumeroAfiliado)) {
+                                    <span class="fst-italic">(@_detalle.NumeroAfiliado)</span>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- HISTORIAL RÁPIDO -->
+        @if (_detalle.PacienteId != 0 && _historia != null && _historia.Count > 0)
+        {
+            <div class="home-card p-3 mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="section-title mb-0">Últimas consultas</h6>
+                    <span class="badge bg-light text-muted fw-normal" style="font-size: 0.65rem;">Recientes</span>
+                </div>
+
+                <div class="d-flex flex-column gap-2">
+                    @foreach (var h in _historia.Take(3))
+                    {
+                        <div class="p-2 border-bottom border-light">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="small fw-bold text-dark">@h.Fecha.ToLocalTime().ToString("dd/MM/yyyy")</span>
+                                <span class="badge bg-primary-subtle text-primary" style="font-size:0.6rem;">@h.CIE10Codigo</span>
+                            </div>
+                            <div class="small text-muted text-truncate">@h.CIE10Descripcion</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        <!-- REGISTRAR CONSULTA -->
+        <div class="home-card p-4 mb-5">
+            <h6 class="section-title mb-3">Registrar Evolución</h6>
+
+            <!-- Estado final del turno (BOTONES MEJORADOS) -->
+            <div class="mb-4">
+                <label class="label-mini d-block mb-2">Resultado del turno</label>
+                <div class="d-flex gap-2">
+                    <button type="button"
+                            class="btn-select-status status-success @(_estadoSeleccionado == TurnoEstadoDTO.Atendido ? "active" : "")"
+                            @onclick="() => SeleccionarEstado(TurnoEstadoDTO.Atendido)">
+                        <i class="bi bi-check-circle-fill"></i> Atendido
+                    </button>
+                    
+                    <button type="button"
+                            class="btn-select-status status-danger @(_estadoSeleccionado == TurnoEstadoDTO.NoAsistio ? "active" : "")"
+                            @onclick="() => SeleccionarEstado(TurnoEstadoDTO.NoAsistio)">
+                        <i class="bi bi-x-circle-fill"></i> No asistió
+                    </button>
+                </div>
+                <!-- Botón 'Ausente' opcional, o agrupado con No Asistió -->
+                @if(_estadoSeleccionado == TurnoEstadoDTO.Ausente)
+                {
+                     <div class="mt-2 text-center small text-danger fw-bold">Marcado como Ausente</div>
+                }
+                
+                <small class="text-muted d-block mt-2" style="font-size: 0.75rem;">
+                    Si marcás "No asistió", no es obligatorio cargar notas ni diagnósticos.
+                </small>
+            </div>
+
+            <div class="mb-3">
+                <label class="label-mini">Notas Clínicas</label>
+                <textarea class="form-control input-modern"
+                          rows="4"
+                          placeholder="Escriba aquí la evolución..."
+                          @bind="_consulta.Notas"
+                          @bind:event="oninput">
+                </textarea>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <label class="label-mini mb-0">Diagnósticos (CIE-10)</label>
+                <button type="button"
+                        class="btn btn-sm btn-light text-primary fw-bold rounded-pill px-3"
+                        @onclick="AbrirModalCie10">
+                    <i class="bi bi-plus-lg me-1"></i> Agregar
+                </button>
+            </div>
+
+            @if (_diagnosticos.Count == 0)
+            {
+                <div class="text-center py-3 bg-light rounded-3 border border-dashed mb-3">
+                    <p class="text-muted small mb-0 fst-italic">Sin diagnósticos cargados.</p>
+                </div>
+            }
+            else
+            {
+                <div class="d-flex flex-column gap-2 mb-3">
+                    @foreach (var d in _diagnosticos)
+                    {
+                        <div class="diagnosis-item">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <span class="badge bg-primary-subtle text-primary mb-1">@d.CIE10Codigo</span>
+                                    @if (_mapaCie10.TryGetValue(d.CIE10Codigo, out var desc))
+                                    {
+                                        <div class="small fw-bold text-dark lh-sm">@desc</div>
+                                    }
+                                </div>
+                                <div class="d-flex gap-1">
+                                    <button type="button" 
+                                            class="btn-icon-action btn-star @(d.Principal ? "active" : "")"
+                                            @onclick="() => MarcarPrincipal(d)"
+                                            title="Marcar como Principal">
+                                        <i class="bi @(d.Principal ? "bi-star-fill" : "bi-star")"></i>
+                                    </button>
+                                    <button type="button" 
+                                            class="btn-icon-action btn-delete"
+                                            @onclick="() => QuitarDiagnostico(d)">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <input class="form-control form-control-sm border-0 bg-white" 
+                                   placeholder="Comentario adicional (opcional)"
+                                   @bind="d.Comentario" />
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- BOTÓN GUARDAR (FLOTANTE) -->
+        <div class="fixed-bottom-action p-3 bg-white shadow-lg border-top">
+            
+            @if (!string.IsNullOrWhiteSpace(_mensaje))
+            {
+                <div class="alert alert-success small py-2 mb-2 text-center border-0 bg-success-subtle text-success fw-bold rounded-3 fade-in">
+                    <i class="bi bi-check-circle me-1"></i> @_mensaje
+                </div>
+            }
+            
+            @if (!string.IsNullOrWhiteSpace(_error))
+            {
+                <div class="alert alert-danger small py-2 mb-2 text-center border-0 bg-danger-subtle text-danger fw-bold rounded-3 fade-in">
+                    <i class="bi bi-exclamation-triangle me-1"></i> @_error
+                </div>
+            }
+
+            <button class="btn btn-primary btn-pill w-100 py-3 shadow-soft fw-bold d-flex justify-content-center align-items-center gap-2"
+                    @onclick="GuardarConsulta"
+                    disabled="@_guardando">
+                @if (_guardando)
+                {
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                    <span>Guardando...</span>
+                }
+                else
+                {
+                    <i class="bi bi-save"></i>
+                    <span>Finalizar Consulta</span>
+                }
+            </button>
+        </div>
+
+        <div class="spacer-bottom-large"></div>
+    </div>
+}
+
+<!-- MODAL CIE-10 -->
+@if (_mostrarModalCie10)
+{
+    <div class="modal-backdrop-custom" @onclick="CerrarModalCie10"></div>
+
+    <div class="modal-custom">
+        <div class="modal-header-custom">
+            <h6 class="mb-0 fw-bold">Buscar Diagnóstico</h6>
+            <button class="btn-close-custom" @onclick="CerrarModalCie10">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="mb-3">
+            <div class="input-group input-modern p-1">
+                <span class="input-group-text ps-2">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input class="form-control border-0 bg-transparent shadow-none"
+                       placeholder="Código o nombre (ej: Hipertensión)"
+                       @bind="_busquedaCie10"
+                       @bind:event="oninput" />
+                <button class="btn btn-sm btn-primary rounded-3 px-3 m-1"
+                        @onclick="BuscarCie10"
+                        disabled="@_buscandoCie10">
+                    Buscar
+                </button>
+            </div>
+        </div>
+
+        <div class="modal-body-custom">
+            @if (_resultadosCie10.Count == 0 && !_buscandoCie10)
+            {
+                <div class="text-center py-4 text-muted small">
+                    <i class="bi bi-search mb-2 fs-4 d-block"></i>
+                    Ingresa un término para buscar en el catálogo CIE-10.
+                </div>
+            }
+            else
+            {
+                <div class="d-flex flex-column">
+                    @foreach (var c in _resultadosCie10)
+                    {
+                        <div class="modal-option" @onclick="() => SeleccionarCie10(c)">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-primary-subtle text-primary">@c.Codigo</span>
+                                <span class="small fw-bold text-dark">@c.Descripcion</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+}
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav shadow-soft">
+    <button class="bottom-nav-item" @onclick="IrInicio">
+        <i class="bi bi-house-door"></i>
+        <span>Inicio</span>
+    </button>
+    <button class="bottom-nav-item active" @onclick="IrTurnosHoy">
+        <i class="bi bi-calendar-check"></i>
+        <span>Turnos</span>
+    </button>
+    <button class="bottom-nav-item" @onclick="IrPerfil">
+        <i class="bi bi-person-badge"></i>
+        <span>Perfil</span>
+    </button>
+</div>
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private AuthMeResponse? _usuario;
+    private TurnoDetalleMedicoDTO? _detalle;
+    private List<HistoriaClinicaItemDTO> _historia = new();
+
+    private RegistrarConsultaMedicoDTO _consulta = new();
+    private List<RegistrarConsultaDiagnosticoDTO> _diagnosticos = new();
+    private Dictionary<string, string> _mapaCie10 = new();
+
+    private bool _cargando = true;
+    private bool _guardando = false;
+    private string _mensaje = string.Empty;
+    private string _error = string.Empty;
+
+    // Modal CIE-10
+    private bool _mostrarModalCie10 = false;
+    private string _busquedaCie10 = "";
+    private bool _buscandoCie10 = false;
+    private List<Cie10DTO> _resultadosCie10 = new();
+
+    // Estado final del turno
+    private TurnoEstadoDTO _estadoSeleccionado = TurnoEstadoDTO.Atendido;
+
+    private bool _puedeGuardar =>
+        _detalle != null &&
+        _detalle.PacienteId != 0 &&
+        !string.IsNullOrWhiteSpace(_consulta.Notas);
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _usuario = await Auth.MeAsync();
+            if (_usuario is null || _usuario.Rol != "Medico")
+            {
+                Nav.NavigateTo("/", true);
+                return;
+            }
+
+            _detalle = await TurnoService.ObtenerDetalleMedicoAsync(Id);
+            if (_detalle is null)
+            {
+                Nav.NavigateTo("/medico/turnos-hoy", true);
+                return;
+            }
+
+            _consulta = new RegistrarConsultaMedicoDTO
+            {
+                TurnoId = _detalle.IdTurno,
+                Notas = string.Empty,
+                Diagnosticos = new List<RegistrarConsultaDiagnosticoDTO>(),
+                EstadoFinal = TurnoEstadoDTO.Atendido
+            };
+
+            if (_detalle.PacienteId != 0)
+            {
+                var hist = await TurnoService.ObtenerHistoriaRapidaPacienteAsync(_detalle.PacienteId);
+                _historia = hist ?? new List<HistoriaClinicaItemDTO>();
+            }
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    private void SeleccionarEstado(TurnoEstadoDTO estado)
+    {
+        _estadoSeleccionado = estado;
+    }
+
+    private void AbrirModalCie10()
+    {
+        _busquedaCie10 = "";
+        _resultadosCie10.Clear();
+        _mostrarModalCie10 = true;
+    }
+
+    private void CerrarModalCie10() => _mostrarModalCie10 = false;
+
+    private async Task BuscarCie10()
+    {
+        if (string.IsNullOrWhiteSpace(_busquedaCie10)) return;
+
+        _buscandoCie10 = true;
+        try
+        {
+            var lista = await Cie10Service.BuscarAsync(_busquedaCie10);
+            _resultadosCie10 = lista ?? new List<Cie10DTO>();
+
+            foreach (var c in _resultadosCie10)
+            {
+                _mapaCie10[c.Codigo] = c.Descripcion ?? "";
+            }
+        }
+        finally
+        {
+            _buscandoCie10 = false;
+        }
+    }
+
+    private void SeleccionarCie10(Cie10DTO cie)
+    {
+        if (_diagnosticos.Any(d => d.CIE10Codigo == cie.Codigo))
+        {
+            _mostrarModalCie10 = false;
+            return;
+        }
+
+        bool esPrimero = _diagnosticos.Count == 0;
+
+        var diag = new RegistrarConsultaDiagnosticoDTO
+        {
+            CIE10Codigo = cie.Codigo,
+            Comentario = "",
+            Principal = esPrimero
+        };
+
+        _diagnosticos.Add(diag);
+        _consulta.Diagnosticos = _diagnosticos;
+
+        if (!_mapaCie10.ContainsKey(cie.Codigo))
+            _mapaCie10[cie.Codigo] = cie.Descripcion ?? "";
+
+        _mostrarModalCie10 = false;
+    }
+
+    private void MarcarPrincipal(RegistrarConsultaDiagnosticoDTO diag)
+    {
+        foreach (var d in _diagnosticos)
+            d.Principal = (d == diag);
+    }
+
+    private void QuitarDiagnostico(RegistrarConsultaDiagnosticoDTO diag)
+    {
+        _diagnosticos.Remove(diag);
+        if (_diagnosticos.Count == 1)
+            _diagnosticos[0].Principal = true;
+
+        _consulta.Diagnosticos = _diagnosticos;
+    }
+
+    private async Task GuardarConsulta()
+    {
+        _error = "";
+        _mensaje = "";
+
+        if (_detalle is null || _detalle.PacienteId == 0)
+        {
+            _error = "El turno no tiene un paciente asignado.";
+            return;
+        }
+
+        // Validación de notas solo si asistió
+        if (_estadoSeleccionado == TurnoEstadoDTO.Atendido && string.IsNullOrWhiteSpace(_consulta.Notas))
+        {
+            _error = "Complete las notas de la consulta.";
+            return;
+        }
+
+        // Regla de negocio: si está Atendido, debe haber al menos un CIE-10
+        if (_estadoSeleccionado == TurnoEstadoDTO.Atendido && _diagnosticos.Count == 0)
+        {
+            _error = "Para marcar como 'Atendido' debe cargar al menos un diagnóstico CIE-10.";
+            return;
+        }
+
+        _guardando = true;
+
+        try
+        {
+            _consulta.Diagnosticos = _diagnosticos;
+            _consulta.EstadoFinal = _estadoSeleccionado;
+
+            var okConsulta = await TurnoService.RegistrarConsultaAsync(_consulta);
+            if (!okConsulta)
+            {
+                _error = "Error al registrar la consulta.";
+                return;
+            }
+
+            _mensaje = "Consulta finalizada con éxito.";
+            await Task.Delay(1500);
+            Nav.NavigateTo("/medico/turnos-hoy", true);
+        }
+        finally
+        {
+            _guardando = false;
+        }
+    }
+
+    private string GetBadgeClass(string estado)
+    {
+        if (string.Equals(estado, "En Curso", StringComparison.OrdinalIgnoreCase)) return "badge-status status-active";
+        if (string.Equals(estado, "Reservado", StringComparison.OrdinalIgnoreCase)) return "badge-status status-reserved";
+        if (string.Equals(estado, "Completado", StringComparison.OrdinalIgnoreCase)) return "badge-status status-finished";
+        if (string.Equals(estado, "No Asistió", StringComparison.OrdinalIgnoreCase) 
+            || string.Equals(estado, "Ausente", StringComparison.OrdinalIgnoreCase)) 
+            return "badge-status status-cancelled";
+
+        return "badge-status status-finished";
+    }
+
+    private string GetInicial(string? nombre) => 
+        string.IsNullOrWhiteSpace(nombre) ? "?" : nombre[0].ToString().ToUpper();
+
+    private void IrTurnosHoy() => Nav.NavigateTo("/medico/turnos-hoy");
+    private void IrInicio() => Nav.NavigateTo("/medico/home");
+    private void IrPerfil() => Nav.NavigateTo("/medico/perfil");
+}

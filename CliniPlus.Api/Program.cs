@@ -4,6 +4,9 @@
 using CliniPlus.Api.Data;
 using CliniPlus.Api.Repositories.Contrato;
 using CliniPlus.Api.Repositories.Implementa;
+using CliniPlus.Api.Services.Contrato;
+using CliniPlus.Api.Services.Implementa;
+using CliniPlus.Shared.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -16,6 +19,9 @@ var builder = WebApplication.CreateBuilder(args);
 // DB
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings"));
 
 // CORS (Somee + clientes)
 var corsOrigins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>() ?? Array.Empty<string>();
@@ -81,11 +87,11 @@ builder.Services
 
 builder.Services.AddAuthorization(opt =>
 {
-    opt.AddPolicy("AdminOnly", p => p.RequireRole("Administrador"));
+    opt.AddPolicy("AdministradorOnly", p => p.RequireRole("Administrador"));
     opt.AddPolicy("SoloMedico", p => p.RequireRole("Medico"));
     opt.AddPolicy("PacienteOnly", p => p.RequireRole("Paciente"));
-    opt.AddPolicy("MedicoOAdmin", p => p.RequireRole("Medico", "Administrador"));
-    opt.AddPolicy("SecretariaOAdmin", p => p.RequireRole("Secretario", "Administrador"));
+    opt.AddPolicy("MedicoOAdministrador", p => p.RequireRole("Medico", "Administrador"));
+    opt.AddPolicy("SecretariaOAdministrador", p => p.RequireRole("Secretaria", "Administrador"));
 });
 
 builder.Services.AddControllers();
@@ -102,6 +108,8 @@ builder.Services.AddScoped<IMedicoPerfilRepository, MedicoPerfilRepository>();
 builder.Services.AddScoped<IAdminPerfilRepository, AdminPerfilRepository>();
 builder.Services.AddScoped<IPacientePerfilRepository, PacientePerfilRepository>();
 builder.Services.AddScoped<ITurnoRepository, TurnoRepository>();
+builder.Services.AddScoped<ITipoTurnoRepository, TipoTurnoRepository>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 var app = builder.Build();
 

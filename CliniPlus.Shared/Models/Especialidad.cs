@@ -24,6 +24,10 @@ namespace CliniPlus.Shared.Models
         [Required]
         public bool IsActive { get; set; } = true;
 
-        public virtual ICollection<MedicoEspecialidad> Medicos { get; set; } = new List<MedicoEspecialidad>();
+        // 🔹 ANTES:
+        // public virtual ICollection<MedicoEspecialidad> Medicos { get; set; } = new List<MedicoEspecialidad>();
+
+        // 🔹 AHORA:
+        public virtual ICollection<Medico> Medicos { get; set; } = new List<Medico>();
     }
 }

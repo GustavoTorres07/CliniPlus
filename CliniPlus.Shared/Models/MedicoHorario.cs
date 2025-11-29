@@ -19,7 +19,6 @@ namespace CliniPlus.Shared.Models
         [Column("MedicoId")]
         public int MedicoId { get; set; }
 
-        /// <summary>0=Dom .. 6=Sab</summary>
         [Required]
         public byte DiaSemana { get; set; }
 
@@ -35,7 +34,6 @@ namespace CliniPlus.Shared.Models
         [Column("Activo")]
         public bool Activo { get; set; } = true;
 
-        // Nav
         [ForeignKey(nameof(MedicoId))]
         public virtual Medico Medico { get; set; } = null!;
     }

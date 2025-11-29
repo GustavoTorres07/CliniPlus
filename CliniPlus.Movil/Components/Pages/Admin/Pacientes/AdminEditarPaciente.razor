@@ -1,4 +1,4 @@
-﻿@page "/admin/pacientes/editar/{Id:int}"
+﻿@page "/Administrador/pacientes/editar/{Id:int}"
 @layout CliniPlus.Movil.Components.Layout.EmptyLayout
 
 @using CliniPlus.Shared.DTOs
@@ -238,7 +238,7 @@ else
         try
         {
             var me = await Auth.MeAsync();
-            if (me is null || (me.Rol != "Administrador" && me.Rol != "Secretario"))
+            if (me is null || (me.Rol != "Administrador" && me.Rol != "Secretaria"))
             {
                 _permitido = false;
                 Nav.NavigateTo("/", true);
@@ -252,7 +252,7 @@ else
 
             if (_detalle is null)
             {
-                Nav.NavigateTo("/admin/pacientes");
+                Nav.NavigateTo("/Administrador/pacientes");
                 return;
             }
 
@@ -294,7 +294,7 @@ else
 
             // Actualizar detalle local para refrescar la vista si nos quedamos
             _detalle = res;
-            Nav.NavigateTo("/admin/pacientes", true);
+            Nav.NavigateTo("/Administrador/pacientes", true);
         }
         catch (Exception ex)
         {
@@ -315,8 +315,8 @@ else
         return nombre[0].ToString().ToUpper();
     }
 
-    private void VolverLista() => Nav.NavigateTo("/admin/pacientes");
-    private void IrInicio() => Nav.NavigateTo("/admin/home");
+    private void VolverLista() => Nav.NavigateTo("/Administrador/pacientes");
+    private void IrInicio() => Nav.NavigateTo("/Administrador/home");
 
     private async Task CerrarSesion()
     {

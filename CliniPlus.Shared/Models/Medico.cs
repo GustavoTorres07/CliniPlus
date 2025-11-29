@@ -31,11 +31,13 @@ namespace CliniPlus.Shared.Models
         [Required]
         public bool IsActive { get; set; } = true;
 
-        // Navs
+        // 👇 Relación 1:N con Especialidad
+        public int? EspecialidadId { get; set; }
+        public Especialidad? Especialidad { get; set; }
+
         [ForeignKey(nameof(UsuarioId))]
         public virtual Usuario Usuario { get; set; } = null!;
 
-        public virtual ICollection<MedicoEspecialidad> Especialidades { get; set; } = new List<MedicoEspecialidad>();
         public virtual ICollection<MedicoHorario> Horarios { get; set; } = new List<MedicoHorario>();
         public virtual ICollection<MedicoBloqueo> Bloqueos { get; set; } = new List<MedicoBloqueo>();
         public virtual ICollection<Turno> Turnos { get; set; } = new List<Turno>();

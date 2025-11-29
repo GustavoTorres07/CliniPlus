@@ -24,5 +24,41 @@ namespace CliniPlus.Api.Repositories.Contrato
 
         Task<bool> ReservarSlotAsync(int medicoId, DateTime fechaUtc, int pacienteId, int tipoTurnoId);
 
+        Task<List<TurnoAgendaMedicoDTO>> ObtenerAgendaHoyMedicoAsync(int medicoId, DateTime hoyUtc);
+
+        Task<TurnoDetalleMedicoDTO?> ObtenerDetalleMedicoAsync(int medicoId, int turnoId);
+
+        Task<List<HistoriaClinicaItemDTO>> ObtenerHistoriaRapidaPacienteAsync(int medicoId, int pacienteId);
+
+        Task<int?> RegistrarConsultaAsync(int medicoId, RegistrarConsultaMedicoDTO dto);
+
+        Task<bool> MarcarTurnoCompletadoAsync(int medicoId, int turnoId);
+
+        Task<List<PacienteListadoMedicoDTO>> ListarPacientesPorMedicoAsync(int medicoId);
+
+        Task<List<HistoriaClinicaListadoDTO>> ObtenerHistoriaClinicaPacienteAsync(
+    int medicoId,
+    int pacienteId,
+    DateTime? desde,
+    DateTime? hasta);
+
+        Task<HistoriaClinicaDetalleDTO?> ObtenerHistoriaClinicaDetalleAsync(
+    int medicoId,
+    int entradaId);
+
+        Task<PacienteDetalleMedicoDTO?> ObtenerPacienteDetalleAsync(
+    int medicoId,
+    int pacienteId);
+
+        Task<List<HistoriaClinicaListadoDTO>> ObtenerHistoriaPacienteAsync(
+    int pacienteId,
+    DateTime? desde,
+    DateTime? hasta);
+
+        Task<HistoriaClinicaDetalleDTO?> ObtenerHistoriaDetallePacienteAsync(
+            int pacienteId,
+            int entradaId);
+
+
     }
 }

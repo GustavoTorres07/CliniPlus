@@ -1,4 +1,4 @@
-﻿@page "/admin/medicos/{Id:int}"
+﻿@page "/Administrador/medicos/{Id:int}"
 @layout CliniPlus.Movil.Components.Layout.EmptyLayout
 @using CliniPlus.Shared.DTOs
 @using CliniPlus.Movil.Services.Contrato
@@ -179,7 +179,7 @@ else
         {
             var me = await Auth.MeAsync();
             // Admin o Secretario pueden ver el detalle
-            if (me is null || (me.Rol != "Administrador" && me.Rol != "Secretario"))
+            if (me is null || (me.Rol != "Administrador" && me.Rol != "Secretaria"))
             {
                 Nav.NavigateTo("/", true);
                 return;
@@ -225,7 +225,7 @@ else
 
         _detalle = res;
         _guardando = false;
-        Nav.NavigateTo("/admin/medicos", true);
+        Nav.NavigateTo("/Administrador/medicos", true);
     }
 
     private async Task ToggleEstadoAsync()
@@ -239,7 +239,7 @@ else
             _detalle.IsActive = nuevo;
     }
 
-    private void IrInicio() => Nav.NavigateTo("/admin/home");
+    private void IrInicio() => Nav.NavigateTo("/Administrador/home");
 
     private async Task CerrarSesion()
     {

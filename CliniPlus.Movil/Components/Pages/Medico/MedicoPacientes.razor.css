@@ -1,0 +1,189 @@
+﻿/* -------------------------------------------------------------------------- */
+/* ESTILOS PARA MIS PACIENTES (MÉDICO)                          */
+/* Fuente: Nunito | Color primario: #6e7bff                   */
+/* -------------------------------------------------------------------------- */
+
+/* Global */
+.home-page {
+    padding: 24px 20px;
+    font-family: 'Nunito', sans-serif;
+    background-color: #f8f9fc;
+    min-height: 100vh;
+    padding-bottom: 100px;
+}
+
+/* --- HEADER --- */
+.home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.home-hello {
+    font-size: 0.85rem;
+    color: #9ba0b8;
+    margin: 0;
+}
+
+.home-name {
+    font-weight: 800;
+    color: #15161b;
+    margin: 0;
+    font-size: 1.4rem;
+}
+
+.badge-medico {
+    background-color: #e2e6ff;
+    color: #6e7bff;
+    font-weight: 700;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    padding: 4px 10px;
+}
+
+/* Avatar Header */
+.home-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #6e7bff, #b3baff);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 10px rgba(110, 123, 255, 0.3);
+}
+
+.btn-logout {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: white;
+    border: 1px solid #f0f2f5;
+    color: #ff6b6b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+    .btn-logout:active {
+        transform: scale(0.95);
+        background-color: #fff5f5;
+    }
+
+/* --- BUSCADOR --- */
+.input-elevated {
+    background-color: white;
+    border-radius: 16px;
+    padding: 6px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    display: flex;
+    align-items: center;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+}
+
+    .input-elevated:focus-within {
+        border-color: #6e7bff;
+        box-shadow: 0 4px 20px rgba(110, 123, 255, 0.1);
+    }
+
+.input-group-text {
+    background: transparent;
+    border: none;
+    color: #6e7bff;
+    font-size: 1.1rem;
+    padding-left: 12px;
+}
+
+.form-control {
+    border: none;
+    font-size: 0.95rem;
+    color: #2c3e50;
+    background: transparent;
+}
+
+    .form-control:focus {
+        box-shadow: none;
+    }
+
+/* --- TARJETAS DE PACIENTE --- */
+.home-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    border: 1px solid #f0f2f5;
+    transition: all 0.2s;
+}
+
+.patient-avatar-small {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background-color: #e0f2f1; /* Verde suave */
+    color: #009688;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.patient-stats {
+    background-color: #f8f9fc;
+    border-radius: 12px;
+    padding: 8px 12px;
+    margin-top: 10px;
+}
+
+/* --- BOTTOM NAV --- */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    box-shadow: 0 -5px 30px rgba(0,0,0,0.05);
+    z-index: 1000;
+}
+
+.bottom-nav-item {
+    background: none;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #b1b6c9;
+    gap: 4px;
+    flex: 1;
+    height: 100%;
+}
+
+    .bottom-nav-item i {
+        font-size: 1.4rem;
+    }
+
+    .bottom-nav-item span {
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+
+    .bottom-nav-item.active {
+        color: #6e7bff;
+    }
+
+/* Utilidades */
+.home-loading {
+    color: #9ba0b8;
+}

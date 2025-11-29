@@ -15,8 +15,24 @@
             },
 
             dateClick: function (info) {
-                // Avisar a Blazor qué fecha se seleccionó
-                // ESTE NOMBRE DE MÉTODO DEBE COINCIDIR CON [JSInvokable] EN EL COMPONENTE RAZOR
+
+                // ------------------------------
+                // ❌ Bloquear días pasados
+                // ------------------------------
+                let today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                let clicked = new Date(info.date);
+                clicked.setHours(0, 0, 0, 0);
+
+                if (clicked < today) {
+                    // No notificar a Blazor → Ignorar selección
+                    return;
+                }
+
+                // ------------------------------
+                // 👉 Avisar a Blazor la fecha seleccionada
+                // ------------------------------
                 dotnetRef.invokeMethodAsync('NotifyDateSelected', info.dateStr);
             }
         });

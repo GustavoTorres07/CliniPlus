@@ -16,14 +16,17 @@ namespace CliniPlus.Api.Repositories.Implementa
 
         public async Task<PerfilMedicoDTO?> ObtenerAsync(int idUsuario)
         {
-            var usuario = await _context.Usuario.FirstOrDefaultAsync(u => u.IdUsuario == idUsuario);
+            // 1) Usuario activo
+            var usuario = await _context.Usuario
+                .FirstOrDefaultAsync(u => u.IdUsuario == idUsuario && u.IsActive);
 
             if (usuario == null || usuario.Rol != "Medico")
                 return null;
 
+            // 2) Médico + Especialidad
             var medico = await _context.Medico
-                .Include(m => m.Especialidades).ThenInclude(e => e.Especialidad)
-                .FirstOrDefaultAsync(m => m.UsuarioId == idUsuario);
+                .Include(m => m.Especialidad)
+                .FirstOrDefaultAsync(m => m.UsuarioId == idUsuario && m.IsActive);
 
             if (medico == null)
                 return null;
@@ -36,35 +39,68 @@ namespace CliniPlus.Api.Repositories.Implementa
                 Apellido = usuario.Apellido,
                 Email = usuario.Email,
                 Bio = medico.Bio,
-                FotoUrl = medico.FotoUrl
+                FotoUrl = medico.FotoUrl,
+                EspecialidadId = medico.EspecialidadId,
+                EspecialidadNombre = medico.Especialidad != null
+                    ? medico.Especialidad.Nombre
+                    : null
             };
 
-            dto.Especialidades = medico.Especialidades
-                .Select(e => new SimpleEspecialidadDTO
+            // 👇 llenar también la lista de Especialidades para la UI
+            if (medico.EspecialidadId.HasValue && medico.Especialidad is not null)
+            {
+                dto.Especialidades.Add(new SimpleEspecialidadDTO
                 {
-                    IdEspecialidad = e.EspecialidadId,
-                    Nombre = e.Especialidad.Nombre
-                }).ToList();
+                    IdEspecialidad = medico.EspecialidadId.Value,
+                    Nombre = medico.Especialidad.Nombre
+                });
+            }
 
             return dto;
         }
 
         public async Task<bool> ActualizarAsync(int idUsuario, PerfilMedicoDTO dto)
         {
-            var usuario = await _context.Usuario.FirstOrDefaultAsync(u => u.IdUsuario == idUsuario);
-            var medico = await _context.Medico.FirstOrDefaultAsync(m => m.UsuarioId == idUsuario);
+            // 1) Usuario y médico
+            var usuario = await _context.Usuario
+                .FirstOrDefaultAsync(u => u.IdUsuario == idUsuario && u.IsActive);
+
+            var medico = await _context.Medico
+                .FirstOrDefaultAsync(m => m.UsuarioId == idUsuario && m.IsActive);
 
             if (usuario == null || medico == null)
                 return false;
 
-            // Usuario
-            usuario.Nombre = dto.Nombre;
-            usuario.Apellido = dto.Apellido;
-            usuario.Email = dto.Email;
+            // 2) Actualizar datos de Usuario
+            if (!string.IsNullOrWhiteSpace(dto.Nombre))
+                usuario.Nombre = dto.Nombre.Trim();
 
-            // Medico
+            if (!string.IsNullOrWhiteSpace(dto.Apellido))
+                usuario.Apellido = dto.Apellido.Trim();
+
+            if (!string.IsNullOrWhiteSpace(dto.Email))
+                usuario.Email = dto.Email.Trim();
+
+            // 3) Actualizar datos de Médico
             medico.Bio = dto.Bio;
             medico.FotoUrl = dto.FotoUrl;
+
+            // 4) Actualizar especialidad (una sola)
+            if (dto.EspecialidadId.HasValue)
+            {
+                bool existe = await _context.Especialidad
+                    .AnyAsync(e => e.IdEspecialidad == dto.EspecialidadId.Value);
+
+                if (!existe)
+                    throw new InvalidOperationException("ESPECIALIDAD_NO_ENCONTRADA");
+
+                medico.EspecialidadId = dto.EspecialidadId.Value;
+            }
+            else
+            {
+                // Permitir dejar al médico sin especialidad
+                medico.EspecialidadId = null;
+            }
 
             await _context.SaveChangesAsync();
             return true;

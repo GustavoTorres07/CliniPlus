@@ -24,7 +24,6 @@ namespace CliniPlus.Shared.Models
         [Required]
         public bool IsActive { get; set; } = true;
 
-        // Nav inversa
         public virtual ICollection<Paciente> Pacientes { get; set; } = new List<Paciente>();
     }
 }

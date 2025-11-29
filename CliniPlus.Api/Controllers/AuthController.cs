@@ -1,8 +1,9 @@
 ﻿using CliniPlus.Api.Data;
 using CliniPlus.Api.Repositories.Contrato;
+using CliniPlus.Api.Services.Contrato;
+using CliniPlus.Api.Utils;
 using CliniPlus.Shared.DTOs;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -15,23 +16,20 @@ namespace CliniPlus.Api.Controllers
     {
         private readonly AppDbContext _db;
         private readonly ITokenRepository _tokens;
+        private readonly IEmailService _email;   // 👈 nuevo
 
-        public AuthController(AppDbContext db, ITokenRepository tokens)
+        public AuthController(AppDbContext db, ITokenRepository tokens, IEmailService email)
         {
             _db = db;
             _tokens = tokens;
+            _email = email;
         }
 
-        /// <summary>
-        /// Ping público (útil para verificar despliegue en Somee).
-        /// </summary>
         [HttpGet("ping")]
         [AllowAnonymous]
         public IActionResult Ping() => Ok(new { ok = true, message = "Auth OK" });
 
-        /// <summary>
-        /// Login con Email/Password -> JWT
-        /// </summary>
+        // ---------------- LOGIN ----------------
         [HttpPost("login")]
         [AllowAnonymous]
         public async Task<ActionResult<AuthLoginResponseDTO>> Login([FromBody] AuthLoginRequest req)
@@ -41,7 +39,6 @@ namespace CliniPlus.Api.Controllers
             var u = await _db.Usuario.FirstOrDefaultAsync(x => x.Email == req.Email && x.IsActive);
             if (u == null) return Unauthorized("Usuario o contraseña inválidos.");
 
-            // Verificar hash con BCrypt.Net-Next
             if (!BCrypt.Net.BCrypt.Verify(req.Password, u.PasswordHash))
                 return Unauthorized("Usuario o contraseña inválidos.");
 
@@ -52,13 +49,14 @@ namespace CliniPlus.Api.Controllers
                 UsuarioId = u.IdUsuario,
                 NombreCompleto = $"{u.Nombre} {u.Apellido}",
                 Rol = u.Rol,
-                Token = token
+                Token = token,
+
+                // 👇 sólo Paciente usa recuperación de contraseña
+                DebeCambiarPassword = (u.Rol == "Paciente" && u.RecuperarContrasena)
             };
         }
 
-        /// <summary>
-        /// Info del usuario autenticado usando las claims del token.
-        /// </summary>
+        // ---------------- ME ----------------
         [HttpGet("me")]
         [Authorize]
         public ActionResult<AuthMeResponse> Me()
@@ -77,7 +75,6 @@ namespace CliniPlus.Api.Controllers
 
             string? rol = User.FindFirstValue("role");
 
-
             if (id is null)
                 return Unauthorized("No se pudo obtener el usuario desde el token.");
 
@@ -90,6 +87,41 @@ namespace CliniPlus.Api.Controllers
             };
 
             return Ok(dto);
+        }
+
+        // ---------------- RECUPERAR PASSWORD (solo Paciente) ----------------
+        [HttpPost("recuperar-password")]
+        [AllowAnonymous]
+        public async Task<IActionResult> RecuperarPassword([FromBody] RecuperarPasswordRequest body)
+        {
+            if (string.IsNullOrWhiteSpace(body.Email))
+                return BadRequest("El email es obligatorio.");
+
+            var email = body.Email.Trim();
+
+            var usuario = await _db.Usuario
+                .FirstOrDefaultAsync(u =>
+                    u.Email == email &&
+                    u.IsActive &&
+                    u.Rol == "Paciente");
+
+            if (usuario is null)
+                return NotFound("No existe un paciente con ese email.");
+
+            var tempPassword = GeneradorPassword.RandomPassword(8);
+
+            usuario.PasswordHash = BCrypt.Net.BCrypt.HashPassword(tempPassword);
+            usuario.RecuperarContrasena = true;
+
+            await _db.SaveChangesAsync();
+
+            await _email.EnviarPasswordTemporalAsync(
+                usuario.Email,
+                usuario.Nombre,
+                tempPassword
+            );
+
+            return Ok(new { mensaje = "Se envió una contraseña temporal a tu correo." });
         }
 
     }

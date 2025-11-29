@@ -15,9 +15,38 @@
         <span>Cargando perfil...</span>
     </div>
 }
-else if (_usuario is null || _perfil is null)
+else if (_usuario is null)
 {
     <RedirectToLogin />
+}
+else if (_perfil is null)
+{
+    <!-- Médico logueado, pero aún sin perfil configurado -->
+    <div class="home-page">
+        <div class="home-header mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn-back" @onclick="IrInicio">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <div class="home-greeting">
+                    <p class="home-hello">Mi Cuenta</p>
+                    <h4 class="home-name">Perfil Médico</h4>
+                </div>
+            </div>
+
+            <div class="home-avatar">
+                <span>@GetInicial(_usuario.NombreCompleto)</span>
+            </div>
+        </div>
+
+        <div class="home-card p-4 mb-3">
+            <h6 class="section-title mb-2">Perfil no configurado</h6>
+            <p class="text-muted small mb-0">
+                Tu usuario médico está activo, pero el perfil aún no está cargado en el sistema.
+                Pedile a Secretaría/Admin que lo configure o que te asigne especialidad.
+            </p>
+        </div>
+    </div>
 }
 else
 {
@@ -223,13 +252,15 @@ else
             }
 
             _perfil = await PerfilService.ObtenerAsync();
-            _todasEspecialidades = await EspecialidadService.ListarAsync();
+            _todasEspecialidades = await EspecialidadService.ListarAsync()
+                                   ?? new List<EspecialidadDTO>();   // 👈 clave
         }
         finally
         {
             _cargando = false;
         }
     }
+
 
     private async Task Guardar()
     {
@@ -262,21 +293,30 @@ else
         _especialidadSeleccionadaId = id;
     }
 
-    private void ConfirmarEspecialidad()
+private void ConfirmarEspecialidad()
+{
+    if (_especialidadSeleccionadaId is null || _todasEspecialidades is null || _perfil is null)
+        return;
+
+    var esp = _todasEspecialidades
+        .FirstOrDefault(e => e.IdEspecialidad == _especialidadSeleccionadaId.Value);
+
+    if (esp is null) return;
+
+    // 👉 actualizar campos principales
+    _perfil.EspecialidadId = esp.IdEspecialidad;
+    _perfil.EspecialidadNombre = esp.Nombre;
+
+    // 👉 mantener la lista para la UI
+    _perfil.Especialidades.Clear();
+    _perfil.Especialidades.Add(new SimpleEspecialidadDTO
     {
-        if (_especialidadSeleccionadaId is null) return;
+        IdEspecialidad = esp.IdEspecialidad,
+        Nombre = esp.Nombre
+    });
 
-        var esp = _todasEspecialidades!.First(e => e.IdEspecialidad == _especialidadSeleccionadaId);
-
-        _perfil!.Especialidades.Clear();
-        _perfil.Especialidades.Add(new SimpleEspecialidadDTO
-        {
-            IdEspecialidad = esp.IdEspecialidad,
-            Nombre = esp.Nombre
-        });
-
-        _mostrarModalEspecialidades = false;
-    }
+    _mostrarModalEspecialidades = false;
+}
 
     private void QuitarEspecialidad(SimpleEspecialidadDTO esp)
     {

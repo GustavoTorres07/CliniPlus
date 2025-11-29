@@ -168,6 +168,15 @@
     color: #ff9800;
 }
 
+/* NUEVO: Teal (Para médicos disponibles) */
+.bg-teal-light {
+    background-color: #e0f7fa;
+}
+
+.text-teal {
+    color: #0097a7;
+}
+
 /* --- TARJETA DE RESUMEN (Próximo Turno) --- */
 .home-card {
     background: white;

@@ -1,5 +1,5 @@
-﻿@page "/admin/medicos/{Id:int}/horarios"
-@page "/admin/medicos/horarios" 
+﻿@page "/Administrador/medicos/{Id:int}/horarios"
+@page "/Administrador/medicos/horarios"
 @layout CliniPlus.Movil.Components.Layout.EmptyLayout
 
 @using CliniPlus.Shared.DTOs
@@ -205,7 +205,7 @@ else
         try
         {
             var me = await Auth.MeAsync();
-            if (me is null || (me.Rol != "Administrador" && me.Rol != "Secretario"))
+            if (me is null || (me.Rol != "Administrador" && me.Rol != "Secretaria"))
             {
                 _permitido = false;
                 Nav.NavigateTo("/", true);
@@ -343,7 +343,7 @@ else
         if (int.TryParse(e.Value?.ToString(), out var nuevoId))
         {
             // Navegamos a la ruta completa para actualizar la URL
-            Nav.NavigateTo($"/admin/medicos/{nuevoId}/horarios", true);
+            Nav.NavigateTo($"/Administrador/medicos/{nuevoId}/horarios", true);
         }
     }
 

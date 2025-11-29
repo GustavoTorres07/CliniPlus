@@ -1,4 +1,4 @@
-﻿@page "/admin/medicos"
+﻿@page "/Administrador/medicos"
 @layout CliniPlus.Movil.Components.Layout.EmptyLayout
 
 @using CliniPlus.Shared.DTOs
@@ -175,7 +175,7 @@
         try
         {
             var me = await Auth.MeAsync();
-            if (me is null || (me.Rol != "Administrador" && me.Rol != "Secretario"))
+            if (me is null || (me.Rol != "Administrador" && me.Rol != "Secretaria"))
             {
                 _permitido = false;
                 Nav.NavigateTo("/", true);
@@ -239,16 +239,16 @@
 
     private string GetInicial(string? nombre) => string.IsNullOrWhiteSpace(nombre) ? "?" : nombre[0].ToString().ToUpper();
 
-    private void IrCrear() => Nav.NavigateTo("/admin/medicos/crear");
-    private void IrDetalle(int id) => Nav.NavigateTo($"/admin/medicos/{id}");
+    private void IrCrear() => Nav.NavigateTo("/Administrador/medicos/crear");
+    private void IrDetalle(int id) => Nav.NavigateTo($"/Administrador/medicos/{id}");
 
     // Navegación a Bloqueos
-    private void IrBloqueos(int id) => Nav.NavigateTo($"/admin/medicos/{id}/bloqueos");
+    private void IrBloqueos(int id) => Nav.NavigateTo($"/Administrador/medicos/{id}/bloqueos");
 
     // Navegación a Horarios (NUEVO)
-    private void IrHorarios(int id) => Nav.NavigateTo($"/admin/medicos/{id}/horarios");
+    private void IrHorarios(int id) => Nav.NavigateTo($"/Administrador/medicos/{id}/horarios");
 
-    private void IrInicio() => Nav.NavigateTo("/admin/home");
+    private void IrInicio() => Nav.NavigateTo("/Administrador/home");
 
     private async Task CerrarSesion()
     {

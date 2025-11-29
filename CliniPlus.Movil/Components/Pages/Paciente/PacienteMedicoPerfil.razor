@@ -1,0 +1,205 @@
+﻿@page "/paciente/medico/{Id:int}"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+
+@using CliniPlus.Shared.DTOs
+@inject CliniPlus.Movil.Services.Contrato.IAuthService Auth
+@inject CliniPlus.Movil.Services.Contrato.IMedicoService MedicoService
+@inject NavigationManager Nav
+
+@if (_cargando)
+{
+    <div class="home-loading d-flex flex-column align-items-center justify-content-center" style="height: 60vh;">
+        <div class="spinner-border text-success me-2"></div>
+        <p class="mt-2 text-muted small">Cargando perfil del médico...</p>
+    </div>
+}
+else if (_usuario is null || _medico is null)
+{
+    <RedirectToLogin />
+}
+else
+{
+    <div class="home-page">
+
+        <!-- HEADER -->
+        <div class="home-header mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn-back" @onclick="Volver">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <div class="home-greeting">
+                    <p class="home-hello">Perfil Profesional</p>
+                    <h4 class="home-name">@_medico.NombreCompleto</h4>
+                    @if (!string.IsNullOrWhiteSpace(_medico.EspecialidadNombre))
+                    {
+                        <span class="badge badge-medico mt-1">
+                            @_medico.EspecialidadNombre
+                        </span>
+                    }
+                </div>
+            </div>
+
+            <div class="home-avatar">
+                @if (!string.IsNullOrWhiteSpace(_medico.FotoUrl))
+                {
+                    <img src="@_medico.FotoUrl"
+                         alt="Foto"
+                         style="width:100%; height:100%; object-fit:cover;" />
+                }
+                else
+                {
+                    <span>@GetInicial(_medico.NombreCompleto)</span>
+                }
+            </div>
+        </div>
+
+        <!-- BIO / PRESENTACIÓN -->
+        <div class="home-card p-4 mb-3">
+            <h6 class="section-title mb-3">Sobre el profesional</h6>
+            @if (!string.IsNullOrWhiteSpace(_medico.Bio))
+            {
+                <p class="text-muted small mb-0" style="line-height: 1.6; white-space: pre-wrap;">
+                    @_medico.Bio
+                </p>
+            }
+            else
+            {
+                <p class="text-muted small mb-0 fst-italic">
+                    El médico aún no ha cargado una biografía.
+                </p>
+            }
+        </div>
+
+        <!-- INFORMACIÓN PROFESIONAL -->
+        <div class="home-card p-4 mb-4">
+            <h6 class="section-title mb-3">Información Detallada</h6>
+
+            <div class="d-flex flex-column">
+                
+                @if (!string.IsNullOrWhiteSpace(_medico.EspecialidadNombre))
+                {
+                    <div class="info-item">
+                        <div class="info-icon primary">
+                            <i class="bi bi-heart-pulse"></i>
+                        </div>
+                        <div class="info-text">
+                            <span class="info-label">Especialidad</span>
+                            <span class="info-value">@_medico.EspecialidadNombre</span>
+                        </div>
+                    </div>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(_medico.Email))
+                {
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="bi bi-envelope-at"></i>
+                        </div>
+                        <div class="info-text">
+                            <span class="info-label">Contacto</span>
+                            <span class="info-value text-truncate" style="max-width: 200px;">@_medico.Email</span>
+                        </div>
+                    </div>
+                }
+
+                <div class="info-item">
+                    <div class="info-icon">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+                    <div class="info-text">
+                        <span class="info-label">Duración Turno</span>
+                        <span class="info-value">@_medico.DefaultSlotMin minutos</span>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-icon @(_medico.IsActive ? "success" : "")">
+                        <i class="bi bi-check2-circle"></i>
+                    </div>
+                    <div class="info-text">
+                        <span class="info-label">Estado en Sistema</span>
+                        <span class="info-value @(_medico.IsActive ? "text-success" : "text-muted")">
+                            @(_medico.IsActive ? "Activo" : "No disponible")
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ACCIÓN: RESERVAR TURNO -->
+        <div class="home-card p-4 mb-5 border-0 bg-transparent shadow-none pt-0">
+            <button class="btn btn-primary w-100 shadow-soft d-flex align-items-center justify-content-center gap-2"
+                    @onclick="IrReservarTurno">
+                <i class="bi bi-calendar-plus"></i>
+                <span>Reservar turno con @_medico.NombreCompleto</span>
+            </button>
+        </div>
+
+        <div class="spacer-bottom-large" style="height: 60px;"></div>
+    </div>
+}
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav shadow-soft">
+    <button class="bottom-nav-item" @onclick="IrInicio">
+        <i class="bi bi-house-door"></i>
+        <span>Inicio</span>
+    </button>
+    <button class="bottom-nav-item" @onclick="IrMisTurnos">
+        <i class="bi bi-calendar-check"></i>
+        <span>Turnos</span>
+    </button>
+    <button class="bottom-nav-item" @onclick="IrPerfilPaciente">
+        <i class="bi bi-person"></i>
+        <span>Perfil</span>
+    </button>
+</div>
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private AuthMeResponse? _usuario;
+    private MedicoDetalleDTO? _medico;
+    private bool _cargando = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _usuario = await Auth.MeAsync();
+
+            if (_usuario is null || _usuario.Rol != "Paciente")
+            {
+                Nav.NavigateTo("/", true);
+                return;
+            }
+
+            _medico = await MedicoService.ObtenerAsync(Id);
+
+            if (_medico is null)
+            {
+                Nav.NavigateTo("/paciente/medicos", true);
+                return;
+            }
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    private void IrReservarTurno()
+    {
+        Nav.NavigateTo($"/paciente/agenda?medicoId={Id}");
+    }
+
+    private void Volver() => Nav.NavigateTo("/paciente/medicos");
+
+    private void IrInicio() => Nav.NavigateTo("/paciente/home", true);
+    private void IrMisTurnos() => Nav.NavigateTo("/paciente/turnos", true);
+    private void IrPerfilPaciente() => Nav.NavigateTo("/paciente/perfil", true);
+
+    private string GetInicial(string? nombre) =>
+        string.IsNullOrWhiteSpace(nombre) ? "?" : nombre[0].ToString().ToUpper();
+}

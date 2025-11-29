@@ -1,4 +1,4 @@
-﻿@page "/admin/usuarios/{Id:int}"
+﻿@page "/Administrador/usuarios/{Id:int}"
 @layout CliniPlus.Movil.Components.Layout.EmptyLayout
 @using CliniPlus.Shared.DTOs
 @using CliniPlus.Movil.Services.Contrato
@@ -206,7 +206,7 @@ else
     private bool _guardando = false;
     private string? _error;
 
-    private readonly string[] _rolesDisponibles = { "Administrador", "Secretario", "Medico", "Paciente" };
+    private readonly string[] _rolesDisponibles = { "Administrador", "Secretaria", "Medico", "Paciente" };
 
     // ---- Campos para cambiar contraseña ----
     private string _passNueva = string.Empty;
@@ -257,7 +257,7 @@ else
 
         _detalle = res; // Actualizamos la vista con la respuesta
         _guardando = false;
-        Nav.NavigateTo("/admin/usuarios", true); // Opcional: volver a la lista
+        Nav.NavigateTo("/Administrador/usuarios", true); // Opcional: volver a la lista
     }
 
     private async Task ToggleEstadoAsync()
@@ -310,7 +310,7 @@ else
         _passConfirmar = string.Empty;
     }
 
-    private void IrInicio() => Nav.NavigateTo("/admin/home");
+    private void IrInicio() => Nav.NavigateTo("/Administrador/home");
 
     private async Task CerrarSesion()
     {

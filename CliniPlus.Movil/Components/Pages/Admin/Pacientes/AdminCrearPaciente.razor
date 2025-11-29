@@ -1,4 +1,4 @@
-﻿@page "/admin/pacientes/crear"
+﻿@page "/Administrador/pacientes/crear"
 @layout CliniPlus.Movil.Components.Layout.EmptyLayout
 @using CliniPlus.Shared.DTOs
 @using CliniPlus.Movil.Services.Contrato
@@ -209,7 +209,7 @@ protected override async Task OnInitializedAsync()
     try
     {
         var me = await Auth.MeAsync();
-        if (me is null || (me.Rol != "Administrador" && me.Rol != "Secretario"))
+        if (me is null || (me.Rol != "Administrador" && me.Rol != "Secretaria"))
         {
             _permitido = false;
             Nav.NavigateTo("/", true);
@@ -243,7 +243,7 @@ protected override async Task OnInitializedAsync()
                 _error = "No se pudo crear. Verifique los datos.";
                 return;
             }
-            Nav.NavigateTo("/admin/pacientes", true);
+            Nav.NavigateTo("/Administrador/pacientes", true);
         }
         catch (Exception ex)
         {
@@ -258,8 +258,8 @@ protected override async Task OnInitializedAsync()
         }
     }
 
-    private void VolverLista() => Nav.NavigateTo("/admin/pacientes");
-    private void IrInicio() => Nav.NavigateTo("/admin/home");
+    private void VolverLista() => Nav.NavigateTo("/Administrador/pacientes");
+    private void IrInicio() => Nav.NavigateTo("/Administrador/home");
     
     private async Task CerrarSesion()
     {

@@ -11,11 +11,11 @@ namespace CliniPlus.Shared.Models
     [Table("ConsultaDiagnostico")]
     public class ConsultaDiagnostico
     {
-        [Required] // ← AGREGAR
+        [Required] 
         [Column("ConsultaId")]
         public int ConsultaId { get; set; }
 
-        [Required, MaxLength(10)] // ← AGREGAR Required
+        [Required, MaxLength(10)] 
         [Column("CIE10Codigo")]
         public string CIE10Codigo { get; set; } = null!;
 
@@ -25,7 +25,6 @@ namespace CliniPlus.Shared.Models
         [Required]
         public bool Principal { get; set; } = false;
 
-        // Navs
         public virtual Consulta Consulta { get; set; } = null!;
         public virtual CIE10 CIE10 { get; set; } = null!;
     }

@@ -1,4 +1,4 @@
-﻿@page "/admin/especialidades/crear"
+﻿@page "/Administrador/especialidades/crear"
 @layout CliniPlus.Movil.Components.Layout.EmptyLayout
 @using CliniPlus.Movil.Services.Contrato
 @using CliniPlus.Shared.DTOs
@@ -85,10 +85,10 @@
     {
         var resp = await SpecialService.CrearAsync(_model);
         if (resp != null)
-            Nav.NavigateTo("/admin/especialidades", true);
+            Nav.NavigateTo("/Administrador/especialidades", true);
     }
 
-    private void IrInicio() => Nav.NavigateTo("/admin/home");
+    private void IrInicio() => Nav.NavigateTo("/Administrador/home");
 
     private async Task CerrarSesion()
     {

@@ -1,4 +1,4 @@
-﻿@page "/admin/obras-sociales/crear"
+﻿@page "/Administrador/obras-sociales/crear"
 @layout CliniPlus.Movil.Components.Layout.EmptyLayout
 @using CliniPlus.Movil.Services.Contrato
 @using CliniPlus.Shared
@@ -106,10 +106,10 @@
             return;
         }
 
-        Nav.NavigateTo("/admin/obras-sociales", true);
+        Nav.NavigateTo("/Administrador/obras-sociales", true);
     }
 
-    private void IrInicio() => Nav.NavigateTo("/admin/home");
+    private void IrInicio() => Nav.NavigateTo("/Administrador/home");
 
     private async Task CerrarSesion()
     {

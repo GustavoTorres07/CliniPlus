@@ -34,7 +34,6 @@ namespace CliniPlus.Shared.Models
         [MaxLength(1000)]
         public string? Observaciones { get; set; }
 
-        // Navs
         [ForeignKey(nameof(PacienteId))]
         public virtual Paciente Paciente { get; set; } = null!;
     }

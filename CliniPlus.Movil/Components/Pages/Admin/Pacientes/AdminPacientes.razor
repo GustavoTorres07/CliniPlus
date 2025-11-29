@@ -1,4 +1,4 @@
-﻿@page "/admin/pacientes"
+﻿@page "/Administrador/pacientes"
 @layout CliniPlus.Movil.Components.Layout.EmptyLayout
 @using CliniPlus.Shared.DTOs
 @using CliniPlus.Movil.Services.Contrato
@@ -183,7 +183,7 @@ else
         try
         {
             var me = await Auth.MeAsync();
-            if (me is null || (me.Rol != "Administrador" && me.Rol != "Secretario"))
+            if (me is null || (me.Rol != "Administrador" && me.Rol != "Secretaria"))
             {
                 _permitido = false;
                 Nav.NavigateTo("/", true);
@@ -234,9 +234,9 @@ else
             : "?";
     }
 
-    private void IrInicio() => Nav.NavigateTo("/admin/home");
-    private void IrCrear() => Nav.NavigateTo("/admin/pacientes/crear");
-    private void IrDetalle(int id) => Nav.NavigateTo($"/admin/pacientes/{id}");
+    private void IrInicio() => Nav.NavigateTo("/Administrador/home");
+    private void IrCrear() => Nav.NavigateTo("/Administrador/pacientes/crear");
+    private void IrDetalle(int id) => Nav.NavigateTo($"/Administrador/pacientes/{id}");
     private async Task CerrarSesion()
     {
         await Auth.LogoutAsync();

@@ -1,0 +1,260 @@
+﻿/* -------------------------------------------------------------------------- */
+/* ESTILOS PARA DETALLE DE PACIENTE (MÉDICO)                    */
+/* Fuente: Nunito | Color primario: #6e7bff                   */
+/* -------------------------------------------------------------------------- */
+
+/* Global */
+.home-page {
+    padding: 24px 20px;
+    font-family: 'Nunito', sans-serif;
+    background-color: #f8f9fc;
+    min-height: 100vh;
+    padding-bottom: 100px;
+}
+
+/* --- HEADER --- */
+.home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.home-hello {
+    font-size: 0.85rem;
+    color: #9ba0b8;
+    margin: 0;
+}
+
+.home-name {
+    font-weight: 800;
+    color: #15161b;
+    margin: 0;
+    font-size: 1.4rem;
+}
+
+/* Botón Volver */
+.btn-back {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: white;
+    border: 1px solid #f0f2f5;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 1.1rem;
+}
+
+    .btn-back:active {
+        transform: scale(0.95);
+        background-color: #f1f3f5;
+    }
+
+/* Avatar Médico (Header) */
+.home-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #6e7bff, #b3baff);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 10px rgba(110, 123, 255, 0.3);
+}
+
+.badge-medico {
+    background-color: #e2e6ff;
+    color: #6e7bff;
+    font-weight: 700;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    padding: 4px 10px;
+}
+
+/* --- TARJETAS --- */
+.home-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    border: 1px solid transparent;
+}
+
+.section-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #15161b;
+    letter-spacing: 0.3px;
+}
+
+.label-mini {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #9ba0b8;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    display: block;
+}
+
+/* Avatar Paciente (Grande) */
+.patient-avatar-large {
+    width: 60px;
+    height: 60px;
+    border-radius: 18px;
+    background-color: #e0f2f1; /* Verde suave */
+    color: #009688;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+/* Badges */
+.badge-status {
+    padding: 4px 10px;
+    border-radius: 50px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.bg-primary-subtle {
+    background-color: #e2e6ff;
+    color: #6e7bff;
+}
+
+.bg-light {
+    background-color: #f8f9fc;
+    color: #6c757d;
+}
+
+/* --- INPUTS MODERNOS (Filtros) --- */
+.input-modern {
+    background-color: #f8f9fc;
+    border: 1px solid #f0f2f5;
+    border-radius: 12px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    color: #2c3e50;
+    transition: all 0.2s;
+}
+
+    .input-modern:focus {
+        background-color: white;
+        border-color: #6e7bff;
+        box-shadow: 0 0 0 3px rgba(110, 123, 255, 0.1);
+        outline: none;
+    }
+
+/* --- LISTA HISTORIA CLÍNICA --- */
+.history-card {
+    background: white;
+    border: 1px solid #f0f2f5;
+    border-radius: 16px;
+    padding: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+    .history-card:active {
+        transform: scale(0.98);
+    }
+
+    .history-card.selected {
+        border-color: #6e7bff;
+        background-color: #fbf9ff;
+        box-shadow: 0 4px 12px rgba(110, 123, 255, 0.15);
+    }
+
+/* --- DETALLE SELECCIONADO --- */
+.detail-box {
+    background-color: #f8f9fc;
+    border-radius: 12px;
+    padding: 12px;
+    border: 1px solid #f0f2f5;
+}
+
+/* --- BOTONES --- */
+.btn-primary {
+    background-color: #6e7bff;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+}
+
+    .btn-primary:active {
+        background-color: #5a66d1;
+    }
+
+/* --- BOTTOM NAV --- */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    box-shadow: 0 -5px 30px rgba(0,0,0,0.05);
+    z-index: 1000;
+}
+
+.bottom-nav-item {
+    background: none;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #b1b6c9;
+    gap: 4px;
+    flex: 1;
+    height: 100%;
+}
+
+    .bottom-nav-item i {
+        font-size: 1.4rem;
+    }
+
+    .bottom-nav-item span {
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+
+    .bottom-nav-item.active {
+        color: #6e7bff;
+    }
+
+/* Utilidades */
+.fade-in {
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+.home-loading {
+    color: #9ba0b8;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

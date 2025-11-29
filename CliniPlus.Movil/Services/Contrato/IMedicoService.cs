@@ -24,5 +24,9 @@ namespace CliniPlus.Movil.Services.Contrato
         Task<List<MedicoBloqueoDTO>?> ListarBloqueosAsync(int medicoId);
         Task<MedicoBloqueoDTO?> CrearBloqueoAsync(int medicoId, MedicoBloqueoDTO dto);
         Task<bool> EliminarBloqueoAsync(int medicoId, int idBloqueo);
+
+        Task<List<MedicoDisponiblePacienteDTO>> ObtenerMedicosParaPacienteAsync(
+    int? especialidadId = null,
+    string? q = null);
     }
 }

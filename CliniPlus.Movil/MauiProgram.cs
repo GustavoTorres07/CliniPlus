@@ -17,7 +17,6 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
             });
 
-        // Blazor WebView
         builder.Services.AddMauiBlazorWebView();
 
 #if DEBUG
@@ -28,7 +27,6 @@ public static class MauiProgram
         // Handler que inyecta el token en cada request
         builder.Services.AddTransient<TokenMessageHandler>();
 
-        // HttpClient nombrado para la API (Somee)
         builder.Services.AddHttpClient("ApiCliniPlus", c =>
         {
             //c.BaseAddress = new Uri("https://CliniPlus.somee.com/");
@@ -37,7 +35,6 @@ public static class MauiProgram
         })
         .AddHttpMessageHandler<TokenMessageHandler>();
 
-        // Servicios del front (Contrato / Implementa)
         builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<ITokenService, TokenService>();
         builder.Services.AddScoped<IMedicoService, MedicoService>();
@@ -50,6 +47,7 @@ public static class MauiProgram
         builder.Services.AddScoped<IAdminPerfilService, AdminPerfilService>();
         builder.Services.AddScoped<IPacientePerfilService, PacientePerfilService>();
         builder.Services.AddScoped<ITurnoService, TurnoService>();
+        builder.Services.AddScoped<ITipoTurnoService, TipoTurnoService>();
 
 
 

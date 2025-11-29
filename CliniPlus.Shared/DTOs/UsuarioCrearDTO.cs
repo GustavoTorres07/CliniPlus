@@ -19,6 +19,8 @@ namespace CliniPlus.Shared.DTOs
         public string Email { get; set; } = null!;
 
         [Required]
+        [MinLength(6, ErrorMessage = "La contraseña debe tener al menos 6 caracteres.")]
+        [MaxLength(200, ErrorMessage = "La contraseña no puede exceder los 200 caracteres.")]
         public string Contraseña { get; set; } = null!;
 
         [Required]

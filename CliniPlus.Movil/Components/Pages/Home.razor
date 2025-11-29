@@ -29,15 +29,14 @@
             switch (me.Rol)
             {
                 case "Administrador":
-                    Nav.NavigateTo("/admin/home", true);
+                    Nav.NavigateTo("/Administrador/home", true);
                     break;
 
                 case "Medico":
                     Nav.NavigateTo("/medico/home", true);
                     break;
 
-                case "Secretario":
-                case "Secretaria":
+                case "Secretaria":     // ← único nombre válido
                     Nav.NavigateTo("/secretaria/home", true);
                     break;
 

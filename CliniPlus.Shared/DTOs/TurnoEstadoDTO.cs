@@ -10,8 +10,9 @@ namespace CliniPlus.Shared.DTOs
     {
         Disponible,
         Reservado,
-        Completado,
-        Cancelled,
-        Inasistencia
+        Atendido,
+        Ausente,
+        NoAsistio,
+        Cancelado
     }
 }

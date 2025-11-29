@@ -9,13 +9,9 @@ namespace CliniPlus.Shared.DTOs
     public class PerfilAdminDTO
     {
         public int UsuarioId { get; set; }
-
-        // Datos personales
         public string Nombre { get; set; } = "";
         public string Apellido { get; set; } = "";
         public string Email { get; set; } = "";
-
-        // Solo lectura
         public string Rol { get; set; } = "Administrador";
         public DateTime FechaRegistro { get; set; }
     }

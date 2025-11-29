@@ -29,7 +29,6 @@ namespace CliniPlus.Shared.Models
         [MaxLength(2000)]
         public string? Notas { get; set; }
 
-        // Navs
         [ForeignKey(nameof(TurnoId))]
         public virtual Turno Turno { get; set; } = null!;
 

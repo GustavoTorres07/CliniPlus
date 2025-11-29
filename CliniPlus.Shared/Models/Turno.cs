@@ -31,14 +31,12 @@ namespace CliniPlus.Shared.Models
         [Required]
         public int DuracionMin { get; set; }
 
-        /// <summary>Disponible|Reservado|Completado|Cancelled|Inasistencia</summary>
         [Required, MaxLength(20)]
         public string Estado { get; set; } = "Disponible";
 
         [Required]
         public bool IsActive { get; set; } = true;
 
-        // Navs
         [ForeignKey(nameof(MedicoId))]
         public virtual Medico Medico { get; set; } = null!;
 

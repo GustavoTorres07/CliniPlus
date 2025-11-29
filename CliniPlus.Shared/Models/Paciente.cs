@@ -39,7 +39,6 @@ namespace CliniPlus.Shared.Models
         [Required]
         public bool IsActive { get; set; } = true;
 
-        // Navs
         [ForeignKey(nameof(UsuarioId))]
         public virtual Usuario? Usuario { get; set; }
 

@@ -8,24 +8,22 @@ namespace CliniPlus.Shared.DTOs
 {
     public class PerfilMedicoDTO
     {
-        // Usuario
         public int IdUsuario { get; set; }
+        public int IdMedico { get; set; }
+
         public string Nombre { get; set; } = "";
         public string Apellido { get; set; } = "";
         public string Email { get; set; } = "";
 
-        // Medico
-        public int IdMedico { get; set; }
         public string? Bio { get; set; }
         public string? FotoUrl { get; set; }
 
-        // Solo lectura
-        public List<SimpleEspecialidadDTO> Especialidades { get; set; } = new();
-    }
+        // 👇 UNA sola especialidad
+        public int? EspecialidadId { get; set; }
+        public string? EspecialidadNombre { get; set; }
 
-    public class SimpleEspecialidadDTO
-    {
-        public int IdEspecialidad { get; set; }
-        public string Nombre { get; set; } = "";
+        public List<SimpleEspecialidadDTO> Especialidades { get; set; } = new();
+
+
     }
 }

@@ -7,7 +7,7 @@ namespace CliniPlus.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize] // TODAS las rutas requieren JWT
+    [Authorize(Roles = "Administrador,Secretaria, Medico")]
     public class EspecialidadesController : ControllerBase
     {
         private readonly IEspecialidadRepository _repo;
@@ -18,9 +18,10 @@ namespace CliniPlus.Api.Controllers
         }
 
         // ======================================================
-        // GET: api/especialidades/listar
+        // GET: api/especialidades/listar  --> PUBLICO
         // ======================================================
         [HttpGet("listar")]
+        [AllowAnonymous]   // 👈 importante: sin [Authorize] acá ni en la clase
         public async Task<ActionResult<List<EspecialidadDTO>>> Listar()
         {
             var lista = await _repo.ListarAsync();
@@ -28,9 +29,10 @@ namespace CliniPlus.Api.Controllers
         }
 
         // ======================================================
-        // GET: api/especialidades/5
+        // GET: api/especialidades/5  --> solo Admin/Sec
         // ======================================================
         [HttpGet("{id:int}")]
+        [Authorize(Roles = "Administrador,Secretaria")]
         public async Task<ActionResult<EspecialidadDTO>> ObtenerPorId(int id)
         {
             var esp = await _repo.ObtenerPorIdAsync(id);
@@ -44,7 +46,7 @@ namespace CliniPlus.Api.Controllers
         // POST: api/especialidades/crear
         // ======================================================
         [HttpPost("crear")]
-        [Authorize(Policy = "AdminOnly")]
+        [Authorize(Policy = "AdministradorOnly")]
         public async Task<ActionResult<EspecialidadDTO>> Crear([FromBody] EspecialidadDTO dto)
         {
             if (string.IsNullOrWhiteSpace(dto.Nombre))
@@ -65,7 +67,7 @@ namespace CliniPlus.Api.Controllers
         // PUT: api/especialidades/editar/5
         // ======================================================
         [HttpPut("editar/{id:int}")]
-        [Authorize(Policy = "AdminOnly")]
+        [Authorize(Policy = "AdministradorOnly")]
         public async Task<ActionResult<EspecialidadDTO>> Editar(int id, [FromBody] EspecialidadDTO dto)
         {
             try
@@ -87,7 +89,7 @@ namespace CliniPlus.Api.Controllers
         // PATCH: api/especialidades/estado/5
         // ======================================================
         [HttpPatch("estado/{id:int}")]
-        [Authorize(Policy = "AdminOnly")]
+        [Authorize(Policy = "AdministradorOnly")]
         public async Task<IActionResult> CambiarEstado(int id, [FromBody] EspecialidadEstadoDTO body)
         {
             var ok = await _repo.CambiarEstadoAsync(id, body.IsActive);
@@ -99,3 +101,4 @@ namespace CliniPlus.Api.Controllers
         }
     }
 }
+

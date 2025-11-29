@@ -1,4 +1,4 @@
-﻿@page "/admin/medicos/crear"
+﻿@page "/Administrador/medicos/crear"
 @layout CliniPlus.Movil.Components.Layout.EmptyLayout
 @using CliniPlus.Shared.DTOs
 @using CliniPlus.Movil.Services.Contrato
@@ -190,7 +190,7 @@
                 return;
             }
 
-            Nav.NavigateTo("/admin/medicos", true);
+            Nav.NavigateTo("/Administrador/medicos", true);
         }
         catch (Exception ex)
         {
@@ -199,7 +199,7 @@
         }
     }
 
-    private void IrInicio() => Nav.NavigateTo("/admin/home");
+    private void IrInicio() => Nav.NavigateTo("/Administrador/home");
 
     private async Task CerrarSesion()
     {

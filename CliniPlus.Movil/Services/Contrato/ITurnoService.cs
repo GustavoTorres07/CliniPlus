@@ -15,10 +15,38 @@ namespace CliniPlus.Movil.Services.Contrato
         Task<bool> CancelarAsync(int turnoId);
         Task<List<TurnoSlotDTO>?> ObtenerSlotsDiaAsync(int medicoId, DateTime fechaLocal);
 
-        // MÉDICO
-        Task<List<TurnoAgendaMedicoDTO>?> ObtenerAgendaHoyAsync();
-
         Task<bool> ReservarSlotAsync(TurnoReservarSlotDTO dto);
+
+        Task<List<TurnoSlotDTO>?> ObtenerSlotsDiaPublicAsync(int medicoId, DateTime fechaLocal);
+        Task<bool> ReservarPublicoAsync(TurnoPublicoReservarDTO dto);
+
+
+        // ============== MÉDICO ==============
+        Task<List<TurnoAgendaMedicoDTO>?> ObtenerAgendaHoyAsync();
+        Task<List<TurnoAgendaMedicoDTO>?> ObtenerAgendaDiaAsync(DateTime fechaLocal);
+        Task<List<PacienteListadoMedicoDTO>?> ObtenerPacientesMedicoAsync();
+        Task<TurnoDetalleMedicoDTO?> ObtenerDetalleMedicoAsync(int turnoId);
+        Task<List<HistoriaClinicaItemDTO>?> ObtenerHistoriaRapidaPacienteAsync(int pacienteId);
+        Task<bool> RegistrarConsultaAsync(RegistrarConsultaMedicoDTO dto);
+        Task<bool> MarcarTurnoCompletadoAsync(int turnoId);
+
+
+        Task<PacienteDetalleMedicoDTO?> ObtenerPacienteDetalleAsync(int pacienteId);
+        Task<List<HistoriaClinicaListadoDTO>?> ObtenerHistoriaClinicaAsync(
+            int pacienteId,
+            DateTime? desde,
+            DateTime? hasta);
+
+        Task<HistoriaClinicaDetalleDTO?> ObtenerHistoriaClinicaDetalleAsync(int entradaId);
+
+        Task<HistoriaClinicaDetalleDTO?> ObtenerMiHistoriaClinicaDetalleAsync(int entradaId);
+
+
+        Task<List<HistoriaClinicaListadoDTO>?> ObtenerMiHistoriaClinicaAsync(
+     DateTime? desde,
+     DateTime? hasta);
+
+
 
     }
 }

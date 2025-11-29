@@ -3,7 +3,6 @@ using CliniPlus.Api.Repositories.Contrato;
 using CliniPlus.Shared.DTOs;
 using CliniPlus.Shared.Models;
 using Microsoft.EntityFrameworkCore;
-using static System.Net.WebRequestMethods;
 
 namespace CliniPlus.Api.Repositories.Implementa
 {
@@ -23,8 +22,7 @@ namespace CliniPlus.Api.Repositories.Implementa
         {
             return await _db.Medico
                 .Include(m => m.Usuario)
-                .Include(m => m.Especialidades)
-                    .ThenInclude(me => me.Especialidad)
+                .Include(m => m.Especialidad)
                 .OrderBy(m => m.Usuario.Nombre)
                 .Select(m => new MedicoListadoDTO
                 {
@@ -32,11 +30,9 @@ namespace CliniPlus.Api.Repositories.Implementa
                     UsuarioId = m.UsuarioId,
                     NombreCompleto = m.Usuario.Nombre + " " + m.Usuario.Apellido,
                     Email = m.Usuario.Email,
-                    Especialidad = m.Especialidades
-                        .Select(x => x.Especialidad.Nombre)
-                        .FirstOrDefault(),
+                    Especialidad = m.Especialidad != null ? m.Especialidad.Nombre : null,
                     IsActive = m.IsActive,
-                    FotoUrl = m.FotoUrl         // 👈 agregar esto si no estaba
+                    FotoUrl = m.FotoUrl
                 })
                 .ToListAsync();
         }
@@ -48,13 +44,10 @@ namespace CliniPlus.Api.Repositories.Implementa
         {
             var m = await _db.Medico
                 .Include(m => m.Usuario)
-                .Include(m => m.Especialidades)
-                    .ThenInclude(me => me.Especialidad)
+                .Include(m => m.Especialidad)
                 .FirstOrDefaultAsync(m => m.IdMedico == id);
 
             if (m == null) return null;
-
-            var esp = m.Especialidades.FirstOrDefault();
 
             return new MedicoDetalleDTO
             {
@@ -66,8 +59,8 @@ namespace CliniPlus.Api.Repositories.Implementa
                 FotoUrl = m.FotoUrl,
                 DefaultSlotMin = m.DefaultSlotMin,
                 IsActive = m.IsActive,
-                EspecialidadId = esp?.EspecialidadId,
-                EspecialidadNombre = esp?.Especialidad.Nombre
+                EspecialidadId = m.EspecialidadId,
+                EspecialidadNombre = m.Especialidad != null ? m.Especialidad.Nombre : null
             };
         }
 
@@ -91,20 +84,7 @@ namespace CliniPlus.Api.Repositories.Implementa
             if (yaExiste)
                 throw new InvalidOperationException("USUARIO_YA_ES_MEDICO");
 
-            // Crear médico
-            var med = new Medico
-            {
-                UsuarioId = dto.UsuarioId,
-                Bio = dto.Bio,
-                FotoUrl = dto.FotoUrl,
-                DefaultSlotMin = dto.DefaultSlotMin > 0 ? dto.DefaultSlotMin : 30,
-                IsActive = true
-            };
-
-            _db.Medico.Add(med);
-            await _db.SaveChangesAsync();
-
-            // Especialidad (opcional)
+            // 4) Validar especialidad (si viene)
             if (dto.EspecialidadId.HasValue)
             {
                 bool espExiste = await _db.Especialidad
@@ -112,15 +92,21 @@ namespace CliniPlus.Api.Repositories.Implementa
 
                 if (!espExiste)
                     throw new InvalidOperationException("ESPECIALIDAD_NO_ENCONTRADA");
-
-                _db.MedicoEspecialidad.Add(new MedicoEspecialidad
-                {
-                    MedicoId = med.IdMedico,
-                    EspecialidadId = dto.EspecialidadId.Value
-                });
-
-                await _db.SaveChangesAsync();
             }
+
+            // Crear médico
+            var med = new Medico
+            {
+                UsuarioId = dto.UsuarioId,
+                Bio = dto.Bio,
+                FotoUrl = dto.FotoUrl,
+                DefaultSlotMin = dto.DefaultSlotMin > 0 ? dto.DefaultSlotMin : 30,
+                IsActive = true,
+                EspecialidadId = dto.EspecialidadId
+            };
+
+            _db.Medico.Add(med);
+            await _db.SaveChangesAsync();
 
             return med.IdMedico;
         }
@@ -131,28 +117,32 @@ namespace CliniPlus.Api.Repositories.Implementa
         public async Task<MedicoDetalleDTO?> EditarAsync(int id, MedicoEditarDTO dto)
         {
             var m = await _db.Medico
-                .Include(x => x.Especialidades)
+                .Include(x => x.Usuario)
+                .Include(x => x.Especialidad)
                 .FirstOrDefaultAsync(x => x.IdMedico == id);
 
             if (m == null) return null;
 
-            m.Bio = dto.Bio;
-            m.FotoUrl = dto.FotoUrl;
-            m.DefaultSlotMin = dto.DefaultSlotMin > 0 ? dto.DefaultSlotMin : m.DefaultSlotMin;
-
-            // BORRAR especialidad previa correctamente
-            _db.MedicoEspecialidad.RemoveRange(m.Especialidades);
-
+            // Si viene especialidad, validar
             if (dto.EspecialidadId.HasValue)
             {
-                _db.MedicoEspecialidad.Add(new MedicoEspecialidad
-                {
-                    MedicoId = m.IdMedico,
-                    EspecialidadId = dto.EspecialidadId.Value
-                });
+                bool espExiste = await _db.Especialidad
+                    .AnyAsync(e => e.IdEspecialidad == dto.EspecialidadId.Value);
+
+                if (!espExiste)
+                    throw new InvalidOperationException("ESPECIALIDAD_NO_ENCONTRADA");
             }
 
+            m.Bio = dto.Bio;
+            m.FotoUrl = dto.FotoUrl;
+            if (dto.DefaultSlotMin > 0)
+                m.DefaultSlotMin = dto.DefaultSlotMin;
+
+            m.EspecialidadId = dto.EspecialidadId;
+
             await _db.SaveChangesAsync();
+
+            // Devolvemos el detalle actualizado
             return await ObtenerAsync(id);
         }
 
@@ -169,13 +159,16 @@ namespace CliniPlus.Api.Repositories.Implementa
             return true;
         }
 
+        // =====================================================
+        //  LISTAR POR ESPECIALIDAD
+        // =====================================================
         public async Task<List<MedicoListadoDTO>> ListarPorEspecialidadAsync(int especialidadId)
         {
             return await _db.Medico
                 .Include(m => m.Usuario)
-                .Include(m => m.Especialidades)
-                    .ThenInclude(me => me.Especialidad)
-                .Where(m => m.Especialidades.Any(e => e.EspecialidadId == especialidadId))
+                .Include(m => m.Especialidad)
+                .Where(m => m.EspecialidadId == especialidadId)
+                .OrderBy(m => m.Usuario.Nombre)
                 .Select(m => new MedicoListadoDTO
                 {
                     IdMedico = m.IdMedico,
@@ -183,12 +176,15 @@ namespace CliniPlus.Api.Repositories.Implementa
                     NombreCompleto = m.Usuario.Nombre + " " + m.Usuario.Apellido,
                     Email = m.Usuario.Email,
                     FotoUrl = m.FotoUrl,
-                    Especialidad = m.Especialidades.Select(e => e.Especialidad.Nombre).FirstOrDefault(),
+                    Especialidad = m.Especialidad != null ? m.Especialidad.Nombre : null,
                     IsActive = m.IsActive
                 })
                 .ToListAsync();
         }
 
+        // =====================================================
+        //  HORARIOS
+        // =====================================================
         public async Task<List<MedicoHorarioDTO>> ListarHorariosAsync(int medicoId)
         {
             return await _db.MedicoHorario
@@ -200,7 +196,6 @@ namespace CliniPlus.Api.Repositories.Implementa
                     IdHorario = h.IdHorario,
                     MedicoId = h.MedicoId,
                     DiaSemana = h.DiaSemana,
-                    // 👇 Los envío como string HH:mm
                     HoraInicio = h.HoraInicio.ToString(@"hh\:mm"),
                     HoraFin = h.HoraFin.ToString(@"hh\:mm"),
                     SlotMinOverride = h.SlotMinOverride,
@@ -218,7 +213,6 @@ namespace CliniPlus.Api.Repositories.Implementa
             if (dto.DiaSemana < 0 || dto.DiaSemana > 6)
                 throw new InvalidOperationException("DIA_INVALIDO");
 
-            // 👇 Convertimos string → TimeSpan
             if (!TimeSpan.TryParse(dto.HoraInicio, out var hi))
                 throw new InvalidOperationException("HORA_INICIO_INVALIDA");
 
@@ -244,7 +238,6 @@ namespace CliniPlus.Api.Repositories.Implementa
             _db.MedicoHorario.Add(h);
             await _db.SaveChangesAsync();
 
-            // 👇 Devolvemos DTO ya normalizado
             return new MedicoHorarioDTO
             {
                 IdHorario = h.IdHorario,
@@ -309,23 +302,25 @@ namespace CliniPlus.Api.Repositories.Implementa
             _db.MedicoHorario.Remove(h);
             await _db.SaveChangesAsync();
             return true;
-
         }
 
+        // =====================================================
+        //  BLOQUEOS
+        // =====================================================
         public async Task<List<MedicoBloqueoDTO>> ListarBloqueosAsync(int medicoId)
         {
             return await _db.MedicoBloqueo
-    .Where(b => b.MedicoId == medicoId)
-    .OrderByDescending(b => b.Desde)
-    .Select(b => new MedicoBloqueoDTO
-    {
-        IdBloqueo = b.IdBloqueo,
-        MedicoId = b.MedicoId,
-        Desde = b.Desde,
-        Hasta = b.Hasta,
-        Motivo = b.Motivo
-    })
-    .ToListAsync();
+                .Where(b => b.MedicoId == medicoId)
+                .OrderByDescending(b => b.Desde)
+                .Select(b => new MedicoBloqueoDTO
+                {
+                    IdBloqueo = b.IdBloqueo,
+                    MedicoId = b.MedicoId,
+                    Desde = b.Desde,
+                    Hasta = b.Hasta,
+                    Motivo = b.Motivo
+                })
+                .ToListAsync();
         }
 
         public async Task<MedicoBloqueoDTO?> CrearBloqueoAsync(int medicoId, MedicoBloqueoDTO dto)
@@ -361,7 +356,7 @@ namespace CliniPlus.Api.Repositories.Implementa
         public async Task<bool> EliminarBloqueoAsync(int medicoId, int idBloqueo)
         {
             var b = await _db.MedicoBloqueo
-    .FirstOrDefaultAsync(x => x.IdBloqueo == idBloqueo && x.MedicoId == medicoId);
+                .FirstOrDefaultAsync(x => x.IdBloqueo == idBloqueo && x.MedicoId == medicoId);
 
             if (b == null) return false;
 

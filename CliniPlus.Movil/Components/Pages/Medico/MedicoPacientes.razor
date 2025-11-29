@@ -1,0 +1,201 @@
+﻿@page "/medico/pacientes"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+
+@using CliniPlus.Shared.DTOs
+@inject CliniPlus.Movil.Services.Contrato.IAuthService Auth
+@inject CliniPlus.Movil.Services.Contrato.ITurnoService TurnoService
+@inject NavigationManager Nav
+
+@if (_cargando)
+{
+    <div class="home-loading d-flex flex-column justify-content-center align-items-center" style="height:70vh;">
+        <div class="spinner-border text-primary mb-3"></div>
+        <span class="text-muted small">Cargando pacientes...</span>
+    </div>
+}
+else if (_usuario is null)
+{
+    <RedirectToLogin />
+}
+else
+{
+    <div class="home-page">
+
+        <!-- HEADER -->
+        <div class="home-header mb-4">
+            <div class="home-greeting">
+                <p class="home-hello">Mis Pacientes</p>
+                <h4 class="home-name">@_usuario.NombreCompleto</h4>
+                <span class="badge badge-medico mt-1">Médico</span>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn-logout" @onclick="CerrarSesion" title="Cerrar sesión">
+                    <i class="bi bi-box-arrow-right"></i>
+                </button>
+
+                <div class="home-avatar">
+                    <span>@GetInicial(_usuario.NombreCompleto)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- BUSCADOR -->
+        <div class="px-1 mb-4">
+            <div class="input-group input-elevated">
+                <span class="input-group-text">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input class="form-control"
+                       placeholder="Buscar por nombre o DNI..."
+                       value="@_busqueda"
+                       @oninput="OnBusquedaInput" />
+            </div>
+        </div>
+
+        <!-- LISTA PACIENTES -->
+        <div class="d-flex flex-column gap-3">
+            @if (_pacientesFiltrados is null || _pacientesFiltrados.Count == 0)
+            {
+                <div class="text-center py-5">
+                    <i class="bi bi-people text-muted fs-1 mb-2"></i>
+                    <p class="text-muted small mb-0">No se encontraron pacientes.</p>
+                </div>
+            }
+            else
+            {
+@foreach (var p in _pacientesFiltrados)
+{
+    <div class="home-card p-3" @onclick="() => AbrirPaciente(p.PacienteId)">
+        <div class="d-flex align-items-center mb-2">
+            <div class="patient-avatar-small me-3">
+                @GetInicial(p.NombreCompleto)
+            </div>
+            <div class="flex-grow-1">
+                <div class="fw-bold text-dark text-truncate">@p.NombreCompleto</div>
+                <div class="text-muted small d-flex align-items-center">
+                    <i class="bi bi-person-vcard me-1 text-primary"></i>
+                    @p.DNI
+                </div>
+            </div>
+        </div>
+
+        <div class="patient-stats d-flex justify-content-between align-items-center small text-muted">
+            <span>
+                <i class="bi bi-folder2-open me-1"></i>
+                <strong>@p.TurnosTotales</strong> Consultas
+            </span>
+
+            @if (p.UltimoTurnoUtc.HasValue)
+            {
+                <span>
+                    <i class="bi bi-clock-history me-1"></i>
+                    @p.UltimoTurnoUtc.Value.ToLocalTime().ToString("dd/MM/yyyy")
+                </span>
+            }
+            else
+            {
+                <span class="fst-italic">Sin visitas</span>
+            }
+        </div>
+    </div>
+}
+            }
+        </div>
+
+        <div class="spacer-bottom-large" style="height: 80px;"></div>
+    </div>
+}
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav shadow-soft">
+    <button class="bottom-nav-item" @onclick="IrInicio">
+        <i class="bi bi-house-door"></i>
+        <span>Inicio</span>
+    </button>
+    <button class="bottom-nav-item" @onclick="IrAgenda">
+        <i class="bi bi-calendar3"></i>
+        <span>Agenda</span>
+    </button>
+    <button class="bottom-nav-item active">
+        <i class="bi bi-people-fill"></i>
+        <span>Pacientes</span>
+    </button>
+</div>
+
+@code {
+    private AuthMeResponse? _usuario;
+    private bool _cargando = true;
+
+    private List<PacienteListadoMedicoDTO> _pacientes = new();
+    private List<PacienteListadoMedicoDTO> _pacientesFiltrados = new();
+    private string _busqueda = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _usuario = await Auth.MeAsync();
+
+            if (_usuario is null || _usuario.Rol != "Medico")
+            {
+                Nav.NavigateTo("/", true);
+                return;
+            }
+
+            var lista = await TurnoService.ObtenerPacientesMedicoAsync();
+            _pacientes = lista ?? new List<PacienteListadoMedicoDTO>();
+            AplicarFiltro();
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    private void OnBusquedaInput(ChangeEventArgs e)
+    {
+        _busqueda = e.Value?.ToString() ?? string.Empty;
+        AplicarFiltro();
+    }
+
+    private void AbrirPaciente(int pacienteId)
+{
+    Nav.NavigateTo($"/medico/paciente/{pacienteId}");
+}
+
+    private void AplicarFiltro()
+    {
+        if (string.IsNullOrWhiteSpace(_busqueda))
+        {
+            _pacientesFiltrados = _pacientes
+                .OrderByDescending(p => p.UltimoTurnoUtc)
+                .ToList();
+        }
+        else
+        {
+            var texto = _busqueda.Trim().ToLower();
+
+            _pacientesFiltrados = _pacientes
+                .Where(p =>
+                    (!string.IsNullOrEmpty(p.NombreCompleto) && p.NombreCompleto.ToLower().Contains(texto)) ||
+                    (!string.IsNullOrEmpty(p.DNI) && p.DNI.Contains(texto)))
+                .OrderByDescending(p => p.UltimoTurnoUtc)
+                .ToList();
+        }
+
+        StateHasChanged();
+    }
+
+    private string GetInicial(string? nombre) => 
+        string.IsNullOrWhiteSpace(nombre) ? "?" : nombre[0].ToString().ToUpper();
+
+    private async Task CerrarSesion()
+    {
+        await Auth.LogoutAsync();
+        Nav.NavigateTo("/", true);
+    }
+
+    private void IrInicio() => Nav.NavigateTo("/medico/home", true);
+    private void IrAgenda() => Nav.NavigateTo("/medico/turnos-hoy", true);
+}

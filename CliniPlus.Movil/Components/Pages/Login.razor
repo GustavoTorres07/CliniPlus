@@ -135,7 +135,17 @@
                 return;
             }
 
-            Nav.NavigateTo("/home", forceLoad: true);
+            // 👇 LÓGICA NUEVA
+            if (resp.Rol == "Paciente" && resp.DebeCambiarPassword)
+            {
+                // Ya guardaste el token adentro de AuthService/TokenService,
+                // así que podemos navegar tranquilamente.
+                Nav.NavigateTo("/paciente/cambiar-password-forzado", forceLoad: true);
+            }
+            else
+            {
+                Nav.NavigateTo("/home", forceLoad: true);
+            }
         }
         catch (HttpRequestException)
         {
@@ -153,9 +163,11 @@
 
     private void IngresarInvitado()
     {
-        if (!_cargando) Nav.NavigateTo("/guest", forceLoad: true);
+        if (!_cargando) Nav.NavigateTo("/public/turno", forceLoad: true);
     }
 
     private void TogglePassword() => _mostrarPassword = !_mostrarPassword;
+
+    // 👇 Ojo: esta ruta debería ser la pantalla donde se ingresa el email para recuperar
     private void RecuperarPassword() => Nav.NavigateTo("/recuperar-password");
 }

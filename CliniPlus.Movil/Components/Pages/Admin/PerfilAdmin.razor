@@ -1,4 +1,4 @@
-﻿@page "/admin/perfil"
+﻿@page "/Administrador/perfil"
 @layout CliniPlus.Movil.Components.Layout.EmptyLayout
 
 @using CliniPlus.Movil.Services.Contrato
@@ -233,7 +233,7 @@ else
         _passwordNueva = "";
     }
 
-    private void IrInicio() => Nav.NavigateTo("/admin/home", true);
+    private void IrInicio() => Nav.NavigateTo("/Administrador/home", true);
 
     private string GetInicial(string? nombre) =>
         string.IsNullOrWhiteSpace(nombre) ? "?" : nombre[0].ToString().ToUpper();

@@ -7,7 +7,7 @@ namespace CliniPlus.Api.Controllers
 {
     [ApiController]
     [Route("api/pacientes")]
-    [Authorize(Policy = "SecretariaOAdmin")]
+    [Authorize(Policy = "SecretariaOAdministrador")]
     public class PacientesController : ControllerBase
     {
         private readonly IPacienteRepository _repo;

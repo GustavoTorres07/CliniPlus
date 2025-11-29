@@ -1,0 +1,248 @@
+﻿@page "/paciente/medicos"
+@page "/paciente/medicos/{EspecialidadId:int?}"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+
+@using CliniPlus.Shared.DTOs
+@inject CliniPlus.Movil.Services.Contrato.IAuthService Auth
+@inject CliniPlus.Movil.Services.Contrato.IMedicoService MedicoService
+@inject NavigationManager Nav
+
+@if (_cargando)
+{
+    <div class="home-loading d-flex flex-column align-items-center justify-content-center" style="height: 60vh;">
+        <div class="spinner-border text-success me-2"></div>
+        <p class="mt-2 text-muted small">Cargando médicos...</p>
+    </div>
+}
+else if (_usuario is null)
+{
+    <RedirectToLogin />
+}
+else
+{
+    <div class="home-page">
+
+        <!-- HEADER -->
+        <div class="home-header mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn-back" @onclick="Volver">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <div class="home-greeting">
+                    <p class="home-hello">Directorio</p>
+                    <h4 class="home-name">Médicos</h4>
+                </div>
+            </div>
+
+            <div class="home-avatar">
+                <span>@GetInicial(_usuario.NombreCompleto)</span>
+            </div>
+        </div>
+
+        <!-- SUBTÍTULO ESPECIALIDAD (si aplica) -->
+        @if (EspecialidadId.HasValue)
+        {
+            <div class="px-1 mb-3">
+                <div class="d-flex align-items-center gap-2 text-muted small bg-white px-3 py-2 rounded-3 shadow-sm border border-light" style="display:inline-flex;">
+                    <i class="bi bi-funnel-fill text-primary"></i>
+                    <span>Filtrado por Especialidad (ID: @EspecialidadId)</span>
+                </div>
+            </div>
+        }
+
+        <!-- BUSCADOR -->
+        <div class="px-1 mb-4">
+            <div class="input-group input-elevated">
+                <span class="input-group-text">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input class="form-control"
+                       placeholder="Buscar por nombre o especialidad..."
+                       value="@_busqueda"
+                       @oninput="OnBusquedaInput" />
+            </div>
+        </div>
+
+        <!-- LISTA DE MÉDICOS -->
+        @if (_cargandoLista)
+        {
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary spinner-border-sm mb-2"></div>
+                <p class="small text-muted mb-0">Actualizando lista...</p>
+            </div>
+        }
+        else if (_medicosFiltrados is null || _medicosFiltrados.Count == 0)
+        {
+            <div class="home-card p-5 text-center border-dashed">
+                <i class="bi bi-person-x text-muted fs-1 mb-3"></i>
+                <p class="text-muted small mb-0 fw-bold">No se encontraron médicos</p>
+                <span class="text-muted small">Intenta con otros términos de búsqueda.</span>
+            </div>
+        }
+        else
+        {
+            <div class="d-flex flex-column gap-3 mb-5">
+                @foreach (var m in _medicosFiltrados)
+                {
+                    <div class="doctor-card fade-in">
+                        <!-- Cabecera: Avatar + Nombre + Especialidad -->
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="doctor-avatar-small me-3">
+                                @GetInicial(m.NombreCompleto)
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="fw-bold text-dark mb-1">@m.NombreCompleto</h6>
+                                @if (!string.IsNullOrWhiteSpace(m.EspecialidadNombre))
+                                {
+                                    <span class="specialty-badge">
+                                        @m.EspecialidadNombre
+                                    </span>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Bio / Descripción -->
+                        @if (!string.IsNullOrWhiteSpace(m.Bio))
+                        {
+                            <div class="text-muted small mb-3 lh-sm text-truncate-2">
+                                @m.Bio
+                            </div>
+                        }
+
+                        <!-- Botones de Acción -->
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-primary flex-grow-1 shadow-sm"
+                                    @onclick="() => IrReservarTurno(m.IdMedico)">
+                                <i class="bi bi-calendar-plus me-1"></i> Reservar
+                            </button>
+                            
+                            <button class="btn btn-outline-secondary"
+                                    style="width: 45px;"
+                                    title="Ver Perfil"
+                                    @onclick="() => IrPerfilMedico(m.IdMedico)">
+                                <i class="bi bi-person-lines-fill"></i>
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        <div class="spacer-bottom-large" style="height: 80px;"></div>
+    </div>
+}
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav shadow-soft">
+    <button class="bottom-nav-item" @onclick="IrInicio">
+        <i class="bi bi-house-door"></i>
+        <span>Inicio</span>
+    </button>
+    <button class="bottom-nav-item" @onclick="IrMisTurnos">
+        <i class="bi bi-calendar-check"></i>
+        <span>Turnos</span>
+    </button>
+    <button class="bottom-nav-item" @onclick="IrPerfilPaciente">
+        <i class="bi bi-person"></i>
+        <span>Perfil</span>
+    </button>
+</div>
+
+@code {
+    [Parameter] public int? EspecialidadId { get; set; }
+
+    private AuthMeResponse? _usuario;
+    private bool _cargando = true;
+    private bool _cargandoLista = false;
+
+    private string _busqueda = string.Empty;
+
+    private List<MedicoDisponiblePacienteDTO> _medicos = new();
+    private List<MedicoDisponiblePacienteDTO> _medicosFiltrados = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _usuario = await Auth.MeAsync();
+
+            if (_usuario is null || _usuario.Rol != "Paciente")
+            {
+                Nav.NavigateTo("/", true);
+                return;
+            }
+
+            await CargarMedicos();
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    private async Task CargarMedicos()
+    {
+        _cargandoLista = true;
+        try
+        {
+            _medicos = await MedicoService.ObtenerMedicosParaPacienteAsync(EspecialidadId, null)
+                        ?? new List<MedicoDisponiblePacienteDTO>();
+
+            AplicarFiltro();
+        }
+        finally
+        {
+            _cargandoLista = false;
+            StateHasChanged();
+        }
+    }
+
+    private void OnBusquedaInput(ChangeEventArgs e)
+    {
+        _busqueda = e.Value?.ToString() ?? string.Empty;
+        AplicarFiltro();
+    }
+
+    private void AplicarFiltro()
+    {
+        if (string.IsNullOrWhiteSpace(_busqueda))
+        {
+            _medicosFiltrados = _medicos
+                .OrderBy(m => m.NombreCompleto)
+                .ToList();
+        }
+        else
+        {
+            var texto = _busqueda.Trim().ToLower();
+
+            _medicosFiltrados = _medicos
+                .Where(m =>
+                    (!string.IsNullOrWhiteSpace(m.NombreCompleto) &&
+                     m.NombreCompleto.ToLower().Contains(texto))
+                    ||
+                    (!string.IsNullOrWhiteSpace(m.EspecialidadNombre) &&
+                     m.EspecialidadNombre.ToLower().Contains(texto)))
+                .OrderBy(m => m.NombreCompleto)
+                .ToList();
+        }
+    }
+
+    private void IrReservarTurno(int medicoId)
+    {
+        // Redirige a la agenda preseleccionando el médico
+        Nav.NavigateTo($"/paciente/agenda?medicoId={medicoId}");
+    }
+
+private void IrPerfilMedico(int medicoId)
+{
+    Nav.NavigateTo($"/paciente/medico/{medicoId}");
+}
+
+    private void Volver() => Nav.NavigateTo("/paciente/home");
+    private void IrInicio() => Nav.NavigateTo("/paciente/home", true);
+    private void IrMisTurnos() => Nav.NavigateTo("/paciente/turnos", true);
+    private void IrPerfilPaciente() => Nav.NavigateTo("/paciente/perfil", true);
+
+    private string GetInicial(string? nombre) =>
+        string.IsNullOrWhiteSpace(nombre) ? "?" : nombre[0].ToString().ToUpper();
+}

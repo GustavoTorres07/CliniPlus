@@ -9,7 +9,6 @@ namespace CliniPlus.Shared.DTOs
     public class FichaMedicaDTO
     {
         public int PacienteId { get; set; }
-
         public string? GrupoSanguineo { get; set; }
         public string? Alergias { get; set; }
         public string? EnfermedadesCronicas { get; set; }

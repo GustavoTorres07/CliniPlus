@@ -1,4 +1,4 @@
-﻿@page "/admin/usuarios/crear"
+﻿@page "/Administrador/usuarios/crear"
 @layout CliniPlus.Movil.Components.Layout.EmptyLayout
 @using CliniPlus.Shared.DTOs
 @using CliniPlus.Movil.Services.Contrato
@@ -143,7 +143,7 @@
     private bool _guardando = false;
     private string? _error;
 
-    private readonly string[] _rolesDisponibles = { "Administrador", "Secretario", "Medico", "Paciente" };
+    private readonly string[] _rolesDisponibles = { "Administrador", "Secretaria", "Medico", "Paciente" };
 
     private async Task GuardarAsync()
     {
@@ -160,7 +160,7 @@
                 return; // El finally se encarga del _guardando = false
             }
 
-            Nav.NavigateTo("/admin/usuarios", true);
+            Nav.NavigateTo("/Administrador/usuarios", true);
         }
         catch (Exception ex)
         {
@@ -172,7 +172,7 @@
         }
     }
 
-    private void IrInicio() => Nav.NavigateTo("/admin/home");
+    private void IrInicio() => Nav.NavigateTo("/Administrador/home");
 
     private async Task CerrarSesion()
     {
