@@ -46,7 +46,7 @@ namespace CliniPlus.Api.Controllers
         // POST: api/especialidades/crear
         // ======================================================
         [HttpPost("crear")]
-        [Authorize(Policy = "AdministradorOnly")]
+        [Authorize(Roles = "Administrador,Secretaria")]
         public async Task<ActionResult<EspecialidadDTO>> Crear([FromBody] EspecialidadDTO dto)
         {
             if (string.IsNullOrWhiteSpace(dto.Nombre))
@@ -67,7 +67,7 @@ namespace CliniPlus.Api.Controllers
         // PUT: api/especialidades/editar/5
         // ======================================================
         [HttpPut("editar/{id:int}")]
-        [Authorize(Policy = "AdministradorOnly")]
+        [Authorize(Roles = "Administrador,Secretaria")]
         public async Task<ActionResult<EspecialidadDTO>> Editar(int id, [FromBody] EspecialidadDTO dto)
         {
             try
@@ -89,7 +89,7 @@ namespace CliniPlus.Api.Controllers
         // PATCH: api/especialidades/estado/5
         // ======================================================
         [HttpPatch("estado/{id:int}")]
-        [Authorize(Policy = "AdministradorOnly")]
+        [Authorize(Roles = "Administrador,Secretaria")]
         public async Task<IActionResult> CambiarEstado(int id, [FromBody] EspecialidadEstadoDTO body)
         {
             var ok = await _repo.CambiarEstadoAsync(id, body.IsActive);

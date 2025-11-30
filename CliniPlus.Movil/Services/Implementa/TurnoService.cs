@@ -229,5 +229,89 @@ namespace CliniPlus.Movil.Services.Implementa
                 $"api/turnos/paciente/historia/{entradaId}");
         }
 
+
+        public async Task<List<TurnoListadoSecretariaDTO>?> ListarTurnosHoySecretariaAsync()
+        {
+            var cli = CreateClient();
+
+            var res = await cli.GetAsync("api/turnos/secretaria/turnos-hoy");
+
+            if (!res.IsSuccessStatusCode)
+                return null;
+
+            return await res.Content.ReadFromJsonAsync<List<TurnoListadoSecretariaDTO>>();
+        }
+
+        public async Task<bool> CancelarTurnoSecretariaAsync(int turnoId)
+        {
+            var cli = CreateClient();
+
+            var dto = new TurnoCancelarDTO
+            {
+                TurnoId = turnoId
+            };
+
+            var res = await cli.PostAsJsonAsync("api/turnos/secretaria/cancelar", dto);
+            return res.IsSuccessStatusCode;
+        }
+
+        public async Task<List<TurnoListadoSecretariaDTO>?> ListarAgendaSecretariaAsync(int medicoId, DateTime? desde, DateTime? hasta)
+        {
+            var cli = CreateClient();
+
+            if (medicoId <= 0)
+                return new List<TurnoListadoSecretariaDTO>();
+
+            var url = $"api/turnos/secretaria/agenda?medicoId={medicoId}";
+
+            if (desde.HasValue)
+                url += $"&desde={desde.Value:yyyy-MM-dd}";
+
+            if (hasta.HasValue)
+                url += $"&hasta={hasta.Value:yyyy-MM-dd}";
+
+            var res = await cli.GetAsync(url);
+
+            if (!res.IsSuccessStatusCode)
+                return null;
+
+            return await res.Content.ReadFromJsonAsync<List<TurnoListadoSecretariaDTO>>();
+        }
+
+
+        public async Task<List<HistoriaClinicaListadoDTO>?> ObtenerHistoriaSecretariaAsync(
+    int pacienteId,
+    DateTime? desde,
+    DateTime? hasta)
+        {
+            var cli = CreateClient();
+
+            var query = new List<string>();
+            if (desde.HasValue) query.Add($"desde={desde.Value:yyyy-MM-dd}");
+            if (hasta.HasValue) query.Add($"hasta={hasta.Value:yyyy-MM-dd}");
+
+            var url = $"api/turnos/secretaria/historia/{pacienteId}";
+            if (query.Count > 0)
+                url += "?" + string.Join("&", query);
+
+            var res = await cli.GetAsync(url);
+            if (!res.IsSuccessStatusCode) return null;
+
+            return await res.Content.ReadFromJsonAsync<List<HistoriaClinicaListadoDTO>>();
+        }
+
+        public async Task<HistoriaClinicaDetalleDTO?> ObtenerHistoriaSecretariaDetalleAsync(int pacienteId, int entradaId)
+        {
+            var cli = CreateClient();
+            // 👇 Coincide EXACTO con el controller
+            var url = $"api/turnos/secretaria/historia/{pacienteId}/detalle/{entradaId}";
+
+            var res = await cli.GetAsync(url);
+            if (!res.IsSuccessStatusCode) return null;
+
+            return await res.Content.ReadFromJsonAsync<HistoriaClinicaDetalleDTO>();
+        }
+
+
     }
 }

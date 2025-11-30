@@ -36,28 +36,20 @@ namespace CliniPlus.Api.Repositories.Contrato
 
         Task<List<PacienteListadoMedicoDTO>> ListarPacientesPorMedicoAsync(int medicoId);
 
-        Task<List<HistoriaClinicaListadoDTO>> ObtenerHistoriaClinicaPacienteAsync(
-    int medicoId,
-    int pacienteId,
-    DateTime? desde,
-    DateTime? hasta);
+        Task<List<HistoriaClinicaListadoDTO>> ObtenerHistoriaClinicaPacienteAsync(int medicoId, int pacienteId, DateTime? desde, DateTime? hasta);
 
-        Task<HistoriaClinicaDetalleDTO?> ObtenerHistoriaClinicaDetalleAsync(
-    int medicoId,
-    int entradaId);
+        Task<HistoriaClinicaDetalleDTO?> ObtenerHistoriaClinicaDetalleAsync(int medicoId, int entradaId);
 
-        Task<PacienteDetalleMedicoDTO?> ObtenerPacienteDetalleAsync(
-    int medicoId,
-    int pacienteId);
+        Task<PacienteDetalleMedicoDTO?> ObtenerPacienteDetalleAsync(int medicoId, int pacienteId);
 
-        Task<List<HistoriaClinicaListadoDTO>> ObtenerHistoriaPacienteAsync(
-    int pacienteId,
-    DateTime? desde,
-    DateTime? hasta);
+        Task<List<HistoriaClinicaListadoDTO>> ObtenerHistoriaPacienteAsync(int pacienteId, DateTime? desde, DateTime? hasta);
 
-        Task<HistoriaClinicaDetalleDTO?> ObtenerHistoriaDetallePacienteAsync(
-            int pacienteId,
-            int entradaId);
+        Task<HistoriaClinicaDetalleDTO?> ObtenerHistoriaDetallePacienteAsync(int pacienteId, int entradaId);
+
+        Task<List<TurnoListadoSecretariaDTO>> ListarTurnosHoySecretariaAsync(DateTime hoyLocal);
+        Task<bool> CancelarPorSecretariaAsync(int turnoId);
+
+        Task<List<TurnoListadoSecretariaDTO>> ListarAgendaSecretariaAsync(int medicoId, DateTime? desde, DateTime? hasta);
 
 
     }

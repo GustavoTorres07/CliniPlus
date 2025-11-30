@@ -64,7 +64,7 @@ namespace CliniPlus.Api.Controllers
         }
 
         [HttpPut("{id:int}")]
-        [Authorize(Policy = "AdministradorOnly")]
+        [Authorize(Policy = "SecretariaOAdministrador")]
         public async Task<ActionResult<MedicoDetalleDTO>> Editar(int id, [FromBody] MedicoEditarDTO dto)
         {
             var medico = await _repo.EditarAsync(id, dto);

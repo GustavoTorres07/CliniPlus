@@ -58,8 +58,8 @@ else
             </button>
 
             <button class="quick-card" @onclick="IrMedicosDisponibles">
-                <div class="icon-box bg-teal-light"> 
-                <i class="bi bi-person"></i>
+                <div class="icon-box bg-teal-light">
+                    <i class="bi bi-person"></i>
                 </div>
                 <span>Médicos disponibles</span>
             </button>
@@ -73,6 +73,14 @@ else
                     <i class="bi bi-file-earmark-medical text-orange"></i>
                 </div>
                 <span>Historial</span>
+            </button>
+
+            <!-- NUEVA TARJETA: MI FICHA MÉDICA -->
+            <button class="quick-card" @onclick="IrMiFichaMedica">
+                <div class="icon-box bg-red-light">
+                    <i class="bi bi-clipboard2-pulse text-danger"></i>
+                </div>
+                <span>Mi ficha médica</span>
             </button>
         </div>
 
@@ -128,6 +136,10 @@ else
         <i class="bi bi-person"></i>
         <span>Perfil</span>
     </button>
+    <button class="bottom-nav-item" @onclick="CerrarSesion">
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Salir</span>
+    </button>
 </div>
 
 @code {
@@ -163,7 +175,7 @@ else
         Nav.NavigateTo("/", true);
     }
 
-    private string GetInicial(string? nombre) => 
+    private string GetInicial(string? nombre) =>
         string.IsNullOrWhiteSpace(nombre) ? "?" : nombre[0].ToString().ToUpper();
 
     private void IrInicio() => Nav.NavigateTo("/paciente/home", true);
@@ -171,7 +183,8 @@ else
     private void IrMisTurnos() => Nav.NavigateTo("/paciente/turnos");
     private void IrHistorial() => Nav.NavigateTo("/paciente/historial");
     private void IrPerfilPaciente() => Nav.NavigateTo("/paciente/perfil");
-    
-    // NUEVO: navegación a la lista de médicos
     private void IrMedicosDisponibles() => Nav.NavigateTo("/paciente/medicos");
+
+    // 🔹 NUEVO: navegación a la ficha médica del paciente
+    private void IrMiFichaMedica() => Nav.NavigateTo("/paciente/ficha-medica");
 }

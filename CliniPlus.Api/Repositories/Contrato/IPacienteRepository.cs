@@ -24,5 +24,12 @@ namespace CliniPlus.Api.Repositories.Contrato
         /// Devuelve false si no se encontró el paciente.
         /// </summary>
         Task<bool> CambiarEstadoAsync(int id, bool isActive);
+
+        Task<List<PacienteListadoDTO>> ListarParaSecretariaAsync();
+
+        Task<bool> ActivarCuentaProvisionalAsync(PacienteActivarCuentaDTO dto);
+
+        Task<int?> ObtenerIdPorUsuarioAsync(int usuarioId);
+
     }
 }

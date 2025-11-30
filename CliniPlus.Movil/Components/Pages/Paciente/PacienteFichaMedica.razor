@@ -1,0 +1,228 @@
+﻿@page "/paciente/ficha-medica"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+
+@using CliniPlus.Shared.DTOs
+@inject CliniPlus.Movil.Services.Contrato.IAuthService Auth
+@inject CliniPlus.Movil.Services.Contrato.IFichaMedicaService FichaMedicaService
+@inject NavigationManager Nav
+
+@if (_cargando)
+{
+    <div class="home-loading d-flex flex-column align-items-center justify-content-center" style="height:60vh;">
+        <div class="spinner-border text-success mb-2"></div>
+        <p class="text-muted small mb-0">Cargando ficha médica...</p>
+    </div>
+}
+else if (_usuario is null || _usuario.Rol != "Paciente")
+{
+    <RedirectToLogin />
+}
+else
+{
+    <div class="home-page">
+
+        <!-- HEADER -->
+        <div class="home-header mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn-back" @onclick="VolverHome">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <div class="home-greeting">
+                    <p class="home-hello">Mi Salud</p>
+                    <h4 class="home-name">Ficha Médica</h4>
+                    <span class="badge badge-paciente mt-1">Paciente</span>
+                </div>
+            </div>
+
+            <div class="home-avatar">
+                <span>@GetInicial(_usuario.NombreCompleto)</span>
+            </div>
+        </div>
+
+        <!-- INFO BÁSICA (del usuario) -->
+        <div class="home-card mb-3 p-4">
+            <h6 class="section-title mb-3">Datos Personales</h6>
+
+            <div class="info-item">
+                <div class="info-icon">
+                    <i class="bi bi-person-vcard"></i>
+                </div>
+                <div class="info-content">
+                    <span class="info-label">Paciente</span>
+                    <span class="info-value">@_usuario.NombreCompleto</span>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(_usuario.Email))
+            {
+                <div class="info-item">
+                    <div class="info-icon">
+                        <i class="bi bi-envelope"></i>
+                    </div>
+                    <div class="info-content">
+                        <span class="info-label">Email</span>
+                        <span class="info-value text-break">@_usuario.Email</span>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- FICHA MÉDICA -->
+        <div class="home-card mb-4 p-4">
+            <h6 class="section-title mb-3">Información Clínica</h6>
+
+            @if (_ficha is null)
+            {
+                <div class="text-center py-4 border-dashed rounded-3">
+                    <i class="bi bi-journal-medical text-muted fs-1 mb-2"></i>
+                    <p class="small text-muted mb-1 fw-bold">
+                        Sin información registrada.
+                    </p>
+                    <p class="small text-muted mb-0" style="font-size: 0.8rem;">
+                        Solicitá a tu médico o en secretaría que completen tu ficha.
+                    </p>
+                </div>
+            }
+            else
+            {
+                <div class="d-flex flex-column gap-1">
+                    @if (!string.IsNullOrWhiteSpace(_ficha.GrupoSanguineo))
+                    {
+                        <div class="info-item">
+                            <div class="info-icon red">
+                                <i class="bi bi-droplet"></i>
+                            </div>
+                            <div class="info-content">
+                                <span class="info-label">Grupo Sanguíneo</span>
+                                <span class="info-value">@_ficha.GrupoSanguineo</span>
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(_ficha.Alergias))
+                    {
+                        <div class="info-item">
+                            <div class="info-icon red">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </div>
+                            <div class="info-content">
+                                <span class="info-label">Alergias</span>
+                                <span class="info-value">@_ficha.Alergias</span>
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(_ficha.EnfermedadesCronicas))
+                    {
+                        <div class="info-item">
+                            <div class="info-icon blue">
+                                <i class="bi bi-heart-pulse"></i>
+                            </div>
+                            <div class="info-content">
+                                <span class="info-label">Enfermedades Crónicas</span>
+                                <span class="info-value">@_ficha.EnfermedadesCronicas</span>
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(_ficha.MedicacionHabitual))
+                    {
+                        <div class="info-item">
+                            <div class="info-icon purple">
+                                <i class="bi bi-capsule"></i>
+                            </div>
+                            <div class="info-content">
+                                <span class="info-label">Medicación Habitual</span>
+                                <span class="info-value">@_ficha.MedicacionHabitual</span>
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(_ficha.Observaciones))
+                    {
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="bi bi-file-text"></i>
+                            </div>
+                            <div class="info-content">
+                                <span class="info-label">Observaciones</span>
+                                <span class="info-value fst-italic">@_ficha.Observaciones</span>
+                            </div>
+                        </div>
+                    }
+
+                    @if (string.IsNullOrWhiteSpace(_ficha.GrupoSanguineo)
+                                && string.IsNullOrWhiteSpace(_ficha.Alergias)
+                                && string.IsNullOrWhiteSpace(_ficha.EnfermedadesCronicas)
+                                && string.IsNullOrWhiteSpace(_ficha.MedicacionHabitual)
+                                && string.IsNullOrWhiteSpace(_ficha.Observaciones))
+                    {
+                        <div class="text-center py-3 border-dashed rounded-3">
+                            <p class="small text-muted mb-0">
+                                Tu ficha está creada pero no tiene datos cargados.
+                            </p>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="spacer-bottom-large"></div>
+    </div>
+}
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav shadow-soft">
+    <button class="bottom-nav-item" @onclick="VolverHome">
+        <i class="bi bi-house-door"></i>
+        <span>Inicio</span>
+    </button>
+    <button class="bottom-nav-item" @onclick="IrTurnos">
+        <i class="bi bi-calendar-check"></i>
+        <span>Turnos</span>
+    </button>
+    <button class="bottom-nav-item active" @onclick="IrPerfil">
+        <i class="bi bi-person-circle"></i>
+        <span>Perfil</span>
+    </button>
+</div>
+
+@code {
+    private AuthMeResponse? _usuario;
+    private bool _cargando = true;
+    private FichaMedicaDTO? _ficha;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _cargando = true;
+            _usuario = await Auth.MeAsync();
+
+            if (_usuario is null || _usuario.Rol != "Paciente")
+            {
+                Nav.NavigateTo("/", true);
+                return;
+            }
+
+            // Solo lectura: trae la ficha del paciente autenticado
+            _ficha = await FichaMedicaService.ObtenerMiFichaAsync();
+        }
+        catch
+        {
+            Nav.NavigateTo("/", true);
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    private string GetInicial(string? nombre) =>
+        string.IsNullOrWhiteSpace(nombre) ? "?" : nombre[0].ToString().ToUpper();
+
+    // Navegación
+    private void VolverHome() => Nav.NavigateTo("/paciente/home", true);
+    private void IrTurnos() => Nav.NavigateTo("/paciente/turnos", true);
+    private void IrPerfil() => Nav.NavigateTo("/paciente/perfil", true);
+}

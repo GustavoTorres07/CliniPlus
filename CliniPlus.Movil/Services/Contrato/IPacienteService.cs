@@ -14,5 +14,14 @@ namespace CliniPlus.Movil.Services.Contrato
         Task<PacienteDetalleDTO?> CrearAsync(PacienteCrearDTO dto);
         Task<PacienteDetalleDTO?> EditarAsync(int id, PacienteEditarDTO dto);
         Task<bool> CambiarEstadoAsync(int id, bool isActive);
+
+        Task<List<PacienteListadoDTO>?> ListarPacientesSecretariaAsync();
+
+        Task<bool> ActivarCuentaPacienteAsync(PacienteActivarCuentaDTO dto);
+
+        Task<bool> ActivarCuentaProvisionalAsync(PacienteActivarCuentaDTO dto);
+
+
+
     }
 }

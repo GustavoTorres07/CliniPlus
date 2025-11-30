@@ -32,20 +32,24 @@ namespace CliniPlus.Movil.Services.Contrato
 
 
         Task<PacienteDetalleMedicoDTO?> ObtenerPacienteDetalleAsync(int pacienteId);
-        Task<List<HistoriaClinicaListadoDTO>?> ObtenerHistoriaClinicaAsync(
-            int pacienteId,
-            DateTime? desde,
-            DateTime? hasta);
+        Task<List<HistoriaClinicaListadoDTO>?> ObtenerHistoriaClinicaAsync(int pacienteId, DateTime? desde, DateTime? hasta);
 
         Task<HistoriaClinicaDetalleDTO?> ObtenerHistoriaClinicaDetalleAsync(int entradaId);
 
         Task<HistoriaClinicaDetalleDTO?> ObtenerMiHistoriaClinicaDetalleAsync(int entradaId);
 
 
-        Task<List<HistoriaClinicaListadoDTO>?> ObtenerMiHistoriaClinicaAsync(
-     DateTime? desde,
-     DateTime? hasta);
+        Task<List<HistoriaClinicaListadoDTO>?> ObtenerMiHistoriaClinicaAsync(DateTime? desde, DateTime? hasta);
 
+
+        Task<List<TurnoListadoSecretariaDTO>?> ListarTurnosHoySecretariaAsync();
+
+        Task<bool> CancelarTurnoSecretariaAsync(int turnoId);
+
+        Task<List<TurnoListadoSecretariaDTO>?> ListarAgendaSecretariaAsync(int medicoId, DateTime? desde, DateTime? hasta);
+
+        Task<List<HistoriaClinicaListadoDTO>?> ObtenerHistoriaSecretariaAsync(int pacienteId, DateTime? desde, DateTime? hasta);
+        Task<HistoriaClinicaDetalleDTO?> ObtenerHistoriaSecretariaDetalleAsync(int pacienteId, int entradaId);
 
 
     }

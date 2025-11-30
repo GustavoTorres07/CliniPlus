@@ -185,5 +185,79 @@ namespace CliniPlus.Api.Repositories.Implementa
             await _db.SaveChangesAsync();
             return true;
         }
+
+        public async Task<List<PacienteListadoDTO>> ListarParaSecretariaAsync()
+        {
+            return await _db.Paciente
+                .Include(p => p.Usuario)
+                .Include(p => p.ObraSocial)
+                .Where(p => p.IsActive)
+                .OrderBy(p => p.Usuario!.Apellido)
+                .ThenBy(p => p.Usuario!.Nombre)
+                .Select(p => new PacienteListadoDTO
+                {
+                    IdPaciente = p.IdPaciente,
+                    NombreCompleto = p.Usuario != null
+                        ? p.Usuario.Nombre + " " + p.Usuario.Apellido
+                        : p.DNI,
+                    DNI = p.DNI,
+                    IsProvisional = p.IsProvisional,
+                    ObraSocialNombre = p.ObraSocial != null
+                        ? p.ObraSocial.Nombre
+                        : null
+                })
+                .ToListAsync();
+        }
+
+        public async Task<bool> ActivarCuentaProvisionalAsync(PacienteActivarCuentaDTO dto)
+        {
+            var paciente = await _db.Paciente
+                .FirstOrDefaultAsync(p => p.IdPaciente == dto.PacienteId && p.IsActive);
+
+            if (paciente == null)
+                throw new InvalidOperationException("PACIENTE_NO_ENCONTRADO");
+
+            if (!paciente.IsProvisional)
+                throw new InvalidOperationException("PACIENTE_NO_ES_PROVISIONAL");
+
+            // 1) Validar DNI coincide
+            if (!string.Equals(paciente.DNI, dto.DNI, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("DNI_NO_COINCIDE");
+
+            // 2) Buscar usuario
+            var usuario = await _db.Usuario
+                .FirstOrDefaultAsync(u => u.IdUsuario == dto.UsuarioId && u.IsActive);
+
+            if (usuario == null)
+                throw new InvalidOperationException("USUARIO_NO_ENCONTRADO");
+
+            // 3) Validar rol Paciente
+            if (usuario.Rol != "Paciente")
+                throw new InvalidOperationException("USUARIO_NO_ES_PACIENTE");
+
+            // 4) Validar que el usuario aún no esté vinculado
+            var yaVinculado = await _db.Paciente.AnyAsync(p =>
+                p.UsuarioId == dto.UsuarioId && p.IsActive);
+
+            if (yaVinculado)
+                throw new InvalidOperationException("USUARIO_YA_VINCULADO");
+
+            // 5) Actualizar datos y activar
+            paciente.UsuarioId = dto.UsuarioId;
+            paciente.Email = dto.Email;
+            paciente.Telefono = dto.Telefono;
+            paciente.IsProvisional = false;
+
+            await _db.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<int?> ObtenerIdPorUsuarioAsync(int usuarioId)
+        {
+            return await _db.Paciente
+                .Where(p => p.UsuarioId == usuarioId && p.IsActive)
+                .Select(p => (int?)p.IdPaciente)
+                .FirstOrDefaultAsync();
+        }
     }
 }

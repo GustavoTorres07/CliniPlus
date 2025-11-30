@@ -61,5 +61,36 @@ namespace CliniPlus.Movil.Services.Implementa
             var res = await cli.PatchAsJsonAsync($"api/pacientes/estado/{id}", payload);
             return res.IsSuccessStatusCode;
         }
+
+        public async Task<List<PacienteListadoDTO>?> ListarPacientesSecretariaAsync()
+        {
+            var cli = CreateClient();
+
+            var res = await cli.GetAsync("api/pacientes/secretaria/listar");
+
+            if (!res.IsSuccessStatusCode)
+                return null;
+
+            return await res.Content.ReadFromJsonAsync<List<PacienteListadoDTO>>();
+        }
+
+        public async Task<bool> ActivarCuentaPacienteAsync(PacienteActivarCuentaDTO dto)
+        {
+            var cli = CreateClient();
+
+            var res = await cli.PostAsJsonAsync("api/pacientes/secretaria/activar", dto);
+
+            return res.IsSuccessStatusCode;
+        }
+
+        public async Task<bool> ActivarCuentaProvisionalAsync(PacienteActivarCuentaDTO dto)
+        {
+            var cli = CreateClient();
+
+            var res = await cli.PostAsJsonAsync("api/pacientes/activar-cuenta", dto);
+
+            return res.IsSuccessStatusCode;
+        }
+
     }
 }

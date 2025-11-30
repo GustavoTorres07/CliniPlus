@@ -110,6 +110,7 @@ builder.Services.AddScoped<IPacientePerfilRepository, PacientePerfilRepository>(
 builder.Services.AddScoped<ITurnoRepository, TurnoRepository>();
 builder.Services.AddScoped<ITipoTurnoRepository, TipoTurnoRepository>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IFichaMedicaRepository, FichaMedicaRepository>();
 
 var app = builder.Build();
 

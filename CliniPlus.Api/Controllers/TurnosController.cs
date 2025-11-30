@@ -505,5 +505,120 @@ namespace CliniPlus.Api.Controllers
             return Ok(dto);
         }
 
+
+        [HttpGet("secretaria/turnos-hoy")]
+        [Authorize(Roles = "Secretaria,Administrador")]
+        public async Task<ActionResult<List<TurnoListadoSecretariaDTO>>> GetTurnosHoySecretaria()
+        {
+            var hoyLocal = DateTime.Now.Date;
+            var lista = await _repo.ListarTurnosHoySecretariaAsync(hoyLocal);
+            return Ok(lista);
+        }
+
+        // POST: api/turnos/secretaria/cancelar
+        // POST: api/turnos/secretaria/cancelar
+        [HttpPost("secretaria/cancelar")]
+        [Authorize(Roles = "Secretaria,Administrador")]
+        public async Task<ActionResult> CancelarComoSecretaria([FromBody] TurnoCancelarSecretariaDTO dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Datos inválidos.");
+
+            // 👇 OJO: solo pasamos el TurnoId, sin motivo
+            var ok = await _repo.CancelarPorSecretariaAsync(dto.TurnoId);
+
+            if (!ok)
+                return BadRequest("No se pudo cancelar el turno (no está reservado o no existe).");
+
+            return NoContent();
+        }
+
+
+        [HttpGet("secretaria/agenda")]
+        [Authorize(Policy = "SecretariaOAdministrador")]
+        public async Task<ActionResult<List<TurnoListadoSecretariaDTO>>> GetAgendaSecretaria(
+    [FromQuery] int medicoId,
+    [FromQuery] string? desde,
+    [FromQuery] string? hasta)
+        {
+            if (medicoId <= 0)
+                return BadRequest("Debe indicar un médico.");
+
+            DateTime? desdeDt = null;
+            DateTime? hastaDt = null;
+
+            if (!string.IsNullOrWhiteSpace(desde) &&
+                DateTime.TryParseExact(desde, "yyyy-MM-dd",
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out var d))
+            {
+                desdeDt = d;
+            }
+
+            if (!string.IsNullOrWhiteSpace(hasta) &&
+                DateTime.TryParseExact(hasta, "yyyy-MM-dd",
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out var h))
+            {
+                hastaDt = h;
+            }
+
+            var lista = await _repo.ListarAgendaSecretariaAsync(medicoId, desdeDt, hastaDt);
+            return Ok(lista);
+        }
+
+        [HttpGet("secretaria/historia/{pacienteId:int}")]
+        [Authorize(Roles = "Secretaria,Administrador")]
+        public async Task<ActionResult<List<HistoriaClinicaListadoDTO>>> GetHistoriaSecretaria(
+    int pacienteId,
+    [FromQuery] string? desde,
+    [FromQuery] string? hasta)
+        {
+            DateTime? desdeDt = null;
+            DateTime? hastaDt = null;
+
+            if (!string.IsNullOrWhiteSpace(desde) &&
+                DateTime.TryParseExact(desde, "yyyy-MM-dd",
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out var d))
+            {
+                desdeDt = d;
+            }
+
+            if (!string.IsNullOrWhiteSpace(hasta) &&
+                DateTime.TryParseExact(hasta, "yyyy-MM-dd",
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out var h))
+            {
+                hastaDt = h;
+            }
+
+            // 👇 reutilizamos la misma lógica que para el paciente,
+            // pero SIN depender del usuario logueado
+            var lista = await _repo.ObtenerHistoriaPacienteAsync(pacienteId, desdeDt, hastaDt);
+            return Ok(lista);
+        }
+
+        // GET: api/turnos/secretaria/historia/detalle/{entradaId}
+        [HttpGet("secretaria/historia/{pacienteId:int}/detalle/{entradaId:int}")]
+        [Authorize(Roles = "Secretaria,Administrador")]
+        public async Task<ActionResult<HistoriaClinicaDetalleDTO>> GetHistoriaDetalleSecretaria(
+            int pacienteId,
+            int entradaId)
+        {
+            // reutilizamos el método que ya existe para paciente,
+            // pero SIN depender del usuario logueado
+            var dto = await _repo.ObtenerHistoriaDetallePacienteAsync(pacienteId, entradaId);
+
+            if (dto == null)
+                return NotFound("Entrada de historia clínica no encontrada.");
+
+            return Ok(dto);
+        }
+
     }
 }

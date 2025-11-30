@@ -100,5 +100,59 @@ namespace CliniPlus.Api.Controllers
             return ok ? Ok(new { mensaje = "Estado actualizado" })
                       : NotFound("Paciente no encontrado");
         }
+
+        // LISTADO PARA SECRETARÍA
+        // GET: api/pacientes/secretaria/listar
+        [HttpGet("secretaria/listar")]
+        public async Task<ActionResult<List<PacienteListadoDTO>>> ListarSecretaria()
+        {
+            var lista = await _repo.ListarParaSecretariaAsync();
+            return Ok(lista);
+        }
+
+        /// <summary>
+        /// Secretaría: completa datos y vincula un paciente provisional con un Usuario existente.
+        /// </summary>
+        [HttpPost("activar-cuenta")]
+        [Authorize(Policy = "SecretariaOAdministrador")]
+        public async Task<IActionResult> ActivarCuenta([FromBody] PacienteActivarCuentaDTO dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Datos inválidos.");
+
+            try
+            {
+                var ok = await _repo.ActivarCuentaProvisionalAsync(dto);
+
+                if (!ok)
+                    return BadRequest("No se pudo activar la cuenta del paciente.");
+
+                return Ok(new { mensaje = "Cuenta de paciente activada correctamente." });
+            }
+            catch (InvalidOperationException ex) when (ex.Message == "PACIENTE_NO_ENCONTRADO")
+            {
+                return NotFound("Paciente no encontrado.");
+            }
+            catch (InvalidOperationException ex) when (ex.Message == "PACIENTE_NO_ES_PROVISIONAL")
+            {
+                return BadRequest("El paciente no es provisional.");
+            }
+            catch (InvalidOperationException ex) when (ex.Message == "DNI_NO_COINCIDE")
+            {
+                return BadRequest("El DNI ingresado no coincide con el registrado.");
+            }
+            catch (InvalidOperationException ex) when (ex.Message == "USUARIO_NO_ENCONTRADO")
+            {
+                return BadRequest("El usuario indicado no existe o no está activo.");
+            }
+            catch (InvalidOperationException ex) when (ex.Message == "USUARIO_NO_ES_PACIENTE")
+            {
+                return BadRequest("El usuario no tiene rol de Paciente.");
+            }
+            catch (InvalidOperationException ex) when (ex.Message == "USUARIO_YA_VINCULADO")
+            {
+                return Conflict("Ese usuario ya está vinculado a otro paciente.");
+            }
+        }
     }
 }

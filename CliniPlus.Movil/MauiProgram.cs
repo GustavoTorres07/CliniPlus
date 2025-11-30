@@ -48,6 +48,7 @@ public static class MauiProgram
         builder.Services.AddScoped<IPacientePerfilService, PacientePerfilService>();
         builder.Services.AddScoped<ITurnoService, TurnoService>();
         builder.Services.AddScoped<ITipoTurnoService, TipoTurnoService>();
+        builder.Services.AddScoped<IFichaMedicaService, FichaMedicaService>();
 
 
 

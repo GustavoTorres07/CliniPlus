@@ -1,0 +1,284 @@
+﻿@page "/medico/paciente/{Id:int}/ficha-medica"
+@layout CliniPlus.Movil.Components.Layout.EmptyLayout
+
+@using CliniPlus.Shared.DTOs
+@inject CliniPlus.Movil.Services.Contrato.IAuthService Auth
+@inject CliniPlus.Movil.Services.Contrato.ITurnoService TurnoService
+@inject CliniPlus.Movil.Services.Contrato.IFichaMedicaService FichaMedicaService
+@inject NavigationManager Nav
+
+@if (_cargando)
+{
+    <div class="home-loading d-flex flex-column align-items-center justify-content-center" style="height:60vh;">
+        <div class="spinner-border text-primary mb-2"></div>
+        <p class="text-muted small mb-0">Cargando ficha médica...</p>
+    </div>
+}
+else if (_usuario is null || _paciente is null || _ficha is null)
+{
+    <RedirectToLogin />
+}
+else
+{
+    <div class="home-page">
+
+        <!-- HEADER -->
+        <div class="home-header mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn-back" @onclick="VolverDetallePaciente">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <div class="home-greeting">
+                    <p class="home-hello">Paciente</p>
+                    <h4 class="home-name text-truncate" style="max-width: 180px;">@_paciente.NombreCompleto</h4>
+                    <span class="badge badge-ficha mt-1">
+                        Ficha Médica
+                    </span>
+                </div>
+            </div>
+
+            <div class="home-avatar">
+                <span>@GetInicial(_usuario.NombreCompleto)</span>
+            </div>
+        </div>
+
+        <!-- INFO BÁSICA PACIENTE -->
+        <div class="home-card mb-3 p-4">
+            <div class="patient-summary">
+                <div class="info-row">
+                    <i class="bi bi-person-vcard"></i>
+                    <span>DNI: <span class="text-dark-bold">@_paciente.DNI</span></span>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(_paciente.ObraSocialNombre))
+                {
+                    <div class="info-row">
+                        <i class="bi bi-shield-plus"></i>
+                        <span>
+                            OS: <span class="text-dark-bold">@_paciente.ObraSocialNombre</span>
+                            @if (!string.IsNullOrWhiteSpace(_paciente.NumeroAfiliado))
+                            {
+                                <span class="small text-muted"> (@_paciente.NumeroAfiliado)</span>
+                            }
+                        </span>
+                    </div>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(_paciente.Telefono))
+                {
+                    <div class="info-row">
+                        <i class="bi bi-telephone"></i>
+                        <span>@_paciente.Telefono</span>
+                    </div>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(_paciente.Email))
+                {
+                    <div class="info-row">
+                        <i class="bi bi-envelope"></i>
+                        <span class="text-truncate">@_paciente.Email</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- FORM FICHA MÉDICA -->
+        <EditForm Model="_ficha" OnValidSubmit="GuardarFicha">
+            <DataAnnotationsValidator />
+
+            <div class="home-card mb-3 p-4">
+                <h6 class="section-title mb-3">Datos Clínicos</h6>
+
+                <!-- Grupo sanguíneo -->
+                <div class="mb-3">
+                    <label class="label-mini">Grupo Sanguíneo</label>
+                    <InputText class="form-control input-modern"
+                               @bind-Value="_ficha.GrupoSanguineo"
+                               placeholder="Ej: 0+, A-, B+ ..." />
+                </div>
+
+                <!-- Alergias -->
+                <div class="mb-3">
+                    <label class="label-mini">Alergias</label>
+                    <InputTextArea class="form-control input-modern"
+                                   rows="2"
+                                   @bind-Value="_ficha.Alergias"
+                                   placeholder="Describir alergias relevantes..." />
+                </div>
+
+                <!-- Enfermedades crónicas -->
+                <div class="mb-3">
+                    <label class="label-mini">Enfermedades Crónicas</label>
+                    <InputTextArea class="form-control input-modern"
+                                   rows="2"
+                                   @bind-Value="_ficha.EnfermedadesCronicas"
+                                   placeholder="Diabetes, HTA, cardiopatías, etc." />
+                </div>
+
+                <!-- Medicación habitual -->
+                <div class="mb-3">
+                    <label class="label-mini">Medicación Habitual</label>
+                    <InputTextArea class="form-control input-modern"
+                                   rows="2"
+                                   @bind-Value="_ficha.MedicacionHabitual"
+                                   placeholder="Medicamentos que toma en forma regular..." />
+                </div>
+
+                <!-- Observaciones -->
+                <div class="mb-1">
+                    <label class="label-mini">Observaciones Generales</label>
+                    <InputTextArea class="form-control input-modern"
+                                   rows="3"
+                                   @bind-Value="_ficha.Observaciones"
+                                   placeholder="Notas generales, antecedentes, cuidados especiales..." />
+                </div>
+            </div>
+
+            <!-- BOTÓN GUARDAR FLOTANTE -->
+            <div class="fixed-bottom-action p-3 bg-white shadow-lg border-top">
+
+                @if (!string.IsNullOrWhiteSpace(_mensaje))
+                {
+                    <div class="alert @( _error ? "alert-danger" : "alert-success") py-2 px-3 small mb-2 text-center fade-in">
+                        <i class="bi @( _error ? "bi-exclamation-triangle" : "bi-check-circle") me-1"></i> @_mensaje
+                    </div>
+                }
+
+                <button type="submit"
+                        class="btn btn-primary btn-pill w-100 py-3 shadow-soft fw-bold d-flex justify-content-center align-items-center gap-2"
+                        disabled="@_guardando">
+                    @if (_guardando)
+                    {
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        <span>Guardando...</span>
+                    }
+                    else
+                    {
+                        <i class="bi bi-save"></i>
+                        <span>Guardar Ficha Médica</span>
+                    }
+                </button>
+            </div>
+
+        </EditForm>
+
+        <div class="spacer-bottom-large"></div>
+    </div>
+}
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav shadow-soft">
+    <button class="bottom-nav-item" @onclick="IrInicio">
+        <i class="bi bi-house-door-fill"></i>
+        <span>Inicio</span>
+    </button>
+    <button class="bottom-nav-item" @onclick="IrAgenda">
+        <i class="bi bi-calendar-check"></i>
+        <span>Agenda</span>
+    </button>
+    <button class="bottom-nav-item active" @onclick="VolverDetallePaciente">
+        <i class="bi bi-person-vcard-fill"></i>
+        <span>Paciente</span>
+    </button>
+</div>
+
+@code {
+    [Parameter] public int Id { get; set; } // PacienteId
+
+    private AuthMeResponse? _usuario;
+    private bool _cargando = true;
+    private bool _guardando = false;
+    private bool _error = false;
+
+    private PacienteDetalleMedicoDTO? _paciente;
+    private FichaMedicaDTO? _ficha;
+    private string _mensaje = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _usuario = await Auth.MeAsync();
+
+            if (_usuario is null || _usuario.Rol != "Medico")
+            {
+                Nav.NavigateTo("/", true);
+                return;
+            }
+
+            if (Id <= 0)
+            {
+                Nav.NavigateTo("/medico/home", true);
+                return;
+            }
+
+            _paciente = await TurnoService.ObtenerPacienteDetalleAsync(Id);
+
+            if (_paciente is null)
+            {
+                Nav.NavigateTo("/medico/home", true);
+                return;
+            }
+
+            // Obtener o crear ficha vacía
+            _ficha = await FichaMedicaService.ObtenerAsync(Id)
+                     ?? new FichaMedicaDTO { PacienteId = Id };
+        }
+        catch
+        {
+            Nav.NavigateTo("/", true);
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    private async Task GuardarFicha()
+    {
+        if (_ficha == null) return;
+
+        _guardando = true;
+        _mensaje = string.Empty;
+        _error = false;
+
+        try
+        {
+            var ok = await FichaMedicaService.GuardarAsync(_ficha);
+
+            if (!ok)
+            {
+                _error = true;
+                _mensaje = "No se pudo guardar la ficha médica.";
+            }
+            else
+            {
+                _error = false;
+                _mensaje = "Ficha médica guardada correctamente.";
+
+                // Limpiar mensaje después de unos segundos
+                _ = Task.Delay(3000).ContinueWith(_ =>
+                {
+                    _mensaje = "";
+                    InvokeAsync(StateHasChanged);
+                });
+            }
+        }
+        catch
+        {
+            _error = true;
+            _mensaje = "Ocurrió un error al guardar la ficha.";
+        }
+        finally
+        {
+            _guardando = false;
+        }
+    }
+
+    private string GetInicial(string? nombre) =>
+        string.IsNullOrWhiteSpace(nombre) ? "?" : nombre[0].ToString().ToUpper();
+
+    private void VolverDetallePaciente() => Nav.NavigateTo($"/medico/paciente/{Id}");
+    private void IrInicio() => Nav.NavigateTo("/medico/home", true);
+    private void IrAgenda() => Nav.NavigateTo("/medico/turnos-hoy", true);
+}

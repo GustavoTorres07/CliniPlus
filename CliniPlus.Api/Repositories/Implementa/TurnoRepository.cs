@@ -532,11 +532,7 @@ namespace CliniPlus.Api.Repositories.Implementa
             return resultado;
         }
 
-        public async Task<List<HistoriaClinicaListadoDTO>> ObtenerHistoriaClinicaPacienteAsync(
-    int medicoId,
-    int pacienteId,
-    DateTime? desde,
-    DateTime? hasta)
+        public async Task<List<HistoriaClinicaListadoDTO>> ObtenerHistoriaClinicaPacienteAsync(int medicoId, int pacienteId, DateTime? desde, DateTime? hasta)
         {
             var query = _db.HistoriaClinicaEntrada
                 .Where(h => h.PacienteId == pacienteId && h.MedicoId == medicoId)
@@ -572,9 +568,7 @@ namespace CliniPlus.Api.Repositories.Implementa
                 .ToListAsync();
         }
 
-        public async Task<HistoriaClinicaDetalleDTO?> ObtenerHistoriaClinicaDetalleAsync(
-            int medicoId,
-            int entradaId)
+        public async Task<HistoriaClinicaDetalleDTO?> ObtenerHistoriaClinicaDetalleAsync(int medicoId, int entradaId)
         {
             return await _db.HistoriaClinicaEntrada
                 .Where(h => h.IdEntrada == entradaId && h.MedicoId == medicoId)
@@ -610,9 +604,7 @@ namespace CliniPlus.Api.Repositories.Implementa
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<PacienteDetalleMedicoDTO?> ObtenerPacienteDetalleAsync(
-            int medicoId,
-            int pacienteId)
+        public async Task<PacienteDetalleMedicoDTO?> ObtenerPacienteDetalleAsync(int medicoId, int pacienteId)
         {
             // Opcional: podrías verificar que el paciente tenga al menos un turno con este médico.
             var paciente = await _db.Paciente
@@ -649,10 +641,7 @@ namespace CliniPlus.Api.Repositories.Implementa
             };
         }
 
-        public async Task<List<HistoriaClinicaListadoDTO>> ObtenerHistoriaPacienteAsync(
-    int pacienteId,
-    DateTime? desde,
-    DateTime? hasta)
+        public async Task<List<HistoriaClinicaListadoDTO>> ObtenerHistoriaPacienteAsync(int pacienteId, DateTime? desde, DateTime? hasta)
         {
             var query = _db.HistoriaClinicaEntrada
                 .Where(h => h.PacienteId == pacienteId)
@@ -725,8 +714,120 @@ namespace CliniPlus.Api.Repositories.Implementa
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<List<TurnoListadoSecretariaDTO>> ListarTurnosHoySecretariaAsync(DateTime hoyLocal)
+        {
+            var desde = hoyLocal.Date;
+            var hasta = desde.AddDays(1);
+
+            return await _db.Turno
+                .Include(t => t.Paciente).ThenInclude(p => p.Usuario)
+                .Include(t => t.Medico).ThenInclude(m => m.Usuario)
+                .Include(t => t.Medico).ThenInclude(m => m.Especialidad)
+                .Include(t => t.TipoTurno)
+                .Where(t =>
+                    t.IsActive &&
+                    t.ScheduledAtUtc >= desde &&
+                    t.ScheduledAtUtc < hasta)
+                .OrderBy(t => t.ScheduledAtUtc)
+                .Select(t => new TurnoListadoSecretariaDTO
+                {
+                    IdTurno = t.IdTurno,
+                    ScheduledAtUtc = t.ScheduledAtUtc,
+                    DuracionMin = t.DuracionMin,
+                    Estado = t.Estado,
+
+                    PacienteId = t.PacienteId,
+                    PacienteNombre = t.Paciente != null && t.Paciente.Usuario != null
+                        ? t.Paciente.Usuario.Nombre + " " + t.Paciente.Usuario.Apellido
+                        : t.Paciente != null ? t.Paciente.DNI : null,
+                    PacienteDni = t.Paciente != null ? t.Paciente.DNI : null,
+
+                    MedicoId = t.MedicoId,
+                    MedicoNombre = t.Medico.Usuario.Nombre + " " + t.Medico.Usuario.Apellido,
+                    EspecialidadNombre = t.Medico.Especialidad != null ? t.Medico.Especialidad.Nombre : null,
+
+                    TipoTurnoNombre = t.TipoTurno != null ? t.TipoTurno.Nombre : null
+                })
+                .ToListAsync();
+        }
+
+        public async Task<bool> CancelarPorSecretariaAsync(int turnoId)
+        {
+            var turno = await _db.Turno
+                .FirstOrDefaultAsync(t => t.IdTurno == turnoId && t.IsActive);
+
+            if (turno == null)
+                return false;
+
+            // Sólo se pueden cancelar turnos reservados
+            if (turno.Estado != "Reservado")
+                return false;
+
+            // Lógica similar a CancelarComoPacienteAsync: liberamos el slot
+            turno.PacienteId = null;
+            turno.TipoTurnoId = null;
+            turno.Estado = "Disponible";
+
+            await _db.SaveChangesAsync();
+            return true;
+        }
 
 
+        public async Task<List<TurnoListadoSecretariaDTO>> ListarAgendaSecretariaAsync(
+            int medicoId,
+            DateTime? desde,
+            DateTime? hasta)
+        {
+            var query = _db.Turno
+                .Include(t => t.Medico).ThenInclude(m => m.Usuario)
+                .Include(t => t.Medico).ThenInclude(m => m.Especialidad)
+                .Include(t => t.Paciente).ThenInclude(p => p.Usuario)
+                .Include(t => t.TipoTurno)
+                .Where(t =>
+                    t.IsActive &&
+                    t.MedicoId == medicoId &&
+                    t.Estado != "Disponible")   // 👈 NO mostrar slots libres
+                .AsQueryable();
+
+            if (desde.HasValue)
+            {
+                var d = desde.Value.Date;
+                query = query.Where(t => t.ScheduledAtUtc >= d);
+            }
+
+            if (hasta.HasValue)
+            {
+                var h = hasta.Value.Date.AddDays(1);
+                query = query.Where(t => t.ScheduledAtUtc < h);
+            }
+
+            return await query
+                .OrderBy(t => t.ScheduledAtUtc)
+                .Select(t => new TurnoListadoSecretariaDTO
+                {
+                    IdTurno = t.IdTurno,
+                    ScheduledAtUtc = t.ScheduledAtUtc,
+                    DuracionMin = t.DuracionMin,
+                    Estado = t.Estado,
+
+                    MedicoNombre = t.Medico != null && t.Medico.Usuario != null
+                        ? t.Medico.Usuario.Nombre + " " + t.Medico.Usuario.Apellido
+                        : "",
+
+                    EspecialidadNombre = t.Medico != null && t.Medico.Especialidad != null
+                        ? t.Medico.Especialidad.Nombre
+                        : null,
+
+                    PacienteNombre = t.Paciente != null && t.Paciente.Usuario != null
+                        ? t.Paciente.Usuario.Nombre + " " + t.Paciente.Usuario.Apellido
+                        : (t.Paciente != null ? t.Paciente.DNI : null),
+
+                    PacienteDni = t.Paciente != null ? t.Paciente.DNI : null,
+
+                    TipoTurnoNombre = t.TipoTurno != null ? t.TipoTurno.Nombre : null
+                })
+                .ToListAsync();
+        }
 
     }
 }
