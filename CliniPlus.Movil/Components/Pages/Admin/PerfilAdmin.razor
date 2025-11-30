@@ -24,7 +24,6 @@ else
 {
     <div class="home-page">
 
-        <!-- HEADER -->
         <div class="home-header mb-4">
             <div class="d-flex align-items-center gap-3">
                 <button class="btn-back" @onclick="IrInicio">
@@ -41,11 +40,9 @@ else
             </div>
         </div>
 
-        <!-- FORMULARIO -->
         <EditForm Model="_perfil" OnValidSubmit="Guardar">
             <DataAnnotationsValidator />
 
-            <!-- DATOS PERSONALES -->
             <div class="home-card p-4 mb-3">
                 <h6 class="section-title mb-3">Datos personales</h6>
 
@@ -65,7 +62,6 @@ else
                 </div>
             </div>
 
-            <!-- INFO DEL SISTEMA -->
             <div class="home-card p-4 mb-3">
                 <h6 class="section-title mb-3">Información del sistema</h6>
 
@@ -80,7 +76,6 @@ else
                 </div>
             </div>
 
-            <!-- SEGURIDAD -->
             <div class="home-card p-4 mb-4">
                 <h6 class="section-title mb-3">Seguridad</h6>
                 <button type="button" class="btn btn-outline-primary w-100 d-flex justify-content-center align-items-center gap-2"
@@ -90,7 +85,6 @@ else
                 </button>
             </div>
 
-            <!-- BOTÓN GUARDAR -->
             <div class="fixed-bottom-action p-3 bg-white shadow-lg border-top">
                 @if (!string.IsNullOrWhiteSpace(_mensaje))
                 {
@@ -119,7 +113,6 @@ else
     </div>
 }
 
-<!-- MODAL CAMBIAR PASSWORD (ESTILO SHEET) -->
 @if (_mostrarModalPassword)
 {
     <div class="modal-backdrop-custom" @onclick="CerrarModalPassword"></div>
@@ -153,7 +146,6 @@ else
     </div>
 }
 
-<!-- BOTTOM NAV -->
 <div class="bottom-nav shadow-soft">
     <button class="bottom-nav-item" @onclick="IrInicio">
         <i class="bi bi-house-door"></i>
@@ -172,7 +164,6 @@ else
     private bool _guardando = false;
     private string _mensaje = "";
 
-    // Modal
     private bool _mostrarModalPassword = false;
     private string _passwordActual = "";
     private string _passwordNueva = "";

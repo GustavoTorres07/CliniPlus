@@ -20,7 +20,6 @@ else if (_usuario is null || _usuario.Rol != "Medico")
 else
 {
     <div class="home-page">
-        <!-- HEADER -->
         <div class="home-header mb-4">
             <div class="home-greeting">
                 <p class="home-hello">Hola,</p>
@@ -34,14 +33,12 @@ else
                 <button class="btn-logout" @onclick="CerrarSesion" title="Cerrar sesión">
                     <i class="bi bi-box-arrow-right"></i>
                 </button>
-                <!-- Usamos la clase home-avatar que estilizaremos igual que el anterior -->
                 <div class="home-avatar">
                     <span>@GetInicial(_usuario.NombreCompleto)</span>
                 </div>
             </div>
         </div>
 
-        <!-- ACCIONES RÁPIDAS (GRID) -->
         <h6 class="section-title">Agenda y Consultas</h6>
         <div class="home-quick-actions mb-4">
             <button class="quick-card" @onclick="IrTurnosHoy">
@@ -75,7 +72,6 @@ else
                 <span>Mi perfil</span>
             </button>
 
-            <!-- Card deshabilitada visualmente -->
             <button class="quick-card disabled-card">
                 <div class="icon-box bg-gray-light">
                     <i class="bi bi-activity text-muted"></i>
@@ -91,7 +87,6 @@ else
             </button>
         </div>
 
-        <!-- RESUMEN DEL DÍA -->
         <div class="home-card mb-2">
             <div class="home-card-header p-3 border-bottom border-light">
                 <span class="home-card-title fw-bold text-dark">Resumen de hoy</span>
@@ -127,7 +122,6 @@ else
     </div>
 }
 
-<!-- BOTTOM NAV -->
 <div class="bottom-nav shadow-soft">
     <button class="bottom-nav-item active" @onclick="IrInicio">
         <i class="bi bi-house-door-fill"></i>

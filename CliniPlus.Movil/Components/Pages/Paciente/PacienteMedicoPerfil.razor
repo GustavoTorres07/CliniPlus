@@ -21,7 +21,6 @@ else
 {
     <div class="home-page">
 
-        <!-- HEADER -->
         <div class="home-header mb-4">
             <div class="d-flex align-items-center gap-3">
                 <button class="btn-back" @onclick="Volver">
@@ -53,7 +52,6 @@ else
             </div>
         </div>
 
-        <!-- BIO / PRESENTACIÓN -->
         <div class="home-card p-4 mb-3">
             <h6 class="section-title mb-3">Sobre el profesional</h6>
             @if (!string.IsNullOrWhiteSpace(_medico.Bio))
@@ -70,7 +68,6 @@ else
             }
         </div>
 
-        <!-- INFORMACIÓN PROFESIONAL -->
         <div class="home-card p-4 mb-4">
             <h6 class="section-title mb-3">Información Detallada</h6>
 
@@ -127,7 +124,6 @@ else
             </div>
         </div>
 
-        <!-- ACCIÓN: RESERVAR TURNO -->
         <div class="home-card p-4 mb-5 border-0 bg-transparent shadow-none pt-0">
             <button class="btn btn-primary w-100 shadow-soft d-flex align-items-center justify-content-center gap-2"
                     @onclick="IrReservarTurno">
@@ -140,7 +136,6 @@ else
     </div>
 }
 
-<!-- BOTTOM NAV -->
 <div class="bottom-nav shadow-soft">
     <button class="bottom-nav-item" @onclick="IrInicio">
         <i class="bi bi-house-door"></i>

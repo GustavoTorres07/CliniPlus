@@ -13,9 +13,6 @@ namespace CliniPlus.Movil.Services.Implementa
 
         public async Task GuardarAsync(string token, bool recordar)
         {
-            // En MAUI, SecureStorage ya persiste entre sesiones.
-            // Si no querés persistir cuando NO recuerda, lo guardamos igual
-            // y en Logout lo limpiamos. Alternativamente, podrías usar Preferences.
             await SecureStorage.SetAsync(KEY, token);
         }
 
@@ -24,6 +21,7 @@ namespace CliniPlus.Movil.Services.Implementa
         public Task BorrarAsync()
         {
             SecureStorage.Remove(KEY);
+
             return Task.CompletedTask;
         }
     }

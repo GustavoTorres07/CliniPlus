@@ -1,5 +1,4 @@
-﻿/* --- ESTRUCTURA GLOBAL --- */
-.home-page {
+﻿.home-page {
     padding: 24px 20px;
     font-family: 'Nunito', sans-serif;
     background-color: #f8f9fc;
@@ -10,7 +9,6 @@
     height: 80px;
 }
 
-/* --- HEADER --- */
 .home-header {
     display: flex;
     justify-content: space-between;
@@ -29,7 +27,6 @@
     margin: 0;
 }
 
-/* Mini Avatar Médico */
 .medico-mini-avatar {
     width: 40px;
     height: 40px;
@@ -44,7 +41,6 @@
     box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
 
-/* --- TARJETAS --- */
 .home-card {
     background: white;
     border-radius: 20px;
@@ -52,7 +48,6 @@
     border: 1px solid #f0f2f5;
 }
 
-/* --- INPUTS ELEVADOS --- */
 .input-elevated {
     border-radius: 16px;
     background-color: #f8f9fc;
@@ -65,7 +60,7 @@
 
     .input-elevated:focus-within {
         background-color: #ffffff;
-        border-color: #dc3545; /* Rojo para bloqueos */
+        border-color: #dc3545; 
         box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.1);
     }
 
@@ -78,13 +73,11 @@
         font-size: 0.85rem;
     }
 
-/* Ajuste para inputs de fecha en móvil */
 .small-date-input {
     font-family: inherit;
-    min-width: 0; /* Evita desborde */
+    min-width: 0; 
 }
 
-/* --- COLORES TEMA (Rojo/Naranja Bloqueos) --- */
 .icon-box {
     border-radius: 12px;
     display: flex;
@@ -104,7 +97,6 @@
     color: #ff922b;
 }
 
-/* --- BOTONES --- */
 .btn-pill {
     border-radius: 99px;
     font-weight: 700;
@@ -134,7 +126,6 @@
         color: #ff6b6b;
     }
 
-/* --- BOTTOM NAV --- */
 .bottom-nav {
     position: fixed;
     bottom: 0;

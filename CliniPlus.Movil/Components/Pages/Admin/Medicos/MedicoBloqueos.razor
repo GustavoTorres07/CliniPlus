@@ -24,7 +24,6 @@ else if (!_permitido)
 else
 {
     <div class="home-page">
-        <!-- HEADER -->
         <div class="home-header mb-4">
             <div class="d-flex align-items-center gap-3">
                 <BotonVolver />
@@ -41,7 +40,6 @@ else
             </div>
         </div>
 
-        <!-- INFO CARD -->
         <div class="alert alert-light border-0 shadow-sm small text-muted mb-4 d-flex align-items-start gap-2">
             <i class="bi bi-info-circle-fill text-primary mt-1"></i>
             <div>
@@ -51,7 +49,6 @@ else
             </div>
         </div>
 
-        <!-- LISTA DE BLOQUEOS ACTUALES -->
         <h6 class="fw-bold text-dark mb-3 ps-1">Bloqueos Vigentes</h6>
 
         @if (!_bloqueos.Any())
@@ -70,13 +67,11 @@ else
                 {
                     <div class="home-card p-3 border-0 shadow-sm d-flex justify-content-between align-items-center">
                         <div class="d-flex align-items-start gap-3">
-                            <!-- Icono Calendario -->
                             <div class="icon-box bg-danger-light flex-shrink-0" style="width: 40px; height: 40px;">
                                 <i class="bi bi-calendar-x text-danger"></i>
                             </div>
 
                             <div class="overflow-hidden">
-                                <!-- AQUÍ ESTÁ LA CORRECCIÓN: text-nowrap para evitar salto de línea -->
                                 <div class="fw-bold text-dark small text-nowrap">
                                     @b.Desde.ToLocalTime().ToString("dd/MM/yy HH:mm")
                                     <i class="bi bi-arrow-right-short text-muted mx-1"></i>
@@ -104,7 +99,6 @@ else
             </div>
         }
 
-        <!-- FORMULARIO NUEVO BLOQUEO -->
         <div class="home-card p-4">
             <h6 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
                 <i class="bi bi-plus-circle-fill text-danger"></i> Agregar Bloqueo
@@ -170,7 +164,6 @@ else
     </div>
 }
 
-<!-- BOTTOM NAV -->
 <div class="bottom-nav shadow-soft">
     <button class="bottom-nav-item" @onclick="IrInicio">
         <i class="bi bi-house-door"></i>

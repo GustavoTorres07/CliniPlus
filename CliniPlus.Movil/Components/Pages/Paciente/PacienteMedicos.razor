@@ -22,7 +22,6 @@ else
 {
     <div class="home-page">
 
-        <!-- HEADER -->
         <div class="home-header mb-4">
             <div class="d-flex align-items-center gap-3">
                 <button class="btn-back" @onclick="Volver">
@@ -39,7 +38,6 @@ else
             </div>
         </div>
 
-        <!-- SUBTÍTULO ESPECIALIDAD (si aplica) -->
         @if (EspecialidadId.HasValue)
         {
             <div class="px-1 mb-3">
@@ -50,7 +48,6 @@ else
             </div>
         }
 
-        <!-- BUSCADOR -->
         <div class="px-1 mb-4">
             <div class="input-group input-elevated">
                 <span class="input-group-text">
@@ -63,7 +60,6 @@ else
             </div>
         </div>
 
-        <!-- LISTA DE MÉDICOS -->
         @if (_cargandoLista)
         {
             <div class="text-center py-5">
@@ -85,7 +81,6 @@ else
                 @foreach (var m in _medicosFiltrados)
                 {
                     <div class="doctor-card fade-in">
-                        <!-- Cabecera: Avatar + Nombre + Especialidad -->
                         <div class="d-flex align-items-center mb-3">
                             <div class="doctor-avatar-small me-3">
                                 @GetInicial(m.NombreCompleto)
@@ -101,7 +96,6 @@ else
                             </div>
                         </div>
 
-                        <!-- Bio / Descripción -->
                         @if (!string.IsNullOrWhiteSpace(m.Bio))
                         {
                             <div class="text-muted small mb-3 lh-sm text-truncate-2">
@@ -109,7 +103,6 @@ else
                             </div>
                         }
 
-                        <!-- Botones de Acción -->
                         <div class="d-flex gap-2">
                             <button class="btn btn-primary flex-grow-1 shadow-sm"
                                     @onclick="() => IrReservarTurno(m.IdMedico)">
@@ -132,7 +125,6 @@ else
     </div>
 }
 
-<!-- BOTTOM NAV -->
 <div class="bottom-nav shadow-soft">
     <button class="bottom-nav-item" @onclick="IrInicio">
         <i class="bi bi-house-door"></i>
@@ -229,7 +221,6 @@ else
 
     private void IrReservarTurno(int medicoId)
     {
-        // Redirige a la agenda preseleccionando el médico
         Nav.NavigateTo($"/paciente/agenda?medicoId={medicoId}");
     }
 

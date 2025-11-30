@@ -1,10 +1,4 @@
-﻿/* -------------------------------------------------------------------------- */
-/* ESTILOS PARA PERFIL MÉDICO                                   */
-/* Fuente: Nunito | Color primario: #6e7bff                   */
-/* -------------------------------------------------------------------------- */
-
-/* Global */
-.home-page {
+﻿.home-page {
     padding: 24px 20px;
     font-family: 'Nunito', sans-serif;
     background-color: #f8f9fc;
@@ -12,7 +6,6 @@
     padding-bottom: 20px;
 }
 
-/* --- HEADER --- */
 .home-header {
     display: flex;
     justify-content: space-between;
@@ -32,7 +25,6 @@
     font-size: 1.4rem;
 }
 
-/* Botón Volver */
 .btn-back {
     width: 40px;
     height: 40px;
@@ -52,7 +44,6 @@
         background-color: #f1f3f5;
     }
 
-/* Avatar */
 .home-avatar {
     width: 45px;
     height: 45px;
@@ -67,7 +58,6 @@
     box-shadow: 0 4px 10px rgba(110, 123, 255, 0.3);
 }
 
-/* --- FORMULARIOS --- */
 .home-card {
     background: white;
     border-radius: 20px;
@@ -91,7 +81,6 @@
     margin-bottom: 6px;
 }
 
-/* Inputs Modernos (Estilo caja gris suave) */
 .input-modern {
     background-color: #f8f9fc;
     border: 1px solid #f0f2f5;
@@ -109,7 +98,6 @@
         outline: none;
     }
 
-/* --- LISTA DE ESPECIALIDADES --- */
 .specialty-item {
     display: flex;
     justify-content: space-between;
@@ -149,10 +137,9 @@
     border-style: dashed !important;
 }
 
-/* --- ACCIÓN FLOTANTE (Botón Guardar) --- */
 .fixed-bottom-action {
     position: fixed;
-    bottom: 70px; /* Encima del bottom nav */
+    bottom: 70px;
     left: 0;
     width: 100%;
     z-index: 90;
@@ -162,14 +149,13 @@
 }
 
 .spacer-bottom-large {
-    height: 160px; /* Espacio para Nav + Botón Guardar */
+    height: 160px; 
 }
 
 .btn-pill {
     border-radius: 50px;
 }
 
-/* --- BOTTOM NAV --- */
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -212,7 +198,6 @@
         color: #6e7bff;
     }
 
-/* Utilidades */
 .fade-in {
     animation: fadeIn 0.4s ease-in-out;
 }
@@ -233,9 +218,6 @@
     color: #9ba0b8;
 }
 
-/* -------------------------------------------------------------------------- */
-/* ESTILOS MODAL CUSTOM (Para Selector de Especialidades)            */
-/* -------------------------------------------------------------------------- */
 .modal-backdrop-custom {
     position: fixed;
     inset: 0;
@@ -253,7 +235,7 @@
     border-radius: 24px 24px 0 0;
     padding: 24px;
     z-index: 1001;
-    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); /* Efecto slide suave */
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); 
     box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
     max-height: 80vh;
     display: flex;
@@ -304,7 +286,6 @@
 .modal-body-custom {
     overflow-y: auto;
     margin-bottom: 20px;
-    /* Ocultar scrollbar pero permitir scroll */
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
@@ -332,7 +313,7 @@
 
     .modal-option.selected {
         border-color: #6e7bff;
-        background-color: #e2e6ff; /* Fondo violeta muy suave */
+        background-color: #e2e6ff; 
         color: #6e7bff;
     }
 

@@ -73,25 +73,20 @@ namespace CliniPlus.Api.Repositories.Implementa
 
         public async Task<bool> CambiarPasswordAsync(int idUsuario, string passwordActual, string passwordNueva)
         {
-            // 1) Obtener usuario
             var usuario = await _db.Usuario
                 .FirstOrDefaultAsync(u => u.IdUsuario == idUsuario && u.IsActive);
 
             if (usuario == null)
                 return false;
 
-            // 2) Verificar contraseña actual con BCrypt
             if (!BCrypt.Net.BCrypt.Verify(passwordActual, usuario.PasswordHash))
                 return false;
 
-            // 3) Hashear nueva contraseña
             usuario.PasswordHash = BCrypt.Net.BCrypt.HashPassword(passwordNueva);
 
-            // 4) IMPORTANTE: si venía de recuperación, marcar como resuelto
             if (usuario.RecuperarContrasena)
                 usuario.RecuperarContrasena = false;
 
-            // 5) Guardar cambios
             await _db.SaveChangesAsync();
             return true;
         }

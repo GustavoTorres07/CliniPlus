@@ -22,7 +22,6 @@ else
 {
     <div class="home-page">
 
-        <!-- HEADER -->
         <div class="home-header mb-4">
             <div class="home-greeting">
                 <p class="home-hello">Gestión de Turnos</p>
@@ -40,7 +39,6 @@ else
             </div>
         </div>
 
-        <!-- CONTROLES DE FECHA -->
         <div class="date-controls-card mb-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <button class="btn-date-nav" @onclick="DiaAnterior">
@@ -66,14 +64,12 @@ else
                     <i class="bi bi-calendar-event me-1"></i> Hoy
                 </button>
 
-                <!-- Input de fecha nativo pero estilizado -->
                 <InputDate @bind-Value="_fechaSeleccionada"
                            @bind-Value:after="OnFechaCambiada"
                            class="input-date-custom" />
             </div>
         </div>
 
-        <!-- LISTADO DE TURNOS -->
         <div class="d-flex flex-column gap-3">
 
             @if (_cargandoAgenda)
@@ -99,14 +95,12 @@ else
 
                     <div class="turn-card @estadoClass fade-in" @onclick="() => AbrirTurno(t.IdTurno)">
                         <div class="turn-content">
-                            <!-- Hora -->
                             <div class="time-box">
                                 <span class="time-text">
                                     @t.ScheduledAtUtc.ToString("HH:mm")
                                 </span>
                             </div>
 
-                            <!-- Info -->
                             <div class="info-box">
                                 @if (string.IsNullOrEmpty(t.PacienteNombre))
                                 {
@@ -123,7 +117,6 @@ else
                                 </span>
                             </div>
 
-                            <!-- Badge Estado -->
                             <div class="status-box">
                                 @if (!string.IsNullOrEmpty(t.Estado)
                                      && t.Estado.Equals("Atendido", StringComparison.OrdinalIgnoreCase))
@@ -168,7 +161,6 @@ else
     </div>
 }
 
-<!-- BOTTOM NAV -->
 <div class="bottom-nav shadow-soft">
     <button class="bottom-nav-item" @onclick="IrInicio">
         <i class="bi bi-house-door"></i>

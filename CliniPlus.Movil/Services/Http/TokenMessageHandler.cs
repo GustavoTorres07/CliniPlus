@@ -11,6 +11,7 @@ namespace CliniPlus.Movil.Services.Http
             if (!string.IsNullOrWhiteSpace(token))
             {
                 request.Headers.Authorization =
+
                     new AuthenticationHeaderValue("Bearer", token);
             }
 

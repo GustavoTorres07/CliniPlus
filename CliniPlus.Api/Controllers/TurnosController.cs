@@ -22,9 +22,6 @@ namespace CliniPlus.Api.Controllers
             _repo = repo;
         }
 
-        // ============================================================
-        // Helper para obtener IdUsuario desde el token
-        // ============================================================
         private int? GetUsuarioId()
         {
             var sub = User.FindFirst("sub")?.Value
@@ -36,10 +33,6 @@ namespace CliniPlus.Api.Controllers
             return null;
         }
 
-        // ============================================================
-        // 1) LISTAR TURNOS DEL PACIENTE LOGUEADO
-        // GET api/turnos/paciente/mis-turnos
-        // ============================================================
         [HttpGet("paciente/mis-turnos")]
         [Authorize(Roles = "Paciente")]
         public async Task<ActionResult<List<TurnoListadoPacienteDTO>>> MisTurnos()
@@ -58,11 +51,6 @@ namespace CliniPlus.Api.Controllers
             return Ok(lista);
         }
 
-        // ============================================================
-        // 2) RESERVAR UN TURNO COMO PACIENTE
-        // POST api/turnos/paciente/reservar
-        // Body: TurnoReservarDTO { TurnoId, TipoTurnoId }
-        // ============================================================
         [HttpPost("paciente/reservar")]
         [Authorize(Roles = "Paciente")]
         public async Task<ActionResult> Reservar([FromBody] TurnoReservarDTO dto)
@@ -88,11 +76,6 @@ namespace CliniPlus.Api.Controllers
             return NoContent();
         }
 
-        // ============================================================
-        // 3) CANCELAR UN TURNO COMO PACIENTE
-        // POST api/turnos/paciente/cancelar
-        // Body: TurnoCancelarDTO { TurnoId }
-        // ============================================================
         [HttpPost("paciente/cancelar")]
         [Authorize(Roles = "Paciente")]
         public async Task<ActionResult> Cancelar([FromBody] TurnoCancelarDTO dto)
@@ -110,15 +93,11 @@ namespace CliniPlus.Api.Controllers
             var ok = await _repo.CancelarComoPacienteAsync(dto.TurnoId, paciente.IdPaciente);
 
             if (!ok)
-                return BadRequest("No se pudo cancelar el turno (no pertenece al paciente o no está reservado).");
+                return BadRequest("No se pudo cancelar el turno (no pertenece al paciente o no esta reservado).");
 
             return NoContent();
         }
 
-        // ============================================================
-        // 4) AGENDA DEL MÉDICO (HOY)
-        // GET api/turnos/medico/agenda-hoy
-        // ============================================================
         [HttpGet("medico/agenda-hoy")]
         [Authorize(Roles = "Medico")]
         public async Task<ActionResult<List<TurnoAgendaMedicoDTO>>> AgendaHoy()
@@ -131,7 +110,7 @@ namespace CliniPlus.Api.Controllers
                 .FirstOrDefaultAsync(m => m.UsuarioId == usuarioId && m.IsActive);
 
             if (medico == null)
-                return Unauthorized("Médico no encontrado para este usuario.");
+                return Unauthorized("Medico no encontrado para este usuario.");
 
             var hoyLocal = DateTime.Now.Date;
 
@@ -142,16 +121,13 @@ namespace CliniPlus.Api.Controllers
 
         [HttpGet("paciente/slots")]
         [Authorize(Roles = "Paciente")]
-        public async Task<ActionResult<List<TurnoSlotDTO>>> SlotsPaciente(
-    int medicoId,
-    string fecha )
+        public async Task<ActionResult<List<TurnoSlotDTO>>> SlotsPaciente(int medicoId, string fecha)
         {
-            // Parseamos la fecha (sin hora)
             if (!DateTime.TryParseExact(fecha, "yyyy-MM-dd",
                 CultureInfo.InvariantCulture,
                 DateTimeStyles.AssumeUniversal, out var fechaUtc))
             {
-                return BadRequest("Formato de fecha inválido. Use yyyy-MM-dd.");
+                return BadRequest("Formato de fecha invalido. Use yyyy-MM-dd.");
             }
 
             var slots = await _repo.ListarSlotsPorDiaAsync(medicoId, fechaUtc);
@@ -160,16 +136,13 @@ namespace CliniPlus.Api.Controllers
 
         [HttpGet("public/slots")]
         [AllowAnonymous]
-        public async Task<ActionResult<List<TurnoSlotDTO>>> SlotsPublic(
-    int medicoId,
-    string fecha // "yyyy-MM-dd"
-)
+        public async Task<ActionResult<List<TurnoSlotDTO>>> SlotsPublic(int medicoId, string fecha)
         {
             if (!DateTime.TryParseExact(fecha, "yyyy-MM-dd",
                 CultureInfo.InvariantCulture,
                 DateTimeStyles.AssumeUniversal, out var fechaUtc))
             {
-                return BadRequest("Formato de fecha inválido. Use yyyy-MM-dd.");
+                return BadRequest("Formato de fecha invalido. Use yyyy-MM-dd.");
             }
 
             var slots = await _repo.ListarSlotsPorDiaAsync(medicoId, fechaUtc);
@@ -190,13 +163,11 @@ namespace CliniPlus.Api.Controllers
                 return BadRequest("DNI, Nombre y Apellido son obligatorios.");
             }
 
-            // 1) Buscar paciente por DNI (reuse registro si existe)
             var paciente = await _db.Paciente
                 .FirstOrDefaultAsync(p => p.DNI == dto.DNI);
 
             if (paciente == null)
             {
-                // 2) Crear Paciente Provisional (IsProvisional = true)
                 paciente = new CliniPlus.Shared.Models.Paciente
                 {
                     DNI = dto.DNI,
@@ -204,7 +175,6 @@ namespace CliniPlus.Api.Controllers
                     ObraSocialId = dto.ObraSocialId,
                     NumeroAfiliado = dto.NumeroAfiliado,
                     IsActive = true
-                    // UsuarioId queda null -> sin acceso a la app por ahora (RN11)
                 };
 
                 _db.Paciente.Add(paciente);
@@ -212,7 +182,6 @@ namespace CliniPlus.Api.Controllers
             }
             else
             {
-                // Si estaba dado de baja lógica, lo reactivamos
                 if (!paciente.IsActive)
                     paciente.IsActive = true;
 
@@ -226,13 +195,11 @@ namespace CliniPlus.Api.Controllers
                 await _db.SaveChangesAsync();
             }
 
-            // 3) Reservar el turno usando la misma lógica que el Paciente logueado
             var ok = await _repo.ReservarAsync(dto.TurnoId, paciente.IdPaciente, dto.TipoTurnoId);
 
             if (!ok)
                 return BadRequest("No se pudo reservar el turno (ya reservado o no disponible).");
 
-            // Podrías devolver info extra si querés (Ej: código de reserva)
             return Ok(new
             {
                 Mensaje = "Turno reservado correctamente.",
@@ -261,12 +228,11 @@ namespace CliniPlus.Api.Controllers
             var ok = await _repo.ReservarSlotAsync(dto.MedicoId, dto.ScheduledAtUtc, paciente.IdPaciente, dto.TipoTurnoId);
 
             if (!ok)
-                return BadRequest("No se pudo reservar ese horario (no disponible o inválido).");
+                return BadRequest("No se pudo reservar ese horario (no disponible o invalido).");
 
             return NoContent();
         }
 
-        // =============== MÉDICO ===============
 
         [HttpGet("medico/detalle/{turnoId:int}")]
         [Authorize(Roles = "Medico")]
@@ -276,7 +242,7 @@ namespace CliniPlus.Api.Controllers
             var dto = await _repo.ObtenerDetalleMedicoAsync(medicoId, turnoId);
 
             if (dto == null)
-                return NotFound("Turno no encontrado para este médico.");
+                return NotFound("Turno no encontrado para este medico.");
 
             return Ok(dto);
         }
@@ -317,7 +283,6 @@ namespace CliniPlus.Api.Controllers
             return ok ? NoContent() : BadRequest("No se pudo marcar el turno como completado.");
         }
 
-        // LISTAR PACIENTES DEL MÉDICO
         [HttpGet("medico/pacientes")]
         [Authorize(Roles = "Medico")]
         public async Task<ActionResult<List<PacienteListadoMedicoDTO>>> GetPacientesMedico()
@@ -329,8 +294,6 @@ namespace CliniPlus.Api.Controllers
             return Ok(lista);
         }
 
-        // AGENDA DEL MÉDICO POR DÍA
-        // GET api/turnos/medico/agenda-dia?fecha=yyyy-MM-dd
         [HttpGet("medico/agenda-dia")]
         [Authorize(Roles = "Medico")]
         public async Task<ActionResult<List<TurnoAgendaMedicoDTO>>> AgendaDia([FromQuery] string? fecha)
@@ -357,15 +320,13 @@ namespace CliniPlus.Api.Controllers
             return Ok(lista);
         }
 
-        // -------- helper para obtener MedicoId desde el token --------
-
         private async Task<int> ResolverMedicoIdAsync()
         {
             var sub = User.FindFirst("sub")?.Value
                       ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (string.IsNullOrEmpty(sub))
-                throw new UnauthorizedAccessException("Token inválido.");
+                throw new UnauthorizedAccessException("Token invalido.");
 
             int usuarioId = int.Parse(sub);
 
@@ -373,17 +334,14 @@ namespace CliniPlus.Api.Controllers
                 .FirstOrDefaultAsync(m => m.UsuarioId == usuarioId && m.IsActive);
 
             if (medico == null)
-                throw new UnauthorizedAccessException("El usuario no tiene perfil de médico activo.");
+                throw new UnauthorizedAccessException("El usuario no tiene perfil de medico activo.");
 
             return medico.IdMedico;
         }
 
         [HttpGet("medico/historia-clinica/{pacienteId:int}")]
         [Authorize(Roles = "Medico")]
-        public async Task<ActionResult<List<HistoriaClinicaListadoDTO>>> GetHistoriaClinica(
-    int pacienteId,
-    [FromQuery] string? desde,
-    [FromQuery] string? hasta)
+        public async Task<ActionResult<List<HistoriaClinicaListadoDTO>>> GetHistoriaClinica(int pacienteId, [FromQuery] string? desde, [FromQuery] string? hasta)
         {
             int medicoId = await ResolverMedicoIdAsync();
 
@@ -412,8 +370,6 @@ namespace CliniPlus.Api.Controllers
             return Ok(lista);
         }
 
-        // Detalle de una entrada de historia clínica
-        // GET: api/turnos/medico/historia-clinica/detalle/{entradaId}
         [HttpGet("medico/historia-clinica/detalle/{entradaId:int}")]
         [Authorize(Roles = "Medico")]
         public async Task<ActionResult<HistoriaClinicaDetalleDTO>> GetHistoriaDetalle(int entradaId)
@@ -422,13 +378,11 @@ namespace CliniPlus.Api.Controllers
 
             var dto = await _repo.ObtenerHistoriaClinicaDetalleAsync(medicoId, entradaId);
             if (dto == null)
-                return NotFound("Entrada de historia clínica no encontrada.");
+                return NotFound("Entrada de historia clinica no encontrada.");
 
             return Ok(dto);
         }
 
-        // Detalle del paciente para el médico
-        // GET: api/turnos/medico/pacientes/{pacienteId}
         [HttpGet("medico/pacientes/{pacienteId:int}")]
         [Authorize(Roles = "Medico")]
         public async Task<ActionResult<PacienteDetalleMedicoDTO>> GetPacienteDetalle(int pacienteId)
@@ -446,7 +400,7 @@ namespace CliniPlus.Api.Controllers
         {
             var usuarioId = GetUsuarioId();
             if (usuarioId is null)
-                throw new UnauthorizedAccessException("Token inválido.");
+                throw new UnauthorizedAccessException("Token invalido.");
 
             var paciente = await _db.Paciente
                 .FirstOrDefaultAsync(p => p.UsuarioId == usuarioId && p.IsActive);
@@ -460,9 +414,7 @@ namespace CliniPlus.Api.Controllers
 
         [HttpGet("paciente/historia")]
         [Authorize(Roles = "Paciente")]
-        public async Task<ActionResult<List<HistoriaClinicaListadoDTO>>> GetMiHistoria(
-    [FromQuery] string? desde,
-    [FromQuery] string? hasta)
+        public async Task<ActionResult<List<HistoriaClinicaListadoDTO>>> GetMiHistoria([FromQuery] string? desde, [FromQuery] string? hasta)
         {
             int pacienteId = await ResolverPacienteIdAsync();
 
@@ -491,7 +443,6 @@ namespace CliniPlus.Api.Controllers
             return Ok(lista);
         }
 
-        // GET: api/turnos/paciente/historia/{entradaId}
         [HttpGet("paciente/historia/{entradaId:int}")]
         [Authorize(Roles = "Paciente")]
         public async Task<ActionResult<HistoriaClinicaDetalleDTO>> GetMiHistoriaDetalle(int entradaId)
@@ -500,11 +451,10 @@ namespace CliniPlus.Api.Controllers
 
             var dto = await _repo.ObtenerHistoriaDetallePacienteAsync(pacienteId, entradaId);
             if (dto == null)
-                return NotFound("Entrada de historia clínica no encontrada.");
+                return NotFound("Entrada de historia clinica no encontrada.");
 
             return Ok(dto);
         }
-
 
         [HttpGet("secretaria/turnos-hoy")]
         [Authorize(Roles = "Secretaria,Administrador")]
@@ -515,20 +465,17 @@ namespace CliniPlus.Api.Controllers
             return Ok(lista);
         }
 
-        // POST: api/turnos/secretaria/cancelar
-        // POST: api/turnos/secretaria/cancelar
         [HttpPost("secretaria/cancelar")]
         [Authorize(Roles = "Secretaria,Administrador")]
         public async Task<ActionResult> CancelarComoSecretaria([FromBody] TurnoCancelarSecretariaDTO dto)
         {
             if (!ModelState.IsValid)
-                return BadRequest("Datos inválidos.");
+                return BadRequest("Datos invalidos.");
 
-            // 👇 OJO: solo pasamos el TurnoId, sin motivo
             var ok = await _repo.CancelarPorSecretariaAsync(dto.TurnoId);
 
             if (!ok)
-                return BadRequest("No se pudo cancelar el turno (no está reservado o no existe).");
+                return BadRequest("No se pudo cancelar el turno (no esta reservado o no existe).");
 
             return NoContent();
         }
@@ -536,10 +483,7 @@ namespace CliniPlus.Api.Controllers
 
         [HttpGet("secretaria/agenda")]
         [Authorize(Policy = "SecretariaOAdministrador")]
-        public async Task<ActionResult<List<TurnoListadoSecretariaDTO>>> GetAgendaSecretaria(
-    [FromQuery] int medicoId,
-    [FromQuery] string? desde,
-    [FromQuery] string? hasta)
+        public async Task<ActionResult<List<TurnoListadoSecretariaDTO>>> GetAgendaSecretaria([FromQuery] int medicoId, [FromQuery] string? desde, [FromQuery] string? hasta)
         {
             if (medicoId <= 0)
                 return BadRequest("Debe indicar un médico.");
@@ -571,10 +515,7 @@ namespace CliniPlus.Api.Controllers
 
         [HttpGet("secretaria/historia/{pacienteId:int}")]
         [Authorize(Roles = "Secretaria,Administrador")]
-        public async Task<ActionResult<List<HistoriaClinicaListadoDTO>>> GetHistoriaSecretaria(
-    int pacienteId,
-    [FromQuery] string? desde,
-    [FromQuery] string? hasta)
+        public async Task<ActionResult<List<HistoriaClinicaListadoDTO>>> GetHistoriaSecretaria(int pacienteId, [FromQuery] string? desde, [FromQuery] string? hasta)
         {
             DateTime? desdeDt = null;
             DateTime? hastaDt = null;
@@ -597,25 +538,21 @@ namespace CliniPlus.Api.Controllers
                 hastaDt = h;
             }
 
-            // 👇 reutilizamos la misma lógica que para el paciente,
-            // pero SIN depender del usuario logueado
             var lista = await _repo.ObtenerHistoriaPacienteAsync(pacienteId, desdeDt, hastaDt);
             return Ok(lista);
         }
 
-        // GET: api/turnos/secretaria/historia/detalle/{entradaId}
         [HttpGet("secretaria/historia/{pacienteId:int}/detalle/{entradaId:int}")]
         [Authorize(Roles = "Secretaria,Administrador")]
         public async Task<ActionResult<HistoriaClinicaDetalleDTO>> GetHistoriaDetalleSecretaria(
             int pacienteId,
             int entradaId)
         {
-            // reutilizamos el método que ya existe para paciente,
-            // pero SIN depender del usuario logueado
+
             var dto = await _repo.ObtenerHistoriaDetallePacienteAsync(pacienteId, entradaId);
 
             if (dto == null)
-                return NotFound("Entrada de historia clínica no encontrada.");
+                return NotFound("Entrada de historia clinica no encontrada.");
 
             return Ok(dto);
         }

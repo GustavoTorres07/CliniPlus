@@ -10,6 +10,5 @@ namespace CliniPlus.Movil.Services.Contrato
     internal interface ITipoTurnoService
     {
         Task<List<TipoTurnoDTO>?> ListarAsync();
-
     }
 }

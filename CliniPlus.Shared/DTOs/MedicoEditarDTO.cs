@@ -10,8 +10,11 @@ namespace CliniPlus.Shared.DTOs
     public class MedicoEditarDTO
     {
         public string? Bio { get; set; }
+
         public string? FotoUrl { get; set; }
+
         public int DefaultSlotMin { get; set; }
+
         public int? EspecialidadId { get; set; }
     }
 }

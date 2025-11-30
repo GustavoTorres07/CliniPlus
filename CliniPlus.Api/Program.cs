@@ -1,6 +1,3 @@
-// ---------------------------------------------------------------
-// 1. AÑADIDOS LOS USINGS PARA MANEJAR CLAIMS Y JWT
-// ---------------------------------------------------------------
 using CliniPlus.Api.Data;
 using CliniPlus.Api.Repositories.Contrato;
 using CliniPlus.Api.Repositories.Implementa;
@@ -16,14 +13,12 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// DB
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
 builder.Services.Configure<EmailSettings>(
     builder.Configuration.GetSection("EmailSettings"));
 
-// CORS (Somee + clientes)
 var corsOrigins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>() ?? Array.Empty<string>();
 builder.Services.AddCors(opt =>
 {
@@ -37,14 +32,8 @@ builder.Services.AddCors(opt =>
     });
 });
 
-
-// ---------------------------------------------------------------
-// 2. EVITAR EL RENOMBRAMIENTO AUTOMÁTICO DE CLAIMS
-//    Debe ir ANTES de AddAuthentication
-// ---------------------------------------------------------------
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
-// JWT
 var jwt = builder.Configuration.GetSection("Jwt");
 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["Key"]!));
 
@@ -52,12 +41,9 @@ builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.RequireHttpsMetadata = false; // Somee puede ser http
+        options.RequireHttpsMetadata = false;
         options.SaveToken = true;
 
-        // ---------------------------------------------------------------
-        // 3. EVITAR EL MAPEADO EXTRA DE CLAIMS
-        // ---------------------------------------------------------------
         options.MapInboundClaims = false;
 
         options.TokenValidationParameters = new TokenValidationParameters
@@ -70,15 +56,6 @@ builder.Services
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = key,
             ClockSkew = TimeSpan.FromMinutes(2),
-
-            // -----------------------------------------------------------
-            // 4. MUY IMPORTANTE:
-            //    LE DECIMOS QUE USE TUS CLAIMS PERSONALIZADOS:
-            //    - "email" para el nombre
-            //    - "role" para el rol
-            //    Esto hace que [Authorize(Roles="Paciente")] funcione bien
-            //    y que User.IsInRole(...) vea el valor de Usuario.Rol.
-            // -----------------------------------------------------------
             NameClaimType = "email",
             RoleClaimType = "role"
 

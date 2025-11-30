@@ -17,8 +17,6 @@ namespace CliniPlus.Api.Controllers
             _repo = repo;
         }
 
-        /// <summary>Lista de pacientes (por defecto solo activos).</summary>
-        /// Nombre en Postman: Pacientes - Listar
         [HttpGet("listar")]
         public async Task<ActionResult<List<PacienteListDTO>>> Listar([FromQuery] bool incluirInactivos = false)
         {
@@ -26,8 +24,6 @@ namespace CliniPlus.Api.Controllers
             return Ok(lista);
         }
 
-        /// <summary>Detalle de un paciente por Id.</summary>
-        /// Nombre en Postman: Pacientes - Obtener por Id
         [HttpGet("{id:int}")]
         public async Task<ActionResult<PacienteDetalleDTO>> Obtener(int id)
         {
@@ -36,13 +32,11 @@ namespace CliniPlus.Api.Controllers
             return Ok(p);
         }
 
-        /// <summary>Crea un paciente (provisional o completo).</summary>
-        /// Nombre en Postman: Pacientes - Crear
         [HttpPost("crear")]
         public async Task<ActionResult<PacienteDetalleDTO>> Crear([FromBody] PacienteCrearDTO dto)
         {
             if (!ModelState.IsValid)
-                return BadRequest("Datos inválidos.");
+                return BadRequest("Datos invalidos.");
 
             try
             {
@@ -59,12 +53,10 @@ namespace CliniPlus.Api.Controllers
             }
             catch (InvalidOperationException ex) when (ex.Message == "USUARIO_YA_VINCULADO")
             {
-                return Conflict("Ese usuario ya está vinculado a otro paciente.");
+                return Conflict("Ese usuario ya esta vinculado a otro paciente.");
             }
         }
 
-        /// <summary>Edita datos de un paciente existente.</summary>
-        /// Nombre en Postman: Pacientes - Editar
         [HttpPut("editar/{id:int}")]
         public async Task<ActionResult<PacienteDetalleDTO>> Editar(int id, [FromBody] PacienteEditarDTO dto)
         {
@@ -87,12 +79,10 @@ namespace CliniPlus.Api.Controllers
             }
             catch (InvalidOperationException ex) when (ex.Message == "USUARIO_YA_VINCULADO")
             {
-                return Conflict("Ese usuario ya está vinculado a otro paciente.");
+                return Conflict("Ese usuario ya esta vinculado a otro paciente.");
             }
         }
 
-        /// <summary>Activa / desactiva un paciente.</summary>
-        /// Nombre en Postman: Pacientes - Cambiar estado
         [HttpPatch("estado/{id:int}")]
         public async Task<IActionResult> CambiarEstado(int id, [FromBody] PacienteEstadoDTO dto)
         {
@@ -101,8 +91,6 @@ namespace CliniPlus.Api.Controllers
                       : NotFound("Paciente no encontrado");
         }
 
-        // LISTADO PARA SECRETARÍA
-        // GET: api/pacientes/secretaria/listar
         [HttpGet("secretaria/listar")]
         public async Task<ActionResult<List<PacienteListadoDTO>>> ListarSecretaria()
         {
@@ -110,15 +98,12 @@ namespace CliniPlus.Api.Controllers
             return Ok(lista);
         }
 
-        /// <summary>
-        /// Secretaría: completa datos y vincula un paciente provisional con un Usuario existente.
-        /// </summary>
         [HttpPost("activar-cuenta")]
         [Authorize(Policy = "SecretariaOAdministrador")]
         public async Task<IActionResult> ActivarCuenta([FromBody] PacienteActivarCuentaDTO dto)
         {
             if (!ModelState.IsValid)
-                return BadRequest("Datos inválidos.");
+                return BadRequest("Datos invalidos.");
 
             try
             {
@@ -143,7 +128,7 @@ namespace CliniPlus.Api.Controllers
             }
             catch (InvalidOperationException ex) when (ex.Message == "USUARIO_NO_ENCONTRADO")
             {
-                return BadRequest("El usuario indicado no existe o no está activo.");
+                return BadRequest("El usuario indicado no existe o no esta activo.");
             }
             catch (InvalidOperationException ex) when (ex.Message == "USUARIO_NO_ES_PACIENTE")
             {
@@ -151,7 +136,7 @@ namespace CliniPlus.Api.Controllers
             }
             catch (InvalidOperationException ex) when (ex.Message == "USUARIO_YA_VINCULADO")
             {
-                return Conflict("Ese usuario ya está vinculado a otro paciente.");
+                return Conflict("Ese usuario ya esta vinculado a otro paciente.");
             }
         }
     }

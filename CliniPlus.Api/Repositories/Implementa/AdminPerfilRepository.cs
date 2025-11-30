@@ -49,11 +49,9 @@ namespace CliniPlus.Api.Repositories.Implementa
 
             if (u == null) return false;
 
-            // verificar actual
             if (!BCrypt.Net.BCrypt.Verify(dto.PasswordActual, u.PasswordHash))
                 return false;
 
-            // guardar nueva
             u.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.PasswordNueva);
             await _db.SaveChangesAsync();
 

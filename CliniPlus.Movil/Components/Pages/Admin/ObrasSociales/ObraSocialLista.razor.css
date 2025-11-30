@@ -1,5 +1,4 @@
-﻿/* --- ESTRUCTURA GLOBAL --- */
-.home-page {
+﻿.home-page {
     padding: 24px 20px;
     font-family: 'Nunito', sans-serif;
     background-color: #f8f9fc;
@@ -10,7 +9,6 @@
     height: 80px;
 }
 
-/* --- HEADER --- */
 .home-header {
     display: flex;
     justify-content: space-between;
@@ -29,7 +27,6 @@
     margin: 0;
 }
 
-/* --- TARJETAS --- */
 .home-card {
     background: white;
     border-radius: 20px;
@@ -47,7 +44,6 @@
         background-color: #fbfbfc;
     }
 
-/* --- TEMA NARANJA (Specifico de Obras Sociales) --- */
 .icon-box {
     width: 42px;
     height: 42px;
@@ -59,14 +55,13 @@
 }
 
 .bg-orange-light {
-    background-color: #fff4e6; /* Fondo naranja muy suave */
+    background-color: #fff4e6; 
 }
 
 .text-orange {
-    color: #ff922b; /* Naranja vibrante */
+    color: #ff922b; 
 }
 
-/* --- BADGES Y BOTONES --- */
 .badge {
     font-weight: 600;
     letter-spacing: 0.3px;
@@ -77,13 +72,12 @@
 }
 
 .btn-primary {
-    background-color: #6e7bff; /* Mantenemos el color principal de la app */
+    background-color: #6e7bff; 
     border: none;
     font-weight: 600;
     box-shadow: 0 4px 10px rgba(110, 123, 255, 0.2);
 }
 
-/* --- BOTTOM NAV --- */
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -122,13 +116,10 @@
         font-weight: 600;
     }
 
-    /* Activo: Usamos Naranja para diferenciar o el Azul standard */
-    /* Aquí uso el Azul standard para mantener coherencia de navegación */
     .bottom-nav-item.active {
         color: #6e7bff;
     }
 
-    /* Salir */
     .bottom-nav-item.text-danger {
         color: #ff6b6b;
     }

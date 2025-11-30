@@ -25,7 +25,6 @@ else if (!_permitido || _detalle is null)
 else
 {
     <div class="home-page">
-        <!-- HEADER -->
         <div class="home-header mb-4">
             <div class="d-flex align-items-center gap-3">
                 <BotonVolver />
@@ -36,10 +35,7 @@ else
             </div>
         </div>
 
-        <!-- TARJETA PRINCIPAL -->
         <div class="home-card p-4">
-
-            <!-- RESUMEN DE PERFIL VISUAL -->
             <div class="d-flex flex-column align-items-center mb-4">
                 <div class="patient-profile-circle shadow-sm mb-2">
                     <span>@(GetInicial(_detalle.NombreCompleto))</span>
@@ -50,7 +46,6 @@ else
                 </h5>
 
                 <div class="d-flex flex-wrap justify-content-center gap-2">
-                    <!-- Badge Tipo -->
                     @if (_detalle.IsProvisional)
                     {
                         <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill">Provisional</span>
@@ -59,8 +54,6 @@ else
                     {
                         <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill">Cuenta App</span>
                     }
-
-                    <!-- Badge Estado -->
                     @if (_detalle.IsActive)
                     {
                         <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">Activo</span>
@@ -72,11 +65,9 @@ else
                 </div>
             </div>
 
-            <!-- FORMULARIO -->
             <EditForm Model="_model" OnValidSubmit="GuardarAsync">
                 <DataAnnotationsValidator />
 
-                <!-- DNI -->
                 <div class="mb-3">
                     <label class="form-label small fw-bold text-muted">DNI</label>
                     <div class="input-group input-elevated">
@@ -90,7 +81,6 @@ else
                     <ValidationMessage For="@(() => _model.DNI)" />
                 </div>
 
-                <!-- Fila Doble: Email y Teléfono -->
                 <div class="row g-2 mb-3">
                     <div class="col-6">
                         <label class="form-label small fw-bold text-muted">Email</label>
@@ -117,7 +107,6 @@ else
                 </div>
                 <ValidationMessage For="@(() => _model.Email)" />
 
-                <!-- Obra Social -->
                 <div class="mb-3">
                     <label class="form-label small fw-bold text-muted">Obra Social</label>
                     <div class="input-group input-elevated">
@@ -134,7 +123,6 @@ else
                     </div>
                 </div>
 
-                <!-- Nro Afiliado -->
                 <div class="mb-4">
                     <label class="form-label small fw-bold text-muted">Nro. Afiliado</label>
                     <div class="input-group input-elevated">
@@ -147,7 +135,6 @@ else
                     </div>
                 </div>
 
-                <!-- Opciones Avanzadas -->
                 <div class="mb-4 p-3 bg-light rounded-3 border border-light">
                     <div class="form-check form-switch mb-2">
                         <InputCheckbox class="form-check-input" id="chkProvEdit" @bind-Value="_model.IsProvisional" />
@@ -167,7 +154,6 @@ else
                     <small class="text-muted" style="font-size: 0.7rem;">ID del usuario app (opcional)</small>
                 </div>
 
-                <!-- Botones -->
                 <div class="d-flex gap-2">
                     <button type="button"
                             class="btn btn-outline-secondary btn-pill flex-fill"
@@ -203,7 +189,6 @@ else
     </div>
 }
 
-<!-- BOTTOM NAV -->
 <div class="bottom-nav shadow-soft">
     <button class="bottom-nav-item" @onclick="IrInicio">
         <i class="bi bi-house-door"></i>
@@ -256,7 +241,6 @@ else
                 return;
             }
 
-            // Mapeo manual
             _model = new PacienteEditarDTO
             {
                 DNI = _detalle.DNI,
@@ -292,7 +276,6 @@ else
                 return;
             }
 
-            // Actualizar detalle local para refrescar la vista si nos quedamos
             _detalle = res;
             Nav.NavigateTo("/Administrador/pacientes", true);
         }

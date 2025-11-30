@@ -10,7 +10,5 @@ namespace CliniPlus.Shared.DTOs
     {
         public int TurnoId { get; set; }
 
-
     }
-
 }

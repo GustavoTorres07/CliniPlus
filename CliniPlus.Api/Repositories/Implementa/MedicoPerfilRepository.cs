@@ -16,14 +16,12 @@ namespace CliniPlus.Api.Repositories.Implementa
 
         public async Task<PerfilMedicoDTO?> ObtenerAsync(int idUsuario)
         {
-            // 1) Usuario activo
             var usuario = await _context.Usuario
                 .FirstOrDefaultAsync(u => u.IdUsuario == idUsuario && u.IsActive);
 
             if (usuario == null || usuario.Rol != "Medico")
                 return null;
 
-            // 2) Médico + Especialidad
             var medico = await _context.Medico
                 .Include(m => m.Especialidad)
                 .FirstOrDefaultAsync(m => m.UsuarioId == idUsuario && m.IsActive);
@@ -46,7 +44,6 @@ namespace CliniPlus.Api.Repositories.Implementa
                     : null
             };
 
-            // 👇 llenar también la lista de Especialidades para la UI
             if (medico.EspecialidadId.HasValue && medico.Especialidad is not null)
             {
                 dto.Especialidades.Add(new SimpleEspecialidadDTO
@@ -61,7 +58,6 @@ namespace CliniPlus.Api.Repositories.Implementa
 
         public async Task<bool> ActualizarAsync(int idUsuario, PerfilMedicoDTO dto)
         {
-            // 1) Usuario y médico
             var usuario = await _context.Usuario
                 .FirstOrDefaultAsync(u => u.IdUsuario == idUsuario && u.IsActive);
 
@@ -71,7 +67,6 @@ namespace CliniPlus.Api.Repositories.Implementa
             if (usuario == null || medico == null)
                 return false;
 
-            // 2) Actualizar datos de Usuario
             if (!string.IsNullOrWhiteSpace(dto.Nombre))
                 usuario.Nombre = dto.Nombre.Trim();
 
@@ -81,11 +76,9 @@ namespace CliniPlus.Api.Repositories.Implementa
             if (!string.IsNullOrWhiteSpace(dto.Email))
                 usuario.Email = dto.Email.Trim();
 
-            // 3) Actualizar datos de Médico
             medico.Bio = dto.Bio;
             medico.FotoUrl = dto.FotoUrl;
 
-            // 4) Actualizar especialidad (una sola)
             if (dto.EspecialidadId.HasValue)
             {
                 bool existe = await _context.Especialidad
@@ -98,7 +91,6 @@ namespace CliniPlus.Api.Repositories.Implementa
             }
             else
             {
-                // Permitir dejar al médico sin especialidad
                 medico.EspecialidadId = null;
             }
 

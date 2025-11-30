@@ -1,22 +1,15 @@
-﻿/* -------------------------------------------------------------------------- */
-/* DISEÑO GLOBAL                                */
-/* (Basado en tu nuevo sistema de diseño - Nunito / #6e7bff)          */
-/* -------------------------------------------------------------------------- */
-
-/* --- ESTRUCTURA GLOBAL --- */
-.home-page {
+﻿.home-page {
     padding: 24px 20px;
     font-family: 'Nunito', sans-serif;
     background-color: #f8f9fc;
     min-height: 100vh;
-    padding-bottom: 100px; /* Espacio extra para el botón flotante */
+    padding-bottom: 100px; 
 }
 
 .spacer-bottom {
     height: 80px;
 }
 
-/* --- HEADER --- */
 .home-header {
     display: flex;
     justify-content: space-between;
@@ -35,7 +28,6 @@
     margin: 0;
 }
 
-/* --- FILTROS (CHIPS) --- */
 .filter-chip {
     border: 1px solid #e0e0e0;
     background-color: white;
@@ -74,7 +66,6 @@
         font-weight: 700;
     }
 
-/* Ocultar scrollbar en filtros */
 .no-scrollbar::-webkit-scrollbar {
     display: none;
 }
@@ -84,7 +75,6 @@
     scrollbar-width: none;
 }
 
-/* --- TARJETAS --- */
 .home-card {
     background: white;
     border-radius: 20px;
@@ -103,8 +93,6 @@
         background-color: #fbfbfc;
     }
 
-/* --- AVATARES --- */
-/* Mapeamos tu clase 'medico-mini-avatar' al nuevo estilo 'medico-avatar-circle' */
 .medico-avatar-circle,
 .medico-mini-avatar {
     width: 45px;
@@ -129,9 +117,8 @@
     border: 1px solid #f0f0f0;
 }
 
-/* --- ESTADOS VACÍOS & ICONOS --- */
 .icon-box {
-    width: 45px; /* Ajustado para que no sea tan grande en la lista compacta */
+    width: 45px; 
     height: 45px;
     border-radius: 14px;
     display: flex;
@@ -148,7 +135,6 @@
     color: #8e24aa;
 }
 
-/* --- BOTONES Y BADGES --- */
 .btn-pill {
     border-radius: 99px;
 }
@@ -171,20 +157,13 @@
     letter-spacing: 0.3px;
 }
 
-/* -------------------------------------------------------------------------- */
-/* ESTILOS ESPECÍFICOS PARA 'MEDICOHORARIOS'               */
-/* (Adaptados para usar los colores y formas de tu nuevo diseño)        */
-/* -------------------------------------------------------------------------- */
-
-/* Input Elevado (Selector de Médico) */
 .input-elevated {
-    background-color: #f8f9fc; /* Fondo claro del tema */
+    background-color: #f8f9fc; 
     border: 1px solid #f0f2f5;
     border-radius: 16px;
     padding: 4px;
 }
 
-/* Inputs Pequeños (Selectores de Hora) */
 .input-elevated-sm {
     background-color: white;
     border: 1px solid #e0e0e0;
@@ -197,7 +176,6 @@
         border-color: #6e7bff;
     }
 
-/* Limpieza de inputs nativos */
 .form-select, .form-control {
     box-shadow: none !important;
     cursor: pointer;
@@ -205,7 +183,6 @@
     color: #15161b;
 }
 
-/* Botones de Icono (Copiar) */
 .btn-icon-light {
     background: transparent;
     border: 1px solid #e0e0e0;
@@ -226,7 +203,6 @@
         border-color: #dbe0ff;
     }
 
-/* Switches (Toggle) - Adaptado al color #6e7bff */
 .custom-switch .form-check-input {
     width: 2.6em;
     height: 1.3em;
@@ -241,17 +217,15 @@
         border-color: #6e7bff;
     }
 
-/* Borde activo para la tarjeta del día */
 .border-purple {
     border: 1px solid #6e7bff !important;
-    background-color: #fbfbfc; /* Un fondo muy sutil */
+    background-color: #fbfbfc;
 }
 
 .transition-card {
     border: 1px solid transparent;
 }
 
-/* Etiquetas pequeñas */
 .label-mini {
     font-size: 0.7rem;
     font-weight: 700;
@@ -262,8 +236,6 @@
     text-align: center;
 }
 
-/* --- BOTTOM ACTION (Botón Guardar Flotante) --- */
-/* Adaptamos tu clase 'fixed-bottom-action' para que se vea como el 'bottom-nav' del diseño */
 .fixed-bottom-action {
     position: fixed;
     bottom: 0;
@@ -281,7 +253,6 @@
     height: 110px;
 }
 
-/* Animaciones */
 .fade-in {
     animation: fadeIn 0.4s ease-in-out;
 }

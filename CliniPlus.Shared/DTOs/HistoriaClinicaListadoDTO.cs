@@ -9,14 +9,17 @@ namespace CliniPlus.Shared.DTOs
     public class HistoriaClinicaListadoDTO
     {
         public int IdEntrada { get; set; }
+
         public DateTime Fecha { get; set; }
 
         public string CIE10Codigo { get; set; } = "";
+
         public string CIE10Descripcion { get; set; } = "";
 
         public string? NotasResumen { get; set; }
 
         public int? TurnoId { get; set; }
+
         public int? ConsultaId { get; set; }
     }
 }

@@ -24,7 +24,6 @@ else if (_modelo is null)
 else
 {
     <div class="home-page">
-        <!-- HEADER -->
         <div class="home-header mb-4">
             <div class="d-flex align-items-center gap-3">
                 <BotonVolver />
@@ -35,7 +34,6 @@ else
             </div>
         </div>
 
-        <!-- TARJETA FORMULARIO -->
         <div class="home-card p-4">
             <EditForm Model="_modelo" OnValidSubmit="Guardar">
                 <DataAnnotationsValidator />
@@ -62,7 +60,6 @@ else
                     </div>
                 </div>
 
-                <!-- Switch de Estado -->
                 <div class="form-check form-switch mb-4">
                     <InputCheckbox class="form-check-input" id="isActiveSwitch" @bind-Value="_modelo.IsActive" />
                     <label class="form-check-label" for="isActiveSwitch">
@@ -94,20 +91,17 @@ else
     </div>
 }
 
-<!-- BOTTOM NAV -->
 <div class="bottom-nav shadow-soft">
     <button class="bottom-nav-item" @onclick="IrInicio">
         <i class="bi bi-house-door"></i>
         <span>Inicio</span>
     </button>
 
-    <!-- Botón Activo -->
     <button class="bottom-nav-item active">
         <i class="bi bi-heart-pulse-fill"></i>
         <span>O. Soc.</span>
     </button>
 
-    <!-- Botón Salir -->
     <button class="bottom-nav-item text-danger" @onclick="CerrarSesion">
         <i class="bi bi-box-arrow-right"></i>
         <span>Salir</span>
@@ -129,7 +123,6 @@ else
         }
         catch
         {
-            // Manejo de error
         }
         finally
         {

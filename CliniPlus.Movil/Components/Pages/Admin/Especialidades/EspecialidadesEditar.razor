@@ -109,7 +109,6 @@ else
         }
         catch
         {
-            // Manejo de error
         }
         finally
         {
@@ -121,7 +120,7 @@ else
     {
         if (_model is null) return;
         await SpecialService.EditarAsync(Id, _model);
-        Nav.NavigateTo("/Administrador/especialidades", true); // O volver atrás
+        Nav.NavigateTo("/Administrador/especialidades", true); 
     }
 
     private async Task ToggleEstado()

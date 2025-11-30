@@ -91,7 +91,6 @@
     private async Task Guardar()
     {
         _error = null;
-        // Pequeña validación manual si no usas DataAnnotations en el DTO
         if (string.IsNullOrWhiteSpace(modelo.Nombre))
         {
             _error = "El nombre es obligatorio.";

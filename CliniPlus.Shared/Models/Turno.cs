@@ -47,6 +47,7 @@ namespace CliniPlus.Shared.Models
         public virtual TipoTurno? TipoTurno { get; set; }
 
         public virtual Consulta? Consulta { get; set; }
+
         public virtual ICollection<HistoriaClinicaEntrada> HistoriaClinica { get; set; } = new List<HistoriaClinicaEntrada>();
     }
 }

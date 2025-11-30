@@ -23,7 +23,6 @@ else if (!_permitido)
 else
 {
     <div class="home-page">
-        <!-- HEADER -->
         <div class="home-header mb-4">
             <div class="d-flex align-items-center gap-3">
                 <BotonVolver />
@@ -34,12 +33,10 @@ else
             </div>
         </div>
 
-        <!-- TARJETA FORMULARIO -->
         <div class="home-card p-4">
             <EditForm Model="_model" OnValidSubmit="GuardarAsync">
                 <DataAnnotationsValidator />
 
-                <!-- DNI -->
                 <div class="mb-3">
                     <label class="form-label small fw-bold text-muted">DNI *</label>
                     <div class="input-group input-elevated">
@@ -53,7 +50,6 @@ else
                     <ValidationMessage For="@(() => _model.DNI)" />
                 </div>
 
-                <!-- Fila Doble: Teléfono y Email -->
                 <div class="row g-3 mb-3">
                     <div class="col-6">
                         <label class="form-label small fw-bold text-muted">Teléfono</label>
@@ -81,7 +77,6 @@ else
                 <ValidationMessage For="@(() => _model.Telefono)" />
                 <ValidationMessage For="@(() => _model.Email)" />
 
-                <!-- Obra Social -->
                 <div class="mb-3">
                     <label class="form-label small fw-bold text-muted">Obra Social</label>
                     <div class="input-group input-elevated">
@@ -98,7 +93,6 @@ else
                     </div>
                 </div>
 
-                <!-- Nro Afiliado -->
                 <div class="mb-4">
                     <label class="form-label small fw-bold text-muted">Número de afiliado</label>
                     <div class="input-group input-elevated">
@@ -113,7 +107,6 @@ else
 
                 <hr class="my-3 opacity-25" />
 
-                <!-- Switch Provisional -->
                 <div class="form-check form-switch mb-2">
                     <InputCheckbox class="form-check-input" id="chkProv" @bind-Value="_model.IsProvisional" />
                     <label class="form-check-label fw-bold small" for="chkProv">
@@ -125,7 +118,6 @@ else
                     Permite reservar turnos sin usuario. Luego se puede vincular.
                 </p>
 
-                <!-- Usuario ID (Solo visible si NO es provisional, opcional) -->
                 @if (!_model.IsProvisional)
                 {
                     <div class="mb-4 fade-in">
@@ -141,7 +133,6 @@ else
                     </div>
                 }
 
-                <!-- Botones -->
                 <div class="d-flex gap-2">
                     <button type="button" 
                             class="btn btn-outline-secondary btn-pill flex-fill" 
@@ -177,7 +168,6 @@ else
     </div>
 }
 
-<!-- BOTTOM NAV -->
 <div class="bottom-nav shadow-soft">
     <button class="bottom-nav-item" @onclick="IrInicio">
         <i class="bi bi-house-door"></i>

@@ -20,6 +20,7 @@ namespace CliniPlus.Shared.Models
         public string Descripcion { get; set; } = null!;
 
         public virtual ICollection<ConsultaDiagnostico> ConsultaDiagnosticos { get; set; } = new List<ConsultaDiagnostico>();
+
         public virtual ICollection<HistoriaClinicaEntrada> HistoriaClinicaEntradas { get; set; } = new List<HistoriaClinicaEntrada>();
     }
 }

@@ -176,7 +176,6 @@ else
 }
 
 @code {
-    // Parámetro opcional. Si entras por /admin/medicos/horarios, Id será 0
     [Parameter] public int Id { get; set; }
 
     private MedicoDetalleDTO? _medico;
@@ -214,24 +213,20 @@ else
 
             _permitido = true;
 
-            // 1. Cargar lista de médicos primero
             _medicos = await MedicoService.ListarAsync() ?? new();
 
-            // 2. Si no hay ID en la URL (es 0) o el ID no existe en la lista, seleccionamos el primero
             if (Id == 0 && _medicos.Any())
             {
                 Id = _medicos.First().IdMedico;
             }
             else if (!_medicos.Any())
             {
-                // No hay médicos en el sistema
                 _cargando = false;
                 return; 
             }
 
             _medicoSeleccionadoId = Id;
 
-            // 3. Ahora cargamos los datos del médico seleccionado
             _medico = await MedicoService.ObtenerAsync(Id);
             await CargarHorarios();
         }
@@ -247,7 +242,6 @@ else
 
     private async Task CargarHorarios()
     {
-        // Se asegura de usar _medicoSeleccionadoId en lugar de Id por si hubo cambios dinámicos
         var idParaCargar = _medicoSeleccionadoId > 0 ? _medicoSeleccionadoId : Id;
         
         var horariosBd = await MedicoService.ListarHorariosAsync(idParaCargar) ?? new();
@@ -307,7 +301,7 @@ else
                     var dto = new MedicoHorarioDTO
                     {
                         IdHorario = dia.DbId ?? 0,
-                        MedicoId = _medicoSeleccionadoId, // Usar el ID seleccionado
+                        MedicoId = _medicoSeleccionadoId, 
                         DiaSemana = (byte)dia.DiaIndex,
                         HoraInicio = ini.ToString(@"hh\:mm"),
                         HoraFin = fin.ToString(@"hh\:mm"),
@@ -342,7 +336,6 @@ else
     {
         if (int.TryParse(e.Value?.ToString(), out var nuevoId))
         {
-            // Navegamos a la ruta completa para actualizar la URL
             Nav.NavigateTo($"/Administrador/medicos/{nuevoId}/horarios", true);
         }
     }

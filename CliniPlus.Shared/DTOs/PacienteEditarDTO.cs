@@ -12,11 +12,17 @@ namespace CliniPlus.Shared.DTOs
         [Required]
         [StringLength(8)]
         public string DNI { get; set; } = null!;
+
         public bool IsProvisional { get; set; }
+
         public string? Telefono { get; set; }
+
         public string? Email { get; set; }
+
         public int? ObraSocialId { get; set; }
+
         public string? NumeroAfiliado { get; set; }
+
         public int? UsuarioId { get; set; }  
     }
 }

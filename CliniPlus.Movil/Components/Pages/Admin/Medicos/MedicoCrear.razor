@@ -145,7 +145,6 @@
         try
         {
             var me = await Auth.MeAsync();
-            // Solo Admin puede crear médicos
             if (me is null || me.Rol != "Administrador")
             {
                 Nav.NavigateTo("/", true);
@@ -156,7 +155,6 @@
         }
         catch
         {
-            // silencioso
         }
     }
 

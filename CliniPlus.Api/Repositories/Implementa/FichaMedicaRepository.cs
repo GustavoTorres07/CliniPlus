@@ -44,13 +44,11 @@ namespace CliniPlus.Api.Repositories.Implementa
             if (paciente == null)
                 throw new InvalidOperationException("PACIENTE_NO_ENCONTRADO");
 
-            // Normalizar textos
             string? Normalizar(string? s) =>
                 string.IsNullOrWhiteSpace(s) ? null : s.Trim();
 
             if (paciente.FichaMedica == null)
             {
-                // Crear nueva ficha
                 var ficha = new FichaMedica
                 {
                     PacienteId = pacienteId,
@@ -65,7 +63,6 @@ namespace CliniPlus.Api.Repositories.Implementa
             }
             else
             {
-                // Actualizar ficha existente
                 paciente.FichaMedica.GrupoSanguineo = Normalizar(dto.GrupoSanguineo);
                 paciente.FichaMedica.Alergias = Normalizar(dto.Alergias);
                 paciente.FichaMedica.EnfermedadesCronicas = Normalizar(dto.EnfermedadesCronicas);

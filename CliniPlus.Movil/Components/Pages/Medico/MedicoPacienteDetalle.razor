@@ -42,7 +42,6 @@ else
 {
     <div class="home-page">
 
-        <!-- HEADER -->
         <div class="home-header mb-4">
             <div class="d-flex align-items-center gap-3">
                 <button class="btn-back" @onclick="VolverPacientes">
@@ -60,7 +59,6 @@ else
             </div>
         </div>
 
-        <!-- DATOS BÁSICOS DEL PACIENTE -->
         <div class="home-card p-4 mb-3">
             <div class="d-flex align-items-center mb-3">
                 <div class="patient-avatar-large me-3">
@@ -102,7 +100,6 @@ else
             </div>
         </div>
 
-        <!-- FICHA MÉDICA -->
         <div class="home-card p-4 mb-3">
             <h6 class="section-title mb-3 d-flex align-items-center">
                 <i class="bi bi-clipboard2-pulse me-2 text-danger"></i> Ficha Médica
@@ -162,7 +159,6 @@ else
             </button>
         </div>
 
-        <!-- HISTORIA CLÍNICA (FILTROS) -->
         <div class="home-card p-4 mb-3">
             <h6 class="section-title mb-3">Historia Clínica</h6>
 
@@ -185,7 +181,6 @@ else
             </div>
         </div>
 
-        <!-- LISTA HISTORIA CLÍNICA -->
         <div class="d-flex flex-column gap-2 mb-4">
             @if (_historia is null || _historia.Count == 0)
             {
@@ -228,7 +223,6 @@ else
             }
         </div>
 
-        <!-- DETALLE DE LA ENTRADA SELECCIONADA -->
         @if (_detalleSeleccionado is not null)
         {
             <div class="home-card p-4 mb-5 border-primary shadow-sm fade-in">
@@ -279,7 +273,6 @@ else
     </div>
 }
 
-<!-- BOTTOM NAV -->
 <div class="bottom-nav shadow-soft">
     <button class="bottom-nav-item" @onclick="IrInicio">
         <i class="bi bi-house-door"></i>
@@ -296,7 +289,7 @@ else
 </div>
 
 @code {
-    [Parameter] public int Id { get; set; } // PacienteId
+    [Parameter] public int Id { get; set; } 
 
     private AuthMeResponse? _usuario;
     private bool _cargando = true;
@@ -323,7 +316,7 @@ else
 
             _paciente = await TurnoService.ObtenerPacienteDetalleAsync(Id);
 
-            await CargarHistoria(); // sin filtros inicialmente
+            await CargarHistoria(); 
         }
         finally
         {

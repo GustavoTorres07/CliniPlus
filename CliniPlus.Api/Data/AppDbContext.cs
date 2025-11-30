@@ -7,7 +7,6 @@ namespace CliniPlus.Api.Data
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        // DbSets (uno por tabla)
         public DbSet<Usuario> Usuario => Set<Usuario>();
         public DbSet<ObraSocial> ObraSocial => Set<ObraSocial>();
         public DbSet<Especialidad> Especialidad => Set<Especialidad>();
@@ -27,10 +26,8 @@ namespace CliniPlus.Api.Data
         {
             base.OnModelCreating(mb);
 
-            // -------------------- Usuario --------------------
             mb.Entity<Usuario>(e =>
             {
-                // CORREGIDO: HasCheckConstraint movido dentro de ToTable
                 e.ToTable("Usuario", t =>
                 {
                     t.HasCheckConstraint("CK_Usuario_Rol",
@@ -49,7 +46,6 @@ namespace CliniPlus.Api.Data
 
             });
 
-            // -------------------- ObraSocial --------------------
             mb.Entity<ObraSocial>(e =>
             {
                 e.ToTable("ObraSocial");
@@ -60,7 +56,6 @@ namespace CliniPlus.Api.Data
                 e.HasIndex(x => x.Nombre).IsUnique();
             });
 
-            // -------------------- Especialidad --------------------
             mb.Entity<Especialidad>(e =>
             {
                 e.ToTable("Especialidad");
@@ -70,14 +65,12 @@ namespace CliniPlus.Api.Data
                 e.Property(x => x.IsActive).HasDefaultValue(true);
                 e.HasIndex(x => x.Nombre).IsUnique();
 
-                // 1:N Especialidad -> Medicos
                 e.HasMany(x => x.Medicos)
                  .WithOne(m => m.Especialidad)
                  .HasForeignKey(m => m.EspecialidadId)
                  .OnDelete(DeleteBehavior.Restrict);
             });
 
-            // -------------------- CIE10 --------------------
             mb.Entity<CIE10>(e =>
             {
                 e.ToTable("CIE10");
@@ -86,10 +79,8 @@ namespace CliniPlus.Api.Data
                 e.Property(x => x.Descripcion).HasMaxLength(300).IsRequired();
             });
 
-            // -------------------- TipoTurno --------------------
             mb.Entity<TipoTurno>(e =>
             {
-                // CORREGIDO: HasCheckConstraint movido dentro de ToTable
                 e.ToTable("TipoTurno", t =>
                 {
                     t.HasCheckConstraint("CK_TipoTurno_Duracion", "DuracionMin > 0");
@@ -103,7 +94,6 @@ namespace CliniPlus.Api.Data
                 e.HasIndex(x => x.Nombre).IsUnique();
             });
 
-            // -------------------- Paciente --------------------
             mb.Entity<Paciente>(e =>
             {
                 e.ToTable("Paciente");
@@ -118,20 +108,17 @@ namespace CliniPlus.Api.Data
                 e.HasIndex(x => x.DNI).IsUnique();
                 e.HasIndex(x => x.UsuarioId).IsUnique();
 
-                // 1:1 opcional con Usuario (FK en Paciente)
                 e.HasOne(x => x.Usuario)
                  .WithOne(u => u.Paciente!)
                  .HasForeignKey<Paciente>(x => x.UsuarioId)
                  .OnDelete(DeleteBehavior.Restrict);
 
-                // N:1 con ObraSocial (nullable)
                 e.HasOne(x => x.ObraSocial)
                  .WithMany(o => o.Pacientes)
                  .HasForeignKey(x => x.ObraSocialId)
                  .OnDelete(DeleteBehavior.Restrict);
             });
 
-            // -------------------- Medico --------------------
             mb.Entity<Medico>(e =>
             {
                 e.ToTable("Medico", t =>
@@ -152,11 +139,8 @@ namespace CliniPlus.Api.Data
                  .HasForeignKey<Medico>(x => x.UsuarioId)
                  .IsRequired()
                  .OnDelete(DeleteBehavior.Restrict);
-
-                // No hace falta nada extra para Especialidad, ya lo cubre el HasMany de arriba
             });
 
-            // -------------------- FichaMedica (1:1 Paciente) --------------------
             mb.Entity<FichaMedica>(e =>
             {
                 e.ToTable("FichaMedica");
@@ -176,10 +160,8 @@ namespace CliniPlus.Api.Data
                  .OnDelete(DeleteBehavior.Restrict);
             });
 
-            // -------------------- MedicoHorario --------------------
             mb.Entity<MedicoHorario>(e =>
             {
-                // CORREGIDO: HasCheckConstraint movido dentro de ToTable
                 e.ToTable("MedicoHorario", t =>
                 {
                     t.HasCheckConstraint("CK_MedicoHorario_Dia", "DiaSemana BETWEEN 0 AND 6");
@@ -197,16 +179,14 @@ namespace CliniPlus.Api.Data
                  .OnDelete(DeleteBehavior.Restrict);
             });
 
-            // -------------------- ConsultaDiagnostico (N:M)  --------------------
-
 
             mb.Entity<ConsultaDiagnostico>(e =>
             {
                 e.ToTable("ConsultaDiagnostico");
                 e.HasKey(x => new { x.ConsultaId, x.CIE10Codigo });
                 e.Property(x => x.Comentario).HasMaxLength(500);
-                e.Property(x => x.Principal).HasDefaultValue(false); // ← AGREGAR ESTA LÍNEA
-                e.Property(x => x.CIE10Codigo).HasMaxLength(10).IsRequired(); // ← AGREGAR IsRequired
+                e.Property(x => x.Principal).HasDefaultValue(false); 
+                e.Property(x => x.CIE10Codigo).HasMaxLength(10).IsRequired(); 
 
                 e.HasOne(x => x.Consulta)
                  .WithMany(c => c.Diagnosticos)
@@ -219,10 +199,8 @@ namespace CliniPlus.Api.Data
                  .OnDelete(DeleteBehavior.Restrict);
             });
 
-            // -------------------- MedicoBloqueo --------------------
             mb.Entity<MedicoBloqueo>(e =>
             {
-                // CORREGIDO: HasCheckConstraint movido dentro de ToTable
                 e.ToTable("MedicoBloqueo", t =>
                 {
                     t.HasCheckConstraint("CK_MedicoBloqueo_Rango", "Hasta > Desde");
@@ -236,14 +214,13 @@ namespace CliniPlus.Api.Data
                  .OnDelete(DeleteBehavior.Restrict);
             });
 
-            // -------------------- Turno --------------------
             mb.Entity<Turno>(e =>
             {
                 e.ToTable("Turno", t =>
                 {
                     t.HasCheckConstraint("CK_Turno_Duracion", "DuracionMin > 0");
                     t.HasCheckConstraint("CK_Turno_Estado",
-                        "Estado IN (N'Disponible', N'Reservado', N'Completado', N'Cancelado', N'Inasistencia', N'Atendido', N'Ausente', N'No Asistió')");
+                        "Estado IN (N'Disponible', N'Reservado', N'Completado', N'Cancelado', N'Inasistencia', N'Atendido', N'Ausente', N'No Asistio')");
                 });
 
                 e.HasKey(x => x.IdTurno);
@@ -277,7 +254,6 @@ namespace CliniPlus.Api.Data
                  .OnDelete(DeleteBehavior.Restrict);
             });
 
-            // -------------------- Consulta --------------------
             mb.Entity<Consulta>(e =>
             {
                 e.ToTable("Consulta");
@@ -295,7 +271,6 @@ namespace CliniPlus.Api.Data
                  .OnDelete(DeleteBehavior.Restrict);
             });
 
-            // -------------------- HistoriaClinicaEntrada --------------------
             mb.Entity<HistoriaClinicaEntrada>(e =>
             {
                 e.ToTable("HistoriaClinicaEntrada");

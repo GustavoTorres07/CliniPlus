@@ -15,7 +15,6 @@ namespace CliniPlus.Api.Repositories.Implementa
             _db = db;
         }
 
-        // LISTAR
         public async Task<List<ObraSocialDTO>> ListarAsync()
         {
             return await _db.ObraSocial
@@ -30,7 +29,6 @@ namespace CliniPlus.Api.Repositories.Implementa
                 .ToListAsync();
         }
 
-        // OBTENER POR ID
         public async Task<ObraSocialDTO?> ObtenerPorIdAsync(int id)
         {
             return await _db.ObraSocial
@@ -45,12 +43,10 @@ namespace CliniPlus.Api.Repositories.Implementa
                 .FirstOrDefaultAsync();
         }
 
-        // CREAR
         public async Task<ObraSocialDTO> CrearAsync(ObraSocialDTO dto)
         {
             var nombreTrim = dto.Nombre.Trim();
 
-            // Validar duplicado (tenés índice único en Nombre)
             bool existe = await _db.ObraSocial
                 .AnyAsync(o => o.Nombre == nombreTrim);
 
@@ -72,7 +68,6 @@ namespace CliniPlus.Api.Repositories.Implementa
             return dto;
         }
 
-        // EDITAR
         public async Task<ObraSocialDTO?> EditarAsync(int id, ObraSocialDTO dto)
         {
             var os = await _db.ObraSocial.FindAsync(id);
@@ -80,7 +75,6 @@ namespace CliniPlus.Api.Repositories.Implementa
 
             var nombreTrim = dto.Nombre.Trim();
 
-            // Validar duplicado en OTRO registro
             bool existe = await _db.ObraSocial
                 .AnyAsync(o => o.IdObraSocial != id && o.Nombre == nombreTrim);
 
@@ -98,7 +92,6 @@ namespace CliniPlus.Api.Repositories.Implementa
             return dto;
         }
 
-        // CAMBIAR ESTADO
         public async Task<bool> CambiarEstadoAsync(int id, bool isActive)
         {
             var os = await _db.ObraSocial.FindAsync(id);

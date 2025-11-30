@@ -178,7 +178,6 @@ else
         try
         {
             var me = await Auth.MeAsync();
-            // Admin o Secretario pueden ver el detalle
             if (me is null || (me.Rol != "Administrador" && me.Rol != "Secretaria"))
             {
                 Nav.NavigateTo("/", true);
@@ -201,7 +200,6 @@ else
         }
         catch
         {
-            // manejo silencioso
         }
         finally
         {

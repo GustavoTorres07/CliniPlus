@@ -46,7 +46,9 @@ namespace CliniPlus.Shared.Models
         public virtual ObraSocial? ObraSocial { get; set; }
 
         public virtual FichaMedica? FichaMedica { get; set; }
+
         public virtual ICollection<Turno> Turnos { get; set; } = new List<Turno>();
+
         public virtual ICollection<HistoriaClinicaEntrada> HistoriaClinica { get; set; } = new List<HistoriaClinicaEntrada>();
     }
 }

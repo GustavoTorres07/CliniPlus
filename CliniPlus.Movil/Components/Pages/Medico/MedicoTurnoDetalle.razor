@@ -22,7 +22,6 @@ else
 {
     <div class="home-page">
 
-        <!-- HEADER -->
         <div class="home-header mb-4">
             <div class="d-flex align-items-center gap-3">
                 <button class="btn-back" @onclick="IrTurnosHoy">
@@ -39,7 +38,6 @@ else
             </div>
         </div>
 
-        <!-- INFO DEL TURNO -->
         <div class="home-card p-3 mb-3">
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <div>
@@ -61,7 +59,6 @@ else
             </div>
         </div>
 
-        <!-- DATOS DEL PACIENTE -->
         <div class="home-card p-3 mb-3">
             <h6 class="section-title mb-3">Paciente</h6>
 
@@ -112,7 +109,6 @@ else
             }
         </div>
 
-        <!-- HISTORIAL RÁPIDO -->
         @if (_detalle.PacienteId != 0 && _historia != null && _historia.Count > 0)
         {
             <div class="home-card p-3 mb-3">
@@ -136,11 +132,9 @@ else
             </div>
         }
 
-        <!-- REGISTRAR CONSULTA -->
         <div class="home-card p-4 mb-5">
             <h6 class="section-title mb-3">Registrar Evolución</h6>
 
-            <!-- Estado final del turno (BOTONES MEJORADOS) -->
             <div class="mb-4">
                 <label class="label-mini d-block mb-2">Resultado del turno</label>
                 <div class="d-flex gap-2">
@@ -156,7 +150,6 @@ else
                         <i class="bi bi-x-circle-fill"></i> No asistió
                     </button>
                 </div>
-                <!-- Botón 'Ausente' opcional, o agrupado con No Asistió -->
                 @if(_estadoSeleccionado == TurnoEstadoDTO.Ausente)
                 {
                      <div class="mt-2 text-center small text-danger fw-bold">Marcado como Ausente</div>
@@ -229,7 +222,6 @@ else
             }
         </div>
 
-        <!-- BOTÓN GUARDAR (FLOTANTE) -->
         <div class="fixed-bottom-action p-3 bg-white shadow-lg border-top">
             
             @if (!string.IsNullOrWhiteSpace(_mensaje))
@@ -266,7 +258,6 @@ else
     </div>
 }
 
-<!-- MODAL CIE-10 -->
 @if (_mostrarModalCie10)
 {
     <div class="modal-backdrop-custom" @onclick="CerrarModalCie10"></div>
@@ -322,7 +313,6 @@ else
     </div>
 }
 
-<!-- BOTTOM NAV -->
 <div class="bottom-nav shadow-soft">
     <button class="bottom-nav-item" @onclick="IrInicio">
         <i class="bi bi-house-door"></i>
@@ -354,13 +344,11 @@ else
     private string _mensaje = string.Empty;
     private string _error = string.Empty;
 
-    // Modal CIE-10
     private bool _mostrarModalCie10 = false;
     private string _busquedaCie10 = "";
     private bool _buscandoCie10 = false;
     private List<Cie10DTO> _resultadosCie10 = new();
 
-    // Estado final del turno
     private TurnoEstadoDTO _estadoSeleccionado = TurnoEstadoDTO.Atendido;
 
     private bool _puedeGuardar =>
@@ -493,14 +481,12 @@ else
             return;
         }
 
-        // Validación de notas solo si asistió
         if (_estadoSeleccionado == TurnoEstadoDTO.Atendido && string.IsNullOrWhiteSpace(_consulta.Notas))
         {
             _error = "Complete las notas de la consulta.";
             return;
         }
 
-        // Regla de negocio: si está Atendido, debe haber al menos un CIE-10
         if (_estadoSeleccionado == TurnoEstadoDTO.Atendido && _diagnosticos.Count == 0)
         {
             _error = "Para marcar como 'Atendido' debe cargar al menos un diagnóstico CIE-10.";

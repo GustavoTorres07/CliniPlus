@@ -13,12 +13,13 @@ namespace CliniPlus.Shared.DTOs
         public int PacienteId { get; set; }
 
         [Required]
-        public int UsuarioId { get; set; }   // usuario YA creado
+        public int UsuarioId { get; set; }   
 
         [Required]
         public string DNI { get; set; } = "";
 
         public string? Email { get; set; }
+
         public string? Telefono { get; set; }
     }
 }

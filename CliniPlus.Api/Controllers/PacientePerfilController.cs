@@ -42,7 +42,7 @@ namespace CliniPlus.Api.Controllers
                       ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (sub is null)
-                return Unauthorized("Token inválido");
+                return Unauthorized("Token invalido");
 
             var ok = await _repo.ActualizarAsync(int.Parse(sub), dto);
 
@@ -56,7 +56,7 @@ namespace CliniPlus.Api.Controllers
                       ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (sub is null)
-                return Unauthorized("Token inválido");
+                return Unauthorized("Token invalido");
 
             var ok = await _repo.CambiarPasswordAsync(int.Parse(sub), dto.PasswordActual, dto.PasswordNueva);
 

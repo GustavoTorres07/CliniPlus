@@ -22,13 +22,17 @@ namespace CliniPlus.Movil.Services.Implementa
 
         public async Task<AuthLoginResponseDTO?> LoginAsync(AuthLoginRequest req, bool recordar)
         {
-            // Para login no necesitamos el handler que agrega token. Usamos el mismo client (no hay token todavía).
+           
             var cli = _http.CreateClient("ApiCliniPlus");
+
             var res = await cli.PostAsJsonAsync("api/auth/login", req);
+
             if (!res.IsSuccessStatusCode) return null;
 
             var payload = await res.Content.ReadFromJsonAsync<AuthLoginResponseDTO>();
+
             if (payload != null && !string.IsNullOrWhiteSpace(payload.Token))
+
                 await _token.GuardarAsync(payload.Token, recordar);
 
             return payload;
@@ -37,9 +41,11 @@ namespace CliniPlus.Movil.Services.Implementa
         public async Task<AuthMeResponse?> MeAsync()
         {
             var cli = _http.CreateClient("ApiCliniPlus");
+
             var res = await cli.GetAsync("api/auth/me");
 
             if (!res.IsSuccessStatusCode)
+
                 return null;
 
             return await res.Content.ReadFromJsonAsync<AuthMeResponse>();
@@ -50,7 +56,9 @@ namespace CliniPlus.Movil.Services.Implementa
         public async Task<bool> PingAsync()
         {
             var cli = _http.CreateClient("ApiCliniPlus");
+
             var res = await cli.GetAsync("api/auth/ping");
+
             return res.IsSuccessStatusCode;
         }
 
@@ -64,6 +72,5 @@ namespace CliniPlus.Movil.Services.Implementa
 
             return resp.IsSuccessStatusCode;
         }
-
     }
 }

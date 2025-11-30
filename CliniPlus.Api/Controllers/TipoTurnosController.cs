@@ -16,7 +16,6 @@ namespace CliniPlus.Api.Controllers
             _repo = repo;
         }
 
-        // GET api/tipoturnos
         [HttpGet]
         public async Task<ActionResult<List<TipoTurnoDTO>>> Get()
         {

@@ -20,7 +20,6 @@ else if (_usuario is null)
 else
 {
     <div class="home-page">
-        <!-- HEADER -->
         <div class="home-header mb-4">
             <div class="home-greeting">
                 <p class="home-hello">Hola,</p>
@@ -40,7 +39,6 @@ else
             </div>
         </div>
 
-        <!-- ACCIONES RÁPIDAS: TURNOS -->
         <h6 class="section-title">Gestión de Turnos</h6>
         <div class="home-quick-actions mb-4">
             <button class="quick-card" @onclick="IrNuevoTurno">
@@ -65,7 +63,6 @@ else
             </button>
         </div>
 
-        <!-- ACCIONES RÁPIDAS: MI SALUD -->
         <h6 class="section-title">Mi Salud</h6>
         <div class="home-quick-actions mb-4">
             <button class="quick-card" @onclick="IrHistorial">
@@ -75,7 +72,6 @@ else
                 <span>Historial</span>
             </button>
 
-            <!-- NUEVA TARJETA: MI FICHA MÉDICA -->
             <button class="quick-card" @onclick="IrMiFichaMedica">
                 <div class="icon-box bg-red-light">
                     <i class="bi bi-clipboard2-pulse text-danger"></i>
@@ -84,7 +80,6 @@ else
             </button>
         </div>
 
-        <!-- ACCIONES RÁPIDAS: DATOS PERSONALES -->
         <h6 class="section-title">Datos Personales</h6>
         <div class="home-quick-actions mb-4">
             <button class="quick-card" @onclick="IrPerfilPaciente">
@@ -95,7 +90,6 @@ else
             </button>
         </div>
 
-        <!-- PRÓXIMO TURNO (Resumen) -->
         <div class="home-card mb-2">
             <div class="home-card-header">
                 <span class="home-card-title">Próximo Turno</span>
@@ -122,7 +116,6 @@ else
     </div>
 }
 
-<!-- BOTTOM NAV -->
 <div class="bottom-nav shadow-soft">
     <button class="bottom-nav-item active" @onclick="IrInicio">
         <i class="bi bi-house-door-fill"></i>
@@ -184,7 +177,5 @@ else
     private void IrHistorial() => Nav.NavigateTo("/paciente/historial");
     private void IrPerfilPaciente() => Nav.NavigateTo("/paciente/perfil");
     private void IrMedicosDisponibles() => Nav.NavigateTo("/paciente/medicos");
-
-    // 🔹 NUEVO: navegación a la ficha médica del paciente
     private void IrMiFichaMedica() => Nav.NavigateTo("/paciente/ficha-medica");
 }

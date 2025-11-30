@@ -19,9 +19,11 @@ namespace CliniPlus.Movil.Services.Implementa
         public async Task<List<TipoTurnoDTO>?> ListarAsync()
         {
             var cli = CreateClient();
+
             var res = await cli.GetAsync("api/tipoturnos");
 
             if (!res.IsSuccessStatusCode)
+
                 return null;
 
             return await res.Content.ReadFromJsonAsync<List<TipoTurnoDTO>>();

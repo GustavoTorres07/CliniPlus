@@ -21,7 +21,7 @@
 
             <h5 class="login-title text-center mb-1">Bienvenido a Clini+</h5>
             <p class="login-subtitle text-center mb-4">
-                Inicia sesión para continuar
+                Inicia sesion para continuar
             </p>
 
             <div class="mb-3">
@@ -133,13 +133,9 @@
             {
                 _error = "Usuario o contraseña inválidos.";
                 return;
-            }
-
-            // 👇 LÓGICA NUEVA
+            }        
             if (resp.Rol == "Paciente" && resp.DebeCambiarPassword)
             {
-                // Ya guardaste el token adentro de AuthService/TokenService,
-                // así que podemos navegar tranquilamente.
                 Nav.NavigateTo("/paciente/cambiar-password-forzado", forceLoad: true);
             }
             else
@@ -168,6 +164,5 @@
 
     private void TogglePassword() => _mostrarPassword = !_mostrarPassword;
 
-    // 👇 Ojo: esta ruta debería ser la pantalla donde se ingresa el email para recuperar
     private void RecuperarPassword() => Nav.NavigateTo("/recuperar-password");
 }

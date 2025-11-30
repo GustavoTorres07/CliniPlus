@@ -46,8 +46,6 @@ namespace CliniPlus.Api.Repositories.Implementa
 
         public async Task<PacienteDetalleDTO?> ObtenerPorIdAsync(int id)
         {
-            // Acá mapeás según cómo tengas armado tu PacienteDetalleDTO.
-            // Ejemplo genérico:
             var p = await _db.Paciente
                 .Include(p => p.Usuario)
                 .Include(p => p.ObraSocial)
@@ -55,7 +53,6 @@ namespace CliniPlus.Api.Repositories.Implementa
 
             if (p == null) return null;
 
-            // 👉 ADAPTAR a las propiedades reales de tu PacienteDetalleDTO
             return new PacienteDetalleDTO
             {
                 IdPaciente = p.IdPaciente,
@@ -71,20 +68,17 @@ namespace CliniPlus.Api.Repositories.Implementa
                 ObraSocialId = p.ObraSocialId,
                 ObraSocialNombre = p.ObraSocial?.Nombre,
                 NumeroAfiliado = p.NumeroAfiliado
-                // + cualquier otro campo que tengas en el DTO
             };
         }
 
         public async Task<PacienteDetalleDTO> CrearAsync(PacienteCrearDTO dto)
         {
-            // 1) Validar DNI único
             var existeDni = await _db.Paciente.AnyAsync(x => x.DNI == dto.DNI);
             if (existeDni)
                 throw new InvalidOperationException("DNI_EXISTE");
 
             int? usuarioId = null;
 
-            // 2) Validar UsuarioId si viene
             if (dto.UsuarioId.HasValue)
             {
                 var usuario = await _db.Usuario
@@ -130,7 +124,6 @@ namespace CliniPlus.Api.Repositories.Implementa
             var p = await _db.Paciente.FirstOrDefaultAsync(x => x.IdPaciente == id);
             if (p == null) return null;
 
-            // 1) Validar DNI único (excepto si es el mismo)
             if (dto.DNI != p.DNI)
             {
                 var existeDni = await _db.Paciente.AnyAsync(x => x.DNI == dto.DNI && x.IdPaciente != id);
@@ -140,7 +133,6 @@ namespace CliniPlus.Api.Repositories.Implementa
 
             int? usuarioId = null;
 
-            // 2) Validar UsuarioId si viene
             if (dto.UsuarioId.HasValue)
             {
                 var usuario = await _db.Usuario
@@ -161,14 +153,13 @@ namespace CliniPlus.Api.Repositories.Implementa
                 usuarioId = dto.UsuarioId.Value;
             }
 
-            // 3) Actualizar campos
             p.DNI = dto.DNI;
             p.Telefono = dto.Telefono;
             p.Email = dto.Email;
             p.ObraSocialId = dto.ObraSocialId;
             p.NumeroAfiliado = dto.NumeroAfiliado;
             p.IsProvisional = dto.IsProvisional;
-            p.UsuarioId = usuarioId; // ← AQUÍ SE VINCULA
+            p.UsuarioId = usuarioId; 
 
             await _db.SaveChangesAsync();
 
@@ -220,29 +211,24 @@ namespace CliniPlus.Api.Repositories.Implementa
             if (!paciente.IsProvisional)
                 throw new InvalidOperationException("PACIENTE_NO_ES_PROVISIONAL");
 
-            // 1) Validar DNI coincide
             if (!string.Equals(paciente.DNI, dto.DNI, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidOperationException("DNI_NO_COINCIDE");
 
-            // 2) Buscar usuario
             var usuario = await _db.Usuario
                 .FirstOrDefaultAsync(u => u.IdUsuario == dto.UsuarioId && u.IsActive);
 
             if (usuario == null)
                 throw new InvalidOperationException("USUARIO_NO_ENCONTRADO");
 
-            // 3) Validar rol Paciente
             if (usuario.Rol != "Paciente")
                 throw new InvalidOperationException("USUARIO_NO_ES_PACIENTE");
 
-            // 4) Validar que el usuario aún no esté vinculado
             var yaVinculado = await _db.Paciente.AnyAsync(p =>
                 p.UsuarioId == dto.UsuarioId && p.IsActive);
 
             if (yaVinculado)
                 throw new InvalidOperationException("USUARIO_YA_VINCULADO");
 
-            // 5) Actualizar datos y activar
             paciente.UsuarioId = dto.UsuarioId;
             paciente.Email = dto.Email;
             paciente.Telefono = dto.Telefono;

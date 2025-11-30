@@ -21,7 +21,6 @@ namespace CliniPlus.Api.Controllers
         [HttpGet("datos")]
         public async Task<ActionResult<PerfilMedicoDTO>> Get()
         {
-            // Buscar el claim de forma más robusta
             var subClaim = User.FindFirst("sub")?.Value
                            ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 

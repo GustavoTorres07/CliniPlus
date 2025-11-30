@@ -21,7 +21,6 @@ else
 {
     <div class="home-page">
 
-        <!-- HEADER -->
         <div class="home-header mb-4">
             <div class="d-flex align-items-center gap-3">
                 <button class="btn-back" @onclick="IrInicio">
@@ -40,7 +39,6 @@ else
             </div>
         </div>
 
-        <!-- PRÓXIMOS TURNOS -->
         <h6 class="section-title">Próximos Turnos</h6>
 
         @if (_proximos.Count == 0)
@@ -62,10 +60,9 @@ else
             <div class="d-flex flex-column gap-3 mb-4 fade-in">
                 @foreach (var t in _proximos)
                 {
-                    var fecha = t.ScheduledAtUtc; // usamos directo, sin ToLocalTime
+                    var fecha = t.ScheduledAtUtc; 
 
                     <div class="turn-card">
-                        <!-- Header de la tarjeta -->
                         <div class="turn-header">
                             <div class="turn-date-box">
                                 <div class="icon-box bg-blue-light text-blue rounded-3" style="width:40px; height:40px;">
@@ -81,7 +78,6 @@ else
                             </span>
                         </div>
 
-                        <!-- Info Médico -->
                         <div class="doctor-info">
                             <div class="doctor-avatar-small">
                                 @GetInicial(t.MedicoNombre)
@@ -95,7 +91,6 @@ else
                             </div>
                         </div>
 
-                        <!-- Botones -->
                         @if (PuedeCancelar(t))
                         {
                             <button class="btn-cancel" @onclick="() => CancelarTurno(t.IdTurno)">
@@ -107,7 +102,6 @@ else
             </div>
         }
 
-        <!-- HISTORIAL -->
         <h6 class="section-title">Historial</h6>
 
         @if (_historial.Count == 0)
@@ -146,7 +140,6 @@ else
     </div>
 }
 
-<!-- BOTTOM NAV -->
 <div class="bottom-nav shadow-soft">
     <button class="bottom-nav-item" @onclick="IrInicio">
         <i class="bi bi-house-door"></i>
@@ -181,11 +174,10 @@ else
             }
 
             var lista = await TurnoService.ObtenerMisTurnosAsync() ?? new List<TurnoListadoPacienteDTO>();
-            var ahora = DateTime.Now; // trabajamos en hora local
+            var ahora = DateTime.Now; 
 
             foreach (var t in lista.OrderBy(t => t.ScheduledAtUtc))
             {
-                // Futuro + reservado => Próximos
                 if (t.ScheduledAtUtc >= ahora &&
                     string.Equals(t.Estado, "Reservado", StringComparison.OrdinalIgnoreCase))
                 {
@@ -226,7 +218,6 @@ else
 
         if (ok)
         {
-            // Recarga la página para refrescar listas
             Nav.NavigateTo(Nav.Uri, forceLoad: true);
         }
 

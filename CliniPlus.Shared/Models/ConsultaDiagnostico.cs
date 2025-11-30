@@ -26,6 +26,7 @@ namespace CliniPlus.Shared.Models
         public bool Principal { get; set; } = false;
 
         public virtual Consulta Consulta { get; set; } = null!;
+
         public virtual CIE10 CIE10 { get; set; } = null!;
     }
 }

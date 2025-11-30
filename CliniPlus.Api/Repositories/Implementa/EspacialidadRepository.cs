@@ -15,7 +15,6 @@ namespace CliniPlus.Api.Repositories.Implementa
             _db = db;
         }
 
-        // LISTAR
         public async Task<List<EspecialidadDTO>> ListarAsync()
         {
             return await _db.Especialidad
@@ -30,7 +29,6 @@ namespace CliniPlus.Api.Repositories.Implementa
                 .ToListAsync();
         }
 
-        // OBTENER POR ID
         public async Task<EspecialidadDTO?> ObtenerPorIdAsync(int id)
         {
             return await _db.Especialidad
@@ -45,12 +43,10 @@ namespace CliniPlus.Api.Repositories.Implementa
                 .FirstOrDefaultAsync();
         }
 
-        // CREAR
         public async Task<EspecialidadDTO> CrearAsync(EspecialidadDTO dto)
         {
             var nombreTrim = dto.Nombre.Trim();
 
-            // Validar duplicado
             bool existe = await _db.Especialidad
                 .AnyAsync(e => e.Nombre == nombreTrim);
 
@@ -72,7 +68,6 @@ namespace CliniPlus.Api.Repositories.Implementa
             return dto;
         }
 
-        // EDITAR
         public async Task<EspecialidadDTO?> EditarAsync(int id, EspecialidadDTO dto)
         {
             var esp = await _db.Especialidad.FindAsync(id);
@@ -80,7 +75,6 @@ namespace CliniPlus.Api.Repositories.Implementa
 
             var nombreTrim = dto.Nombre.Trim();
 
-            // Validar duplicado en OTRO registro
             bool existe = await _db.Especialidad
                 .AnyAsync(e => e.IdEspecialidad != id && e.Nombre == nombreTrim);
 
@@ -98,7 +92,6 @@ namespace CliniPlus.Api.Repositories.Implementa
             return dto;
         }
 
-        // CAMBIAR ESTADO (activar/desactivar)
         public async Task<bool> CambiarEstadoAsync(int id, bool isActive)
         {
             var esp = await _db.Especialidad.FindAsync(id);

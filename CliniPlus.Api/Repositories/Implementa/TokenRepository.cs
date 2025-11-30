@@ -20,13 +20,11 @@ namespace CliniPlus.Api.Repositories.Implementa
 
             var claims = new List<Claim>
         {
-            // JWT “puros”
             new("sub", usuarioId.ToString()),
             new("name", $"{nombre} {apellido}"),
             new("email", email),
             new("role", rol),
 
-            // Estándar .NET
             new(ClaimTypes.NameIdentifier, usuarioId.ToString()),
             new(ClaimTypes.Name, $"{nombre} {apellido}"),
             new(ClaimTypes.Email, email),

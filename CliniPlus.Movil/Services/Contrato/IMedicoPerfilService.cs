@@ -10,6 +10,7 @@ namespace CliniPlus.Movil.Services.Contrato
     public interface IMedicoPerfilService
     {
         Task<PerfilMedicoDTO?> ObtenerAsync();
+
         Task<bool> ActualizarAsync(PerfilMedicoDTO dto);
     }
 }

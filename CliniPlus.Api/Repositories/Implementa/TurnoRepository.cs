@@ -15,14 +15,11 @@ namespace CliniPlus.Api.Repositories.Implementa
             _db = db;
         }
 
-        // ============================================================
-        // 1) LISTAR TURNOS DEL PACIENTE
-        // ============================================================
         public async Task<List<TurnoListadoPacienteDTO>> ListarPorPacienteAsync(int pacienteId)
         {
             return await _db.Turno
                 .Include(t => t.Medico).ThenInclude(m => m.Usuario)
-                .Include(t => t.Medico).ThenInclude(m => m.Especialidad)   // 👈 UNA sola especialidad
+                .Include(t => t.Medico).ThenInclude(m => m.Especialidad)   
                 .Include(t => t.TipoTurno)
                 .Where(t => t.PacienteId == pacienteId && t.IsActive)
                 .OrderBy(t => t.ScheduledAtUtc)
@@ -43,13 +40,7 @@ namespace CliniPlus.Api.Repositories.Implementa
                 .ToListAsync();
         }
 
-        // ============================================================
-        // 2) LISTAR AGENDA DEL MÉDICO (DÍA)
-        // ============================================================
-        public async Task<List<TurnoAgendaMedicoDTO>> ListarAgendaMedicoDiaAsync(
-            int medicoId,
-            DateTime diaLocal,
-            int? pacienteIdActual = null)
+        public async Task<List<TurnoAgendaMedicoDTO>> ListarAgendaMedicoDiaAsync(int medicoId, DateTime diaLocal, int? pacienteIdActual = null)
         {
             DateTime desde = diaLocal.Date;
             DateTime hasta = desde.AddDays(1);
@@ -63,8 +54,8 @@ namespace CliniPlus.Api.Repositories.Implementa
                     t.IsActive &&
                     t.ScheduledAtUtc >= desde &&
                     t.ScheduledAtUtc < hasta &&
-                    t.Estado != "Disponible" &&      // 👈 NO mostrar slots libres
-                    t.Estado != "Cancelado")         // 👈 NO mostrar cancelados
+                    t.Estado != "Disponible" &&     
+                    t.Estado != "Cancelado")        
                 .OrderBy(t => t.ScheduledAtUtc)
                 .Select(t => new TurnoAgendaMedicoDTO
                 {
@@ -84,18 +75,13 @@ namespace CliniPlus.Api.Repositories.Implementa
                 .ToListAsync();
         }
 
-        // ============================================================
-        // 3) RESERVAR TURNO (PACIENTE)
-        // ============================================================
         public async Task<bool> ReservarAsync(int turnoId, int pacienteId, int tipoTurnoId)
         {
             var turno = await _db.Turno.FirstOrDefaultAsync(t => t.IdTurno == turnoId && t.IsActive);
             if (turno == null) return false;
 
-            // VALIDACIONES DE NEGOCIO
             if (turno.Estado != "Disponible") return false;
 
-            // Asignar el turno
             turno.PacienteId = pacienteId;
             turno.TipoTurnoId = tipoTurnoId;
             turno.Estado = "Reservado";
@@ -104,21 +90,15 @@ namespace CliniPlus.Api.Repositories.Implementa
             return true;
         }
 
-        // ============================================================
-        // 4) CANCELAR COMO PACIENTE
-        // ============================================================
         public async Task<bool> CancelarComoPacienteAsync(int turnoId, int pacienteId)
         {
             var turno = await _db.Turno.FirstOrDefaultAsync(t => t.IdTurno == turnoId && t.IsActive);
             if (turno == null) return false;
 
-            // No puede cancelar turnos ajenos
             if (turno.PacienteId != pacienteId) return false;
 
-            // Debe estar reservado
             if (turno.Estado != "Reservado") return false;
 
-            // Liberar turno
             turno.PacienteId = null;
             turno.TipoTurnoId = null;
             turno.Estado = "Disponible";
@@ -127,24 +107,17 @@ namespace CliniPlus.Api.Repositories.Implementa
             return true;
         }
 
-        // ============================================================
-        // 5) LISTAR SLOTS POR DÍA
-        // ============================================================
         public async Task<List<TurnoSlotDTO>> ListarSlotsPorDiaAsync(int medicoId, DateTime fechaUtc)
         {
-            // Tomamos solo la parte de fecha (UTC) y generamos el rango día completo
-            var inicioDiaUtc = fechaUtc.Date;                 // 00:00 UTC
-            var finDiaUtc = inicioDiaUtc.AddDays(1);          // 00:00 del día siguiente
+            var inicioDiaUtc = fechaUtc.Date;                
+            var finDiaUtc = inicioDiaUtc.AddDays(1);          
 
-            // 1) Obtenemos el médico y su slot base
             var medico = await _db.Medico.FirstOrDefaultAsync(m => m.IdMedico == medicoId && m.IsActive);
             if (medico == null)
                 return new List<TurnoSlotDTO>();
 
-            var defaultSlot = medico.DefaultSlotMin; // ej: 30 min
+            var defaultSlot = medico.DefaultSlotMin; 
 
-            // 2) Horarios del médico para ese día de la semana
-            //    DayOfWeek: 0=Sunday, 1=Monday...
             var diaSemana = (int)inicioDiaUtc.DayOfWeek;
 
             var horario = await _db.MedicoHorario
@@ -154,18 +127,16 @@ namespace CliniPlus.Api.Repositories.Implementa
                     h.DiaSemana == diaSemana);
 
             if (horario == null)
-                return new List<TurnoSlotDTO>(); // no trabaja ese día
+                return new List<TurnoSlotDTO>();
 
             var slotMin = horario.SlotMinOverride ?? defaultSlot;
 
-            // 3) Inicio / fin de jornada
             var inicioJornadaUtc = inicioDiaUtc.Add(horario.HoraInicio);
             var finJornadaUtc = inicioDiaUtc.Add(horario.HoraFin);
 
             if (finJornadaUtc <= inicioJornadaUtc)
                 return new List<TurnoSlotDTO>();
 
-            // 4) Turnos existentes en ese rango
             var turnosDia = await _db.Turno
                 .Include(t => t.TipoTurno)
                 .Where(t =>
@@ -175,7 +146,6 @@ namespace CliniPlus.Api.Repositories.Implementa
                     t.ScheduledAtUtc < finJornadaUtc)
                 .ToListAsync();
 
-            // 5) Bloqueos del médico
             var bloqueosDia = await _db.MedicoBloqueo
                 .Where(b =>
                     b.MedicoId == medicoId &&
@@ -185,12 +155,10 @@ namespace CliniPlus.Api.Repositories.Implementa
 
             var slots = new List<TurnoSlotDTO>();
 
-            // 6) Recorremos de a slotMin minutos
             for (var cursor = inicioJornadaUtc; cursor < finJornadaUtc; cursor = cursor.AddMinutes(slotMin))
             {
                 var finSlot = cursor.AddMinutes(slotMin);
 
-                // 6.1) ¿Está bloqueado?
                 bool bloqueado = bloqueosDia.Any(b =>
                     cursor < b.Hasta && finSlot > b.Desde);
 
@@ -208,15 +176,13 @@ namespace CliniPlus.Api.Repositories.Implementa
                     continue;
                 }
 
-                // 6.2) ¿Hay turno exacto en este horario?
                 var turno = turnosDia.FirstOrDefault(t => t.ScheduledAtUtc == cursor);
 
                 if (turno == null)
                 {
-                    // Hueco disponible
                     slots.Add(new TurnoSlotDTO
                     {
-                        IdTurno = 0, // se creará al reservar
+                        IdTurno = 0, 
                         ScheduledAtUtc = cursor,
                         DuracionMin = slotMin,
                         EsReservable = true,
@@ -244,15 +210,10 @@ namespace CliniPlus.Api.Repositories.Implementa
             return slots;
         }
 
-        // ============================================================
-        // 6) RESERVAR SLOT (GENERANDO TURNO)
-        // ============================================================
         public async Task<bool> ReservarSlotAsync(int medicoId, DateTime fechaUtc, int pacienteId, int tipoTurnoId)
         {
-            // 1) Obtenemos los slots del día
             var slots = await ListarSlotsPorDiaAsync(medicoId, fechaUtc.Date);
 
-            // Buscamos el slot exacto
             var slot = slots.FirstOrDefault(s =>
                 s.ScheduledAtUtc == fechaUtc &&
                 s.EsReservable &&
@@ -262,14 +223,12 @@ namespace CliniPlus.Api.Repositories.Implementa
             if (slot == null)
                 return false;
 
-            // 2) Validar tipo de turno
             var tipo = await _db.TipoTurno
                 .FirstOrDefaultAsync(t => t.IdTipoTurno == tipoTurnoId && t.Activo);
 
             if (tipo == null)
                 return false;
 
-            // 3) Creamos el Turno ya reservado
             var turno = new Turno
             {
                 MedicoId = medicoId,
@@ -300,8 +259,8 @@ namespace CliniPlus.Api.Repositories.Implementa
                     t.IsActive &&
                     t.ScheduledAtUtc >= desdeUtc &&
                     t.ScheduledAtUtc < hastaUtc &&
-                    t.Estado != "Disponible" &&   // 👈 no libres
-                    t.Estado != "Cancelado")      // 👈 no cancelados
+                    t.Estado != "Disponible" &&   
+                    t.Estado != "Cancelado")      
                 .OrderBy(t => t.ScheduledAtUtc)
                 .Select(t => new TurnoAgendaMedicoDTO
                 {
@@ -395,19 +354,16 @@ namespace CliniPlus.Api.Repositories.Implementa
             if (turno.PacienteId == null)
                 return null;
 
-            // 1) Crear la consulta
             var consulta = new Consulta
             {
                 TurnoId = turno.IdTurno,
                 MedicoId = medicoId,
                 Notas = dto.Notas
-                // FechaHora usa el default DateTime.UtcNow del modelo
             };
 
             _db.Consulta.Add(consulta);
-            await _db.SaveChangesAsync();   // para obtener IdConsulta
+            await _db.SaveChangesAsync();   
 
-            // 2) Diagnósticos CIE-10 (solo si hay)
             if (dto.Diagnosticos != null && dto.Diagnosticos.Count > 0)
             {
                 foreach (var d in dto.Diagnosticos)
@@ -423,7 +379,6 @@ namespace CliniPlus.Api.Repositories.Implementa
                     _db.ConsultaDiagnostico.Add(diag);
                 }
 
-                // 3) Historia clínica rápida SOLO si hay CIE-10
                 var ciePrincipal = dto.Diagnosticos
                     .FirstOrDefault(x => x.Principal)?.CIE10Codigo
                     ?? dto.Diagnosticos.First().CIE10Codigo;
@@ -442,7 +397,6 @@ namespace CliniPlus.Api.Repositories.Implementa
                 _db.HistoriaClinicaEntrada.Add(entrada);
             }
 
-            // 4) Actualizar estado del turno según la lógica de negocio
             switch (dto.EstadoFinal)
             {
                 case TurnoEstadoDTO.Atendido:
@@ -450,7 +404,7 @@ namespace CliniPlus.Api.Repositories.Implementa
                     break;
 
                 case TurnoEstadoDTO.NoAsistio:
-                    turno.Estado = "No Asistió";
+                    turno.Estado = "No Asistio";
                     break;
 
                 default:
@@ -486,7 +440,6 @@ namespace CliniPlus.Api.Repositories.Implementa
 
         public async Task<List<PacienteListadoMedicoDTO>> ListarPacientesPorMedicoAsync(int medicoId)
         {
-            // 1) Agrupamos turnos por PacienteId
             var grupos = await _db.Turno
                 .Where(t => t.MedicoId == medicoId &&
                             t.PacienteId != null &&
@@ -503,7 +456,6 @@ namespace CliniPlus.Api.Repositories.Implementa
             if (grupos.Count == 0)
                 return new List<PacienteListadoMedicoDTO>();
 
-            // 2) Traemos los pacientes correspondientes (con Usuario)
             var pacienteIds = grupos.Select(x => x.PacienteId).ToList();
 
             var pacientes = await _db.Paciente
@@ -511,7 +463,6 @@ namespace CliniPlus.Api.Repositories.Implementa
                 .Where(p => pacienteIds.Contains(p.IdPaciente))
                 .ToListAsync();
 
-            // 3) Armamos DTO mezclando grupo + paciente
             var resultado = (from g in grupos
                              join p in pacientes on g.PacienteId equals p.IdPaciente
                              select new PacienteListadoMedicoDTO
@@ -594,7 +545,6 @@ namespace CliniPlus.Api.Repositories.Implementa
                     ConsultaId = h.ConsultaId,
                     ConsultaFechaHora = h.Consulta != null ? h.Consulta.FechaHora : null,
 
-                            // 👉 AQUÍ VA MedicoNombre:
         MedicoNombre = h.Consulta != null
                        && h.Consulta.Medico != null
                        && h.Consulta.Medico.Usuario != null
@@ -606,7 +556,6 @@ namespace CliniPlus.Api.Repositories.Implementa
 
         public async Task<PacienteDetalleMedicoDTO?> ObtenerPacienteDetalleAsync(int medicoId, int pacienteId)
         {
-            // Opcional: podrías verificar que el paciente tenga al menos un turno con este médico.
             var paciente = await _db.Paciente
                 .Include(p => p.Usuario)
                 .Include(p => p.ObraSocial)
@@ -759,11 +708,9 @@ namespace CliniPlus.Api.Repositories.Implementa
             if (turno == null)
                 return false;
 
-            // Sólo se pueden cancelar turnos reservados
             if (turno.Estado != "Reservado")
                 return false;
 
-            // Lógica similar a CancelarComoPacienteAsync: liberamos el slot
             turno.PacienteId = null;
             turno.TipoTurnoId = null;
             turno.Estado = "Disponible";
@@ -786,7 +733,7 @@ namespace CliniPlus.Api.Repositories.Implementa
                 .Where(t =>
                     t.IsActive &&
                     t.MedicoId == medicoId &&
-                    t.Estado != "Disponible")   // 👈 NO mostrar slots libres
+                    t.Estado != "Disponible")   
                 .AsQueryable();
 
             if (desde.HasValue)

@@ -35,7 +35,9 @@ namespace CliniPlus.Shared.Models
 
         [Required]
         public DateTime FechaRegistro { get; set; } = DateTime.UtcNow;
+
         public virtual Medico? Medico { get; set; }
+
         public virtual Paciente? Paciente { get; set; }
 
         public bool RecuperarContrasena { get; set; } = false;

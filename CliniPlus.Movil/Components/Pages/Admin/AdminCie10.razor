@@ -24,7 +24,6 @@ else
 {
     <div class="home-page">
 
-        <!-- HEADER CON FLECHA DE VOLVER -->
         <div class="home-header mb-4">
             <div class="d-flex align-items-center gap-3">
                 <button class="btn-back" @onclick="IrInicio">
@@ -46,7 +45,6 @@ else
             </div>
         </div>
 
-        <!-- BUSCADOR -->
         <div class="home-card p-3 mb-3">
             <label class="form-label label-mini text-muted mb-2">Buscar diagnóstico</label>
             <div class="input-group input-elevated">
@@ -79,7 +77,6 @@ else
             </div>
         </div>
 
-        <!-- FORMULARIO ALTA / EDICIÓN -->
         <div class="home-card p-3 mb-3 border-purple-subtle">
             <h6 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2" style="font-size: 0.95rem;">
                 <span class="icon-box-sm @(_editando ? "bg-orange-light text-orange" : "bg-purple-light text-purple")">
@@ -141,7 +138,6 @@ else
             </EditForm>
         </div>
 
-        <!-- RESULTADOS -->
         @if (_lista is null || !_lista.Any())
         {
             <div class="empty-state text-center py-4">
@@ -167,7 +163,6 @@ else
                             <div class="cie-code-box">
                                 @c.Codigo
                             </div>
-                            <!-- Botones de Acción -->
                             <div class="d-flex gap-1">
                                 <button class="btn-icon-secondary"
                                         title="Editar"
@@ -193,7 +188,6 @@ else
     </div>
 }
 
-<!-- BOTTOM NAV -->
 <div class="bottom-nav shadow-soft">
     <button class="bottom-nav-item" @onclick="IrInicio">
         <i class="bi bi-house-door"></i>

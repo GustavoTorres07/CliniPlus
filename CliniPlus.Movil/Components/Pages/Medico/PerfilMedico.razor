@@ -21,7 +21,6 @@ else if (_usuario is null)
 }
 else if (_perfil is null)
 {
-    <!-- Médico logueado, pero aún sin perfil configurado -->
     <div class="home-page">
         <div class="home-header mb-4">
             <div class="d-flex align-items-center gap-3">
@@ -52,7 +51,6 @@ else
 {
     <div class="home-page">
 
-        <!-- HEADER -->
         <div class="home-header mb-4">
             <div class="d-flex align-items-center gap-3">
                 <button class="btn-back" @onclick="IrInicio">
@@ -69,11 +67,9 @@ else
             </div>
         </div>
 
-        <!-- FORMULARIO -->
         <EditForm Model="_perfil" OnValidSubmit="Guardar">
             <DataAnnotationsValidator />
 
-            <!-- DATOS PERSONALES -->
             <div class="home-card p-4 mb-3">
                 <h6 class="section-title mb-3">Datos Personales</h6>
 
@@ -93,7 +89,6 @@ else
                 </div>
             </div>
 
-            <!-- INFORMACIÓN PROFESIONAL -->
             <div class="home-card p-4 mb-3">
                 <h6 class="section-title mb-3">Información Profesional</h6>
 
@@ -108,7 +103,6 @@ else
                 </div>
             </div>
 
-            <!-- ESPECIALIDAD -->
             <div class="home-card p-4 mb-4">
 
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -144,7 +138,6 @@ else
                 }
             </div>
 
-            <!-- BOTÓN GUARDAR -->
             <div class="fixed-bottom-action p-3 bg-white shadow-lg border-top">
 
                 @if (!string.IsNullOrWhiteSpace(_mensaje))
@@ -175,7 +168,6 @@ else
     </div>
 }
 
-<!-- MODAL SELECCIÓN ESPECIALIDAD -->
 @if (_mostrarModalEspecialidades && _todasEspecialidades is not null)
 {
     <div class="modal-backdrop-custom" @onclick="CerrarModal"></div>
@@ -210,7 +202,6 @@ else
     </div>
 }
 
-<!-- BOTTOM NAV -->
 <div class="bottom-nav shadow-soft">
     <button class="bottom-nav-item" @onclick="IrInicio">
         <i class="bi bi-house-door"></i>
@@ -253,7 +244,7 @@ else
 
             _perfil = await PerfilService.ObtenerAsync();
             _todasEspecialidades = await EspecialidadService.ListarAsync()
-                                   ?? new List<EspecialidadDTO>();   // 👈 clave
+                                   ?? new List<EspecialidadDTO>();   
         }
         finally
         {
@@ -303,11 +294,9 @@ private void ConfirmarEspecialidad()
 
     if (esp is null) return;
 
-    // 👉 actualizar campos principales
     _perfil.EspecialidadId = esp.IdEspecialidad;
     _perfil.EspecialidadNombre = esp.Nombre;
 
-    // 👉 mantener la lista para la UI
     _perfil.Especialidades.Clear();
     _perfil.Especialidades.Add(new SimpleEspecialidadDTO
     {

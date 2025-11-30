@@ -10,7 +10,9 @@ namespace CliniPlus.Movil.Services.Contrato
     public interface IFichaMedicaService
     {
         Task<FichaMedicaDTO?> ObtenerAsync(int pacienteId);
+
         Task<bool> GuardarAsync(FichaMedicaDTO dto);
+
         Task<FichaMedicaDTO?> ObtenerMiFichaAsync();
 
     }

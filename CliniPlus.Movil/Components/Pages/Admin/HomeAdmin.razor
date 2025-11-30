@@ -20,7 +20,6 @@ else if (_usuario is null)
 else
 {
     <div class="home-page">
-        <!-- HEADER -->
         <div class="home-header mb-4">
             <div class="home-greeting">
                 <p class="home-hello">Bienvenido,</p>
@@ -40,7 +39,6 @@ else
             </div>
         </div>
 
-        <!-- GESTIÓN PRINCIPAL -->
         <h6 class="section-title">Gestión Principal</h6>
         <div class="home-quick-actions mb-4">
             <button class="quick-card" @onclick="IrUsuarios">
@@ -63,7 +61,6 @@ else
             </button>
         </div>
 
-        <!-- CONFIGURACIÓN MÉDICA -->
         <h6 class="section-title">Configuración Médica</h6>
         <div class="home-quick-actions mb-4">
             <button class="quick-card" @onclick="IrObrasSociales">
@@ -87,7 +84,6 @@ else
             </button>
         </div>
 
-        <!-- AGENDA Y TURNOS (ACCESO A HORARIOS/BLOQUEOS) -->
         <h6 class="section-title">Agenda y Turnos</h6>
         <div class="home-quick-actions mb-4">
             <button class="quick-card" @onclick="IrAgendaMedicos">
@@ -104,7 +100,6 @@ else
             </button>
         </div>
 
-        <!-- MI CUENTA -->
         <h6 class="section-title">Mi cuenta</h6>
         <div class="home-quick-actions mb-4">
             <button class="quick-card" @onclick="IrPerfilAdmin">
@@ -115,7 +110,6 @@ else
             </button>
         </div>
 
-        <!-- RESUMEN -->
         <div class="home-card mb-2">
             <div class="home-card-header">
                 <span class="home-card-title">Resumen del Sistema</span>
@@ -126,7 +120,7 @@ else
                     <span class="metric-label">
                         <i class="bi bi-calendar-check me-2"></i>Turnos hoy
                     </span>
-                    <span class="metric-value">0</span> @* TODO: conectar con API de turnos *@
+                    <span class="metric-value">0</span> 
                 </div>
                 <div class="metric-divider"></div>
                 <div class="metric-row">
@@ -149,7 +143,6 @@ else
     </div>
 }
 
-<!-- BOTTOM NAV -->
 <div class="bottom-nav shadow-soft">
     <button class="bottom-nav-item active" @onclick="IrInicio">
         <i class="bi bi-house-door-fill"></i>
@@ -205,7 +198,6 @@ else
     private void IrEspecialidades() => Nav.NavigateTo("/Administrador/especialidades");
     private void IrCie10() => Nav.NavigateTo("/Administrador/cie10");
 
-    // Acceso central a horarios / bloqueos (entra por listado de médicos)
     private void IrAgendaMedicos() => Nav.NavigateTo("/Administrador/medicos/horarios");
 
     private void IrPerfilAdmin() => Nav.NavigateTo("/Administrador/perfil", true);

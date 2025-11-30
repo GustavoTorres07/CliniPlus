@@ -26,7 +26,6 @@ else
 {
     <div class="home-page">
 
-        <!-- HEADER -->
         <div class="home-header mb-4">
             <div class="d-flex align-items-center gap-3">
                 <button class="btn-back" @onclick="IrHomePaciente">
@@ -39,11 +38,9 @@ else
             </div>
         </div>
 
-        <!-- TARJETA: FILTROS DE BÚSQUEDA -->
         <div class="home-card p-4 mb-3">
             <h6 class="section-title mb-3">Selección Profesional</h6>
 
-            <!-- ESPECIALIDAD -->
             <div class="mb-3">
                 <label class="label-mini">Especialidad</label>
                 <select class="form-select input-modern" @onchange="OnEspecialidadChanged">
@@ -58,7 +55,6 @@ else
                 </select>
             </div>
 
-            <!-- MÉDICO -->
             <div class="mb-3">
                 <label class="label-mini">Médico</label>
                 <select class="form-select input-modern" 
@@ -78,7 +74,6 @@ else
                 }
             </div>
 
-            <!-- TIPO DE TURNO (NUEVO) -->
             <div class="mb-2">
                 <label class="label-mini">Tipo de turno</label>
                 <select class="form-select input-modern"
@@ -94,7 +89,6 @@ else
             </div>
         </div>
 
-        <!-- TARJETA: CALENDARIO -->
         <div class="home-card p-4 mb-3">
             <h6 class="section-title mb-3">Fecha</h6>
             <div class="calendar-wrapper">
@@ -105,7 +99,6 @@ else
             </div>
         </div>
 
-        <!-- TARJETA: SLOTS (HORARIOS) -->
         <div class="home-card p-4 mb-4">
             <h6 class="section-title mb-3">Horarios Disponibles</h6>
 
@@ -135,7 +128,6 @@ else
                 <div class="row g-2 fade-in">
                     @foreach (var slot in _slots)
                     {
-                        // ✅ Solo se marca seleccionado exactamente el objeto que guardamos en _slotSeleccionado
                         var isSelected = object.ReferenceEquals(slot, _slotSeleccionado);
 
                         var classes = "btn w-100 slot-btn";
@@ -162,7 +154,6 @@ else
             }
         </div>
 
-        <!-- BOTÓN CONFIRMAR (FLOTANTE) -->
         <div class="fixed-bottom-action p-3 bg-white shadow-lg border-top">
             @if (!string.IsNullOrWhiteSpace(_mensaje))
             {
@@ -191,7 +182,6 @@ else
     </div>
 }
 
-<!-- BOTTOM NAV -->
 <div class="bottom-nav shadow-soft">
     <button class="bottom-nav-item" @onclick="IrHomePaciente">
         <i class="bi bi-house-door"></i>
@@ -216,7 +206,6 @@ else
     private List<MedicoListadoDTO> _medicos = new();
     private int _medicoIdSeleccionado;
 
-    // 👉 NUEVO: tipos de turno
     private List<TipoTurnoDTO> _tiposTurno = new();
     private int _tipoTurnoSeleccionadoId;
 
@@ -243,10 +232,8 @@ else
             _especialidades = await EspecialidadService.ListarAsync() ?? new();
             _medicos        = await MedicoService.ListarAsync(null)   ?? new();
 
-            // 👉 Cargar tipos de turno
             _tiposTurno = await TipoTurnoService.ListarAsync() ?? new();
 
-            // Si hay solo uno, lo dejamos seleccionado para simplificar
             if (_tiposTurno.Count == 1)
                 _tipoTurnoSeleccionadoId = _tiposTurno[0].IdTipoTurno;
         }
@@ -344,7 +331,7 @@ else
             var dto = new TurnoReservarDTO
             {
                 TurnoId     = _slotSeleccionado.IdTurno,
-                TipoTurnoId = _tipoTurnoSeleccionadoId   // 👈 usamos lo elegido
+                TipoTurnoId = _tipoTurnoSeleccionadoId  
             };
             ok = await TurnoService.ReservarAsync(dto);
         }
@@ -354,7 +341,7 @@ else
             {
                 MedicoId       = _medicoIdSeleccionado,
                 ScheduledAtUtc = _slotSeleccionado.ScheduledAtUtc,
-                TipoTurnoId    = _tipoTurnoSeleccionadoId  // 👈 también acá
+                TipoTurnoId    = _tipoTurnoSeleccionadoId  
             };
             ok = await TurnoService.ReservarSlotAsync(dtoSlot);
         }

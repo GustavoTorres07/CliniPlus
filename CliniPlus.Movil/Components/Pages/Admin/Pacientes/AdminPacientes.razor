@@ -21,7 +21,6 @@ else if (!_permitido)
 else
 {
     <div class="home-page">
-        <!-- HEADER -->
         <div class="home-header mb-4">
             <div class="d-flex align-items-center gap-3">
                 <BotonVolver />
@@ -36,9 +35,7 @@ else
             </button>
         </div>
 
-        <!-- FILTROS -->
         <div class="d-flex flex-column gap-3 mb-4">
-            <!-- Filtro Tipo -->
             <div class="input-group input-elevated">
                 <span class="input-group-text bg-transparent border-0">
                     <i class="bi bi-funnel"></i>
@@ -50,7 +47,6 @@ else
                 </select>
             </div>
 
-            <!-- Buscador -->
             <div class="input-group input-elevated">
                 <span class="input-group-text bg-transparent border-0">
                     <i class="bi bi-search"></i>
@@ -62,7 +58,6 @@ else
             </div>
         </div>
 
-        <!-- LISTA -->
         @if (!ListaFiltrada.Any())
         {
             <div class="home-card text-center py-5">
@@ -87,12 +82,10 @@ else
                          @onclick="() => IrDetalle(p.IdPaciente)">
 
                         <div class="d-flex align-items-center gap-3">
-                            <!-- Avatar Circular Verde -->
                             <div class="patient-avatar-circle">
                                 <span>@(GetInicial(p))</span>
                             </div>
 
-                            <!-- Info Principal -->
                             <div class="flex-grow-1">
                                 <h6 class="mb-0 fw-bold text-dark">
                                     @(string.IsNullOrWhiteSpace(p.NombreCompleto)
@@ -112,7 +105,6 @@ else
                                 }
                             </div>
 
-                            <!-- Badges de Estado -->
                             <div class="d-flex flex-column align-items-end gap-1">
                                 @if (p.IsProvisional)
                                 {
@@ -144,20 +136,17 @@ else
     </div>
 }
 
-<!-- BOTTOM NAV -->
 <div class="bottom-nav shadow-soft">
     <button class="bottom-nav-item" @onclick="IrInicio">
         <i class="bi bi-house-door"></i>
         <span>Inicio</span>
     </button>
 
-    <!-- Activo -->
     <button class="bottom-nav-item active">
         <i class="bi bi-person-lines-fill"></i>
         <span>Pacientes</span>
     </button>
 
-    <!-- Botón Salir -->
     <button class="bottom-nav-item text-danger" @onclick="CerrarSesion">
         <i class="bi bi-box-arrow-right"></i>
         <span>Salir</span>
@@ -172,7 +161,6 @@ else
     private string _filtroTipo = "";
     private string _busqueda = "";
 
-    // Filtro dinámico en memoria
     private IEnumerable<PacienteListDTO> ListaFiltrada =>
         _lista
             .Where(p => FiltraPorTipo(p))

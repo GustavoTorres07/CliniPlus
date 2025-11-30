@@ -36,6 +36,7 @@ namespace CliniPlus.Shared.Models
         public virtual Medico Medico { get; set; } = null!;
 
         public virtual ICollection<ConsultaDiagnostico> Diagnosticos { get; set; } = new List<ConsultaDiagnostico>();
+
         public virtual ICollection<HistoriaClinicaEntrada> HistoriaClinica { get; set; } = new List<HistoriaClinicaEntrada>();
     }
 }

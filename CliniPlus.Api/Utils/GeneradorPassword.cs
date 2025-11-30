@@ -14,7 +14,6 @@ namespace CliniPlus.Api.Utils
             var builder = new StringBuilder();
             for (int i = 0; i < size; i++)
             {
-                // Letras A-Z
                 char ch = Convert.ToChar(Convert.ToInt32(Math.Floor(26 * _random.NextDouble() + 65)));
                 builder.Append(ch);
             }
@@ -22,12 +21,11 @@ namespace CliniPlus.Api.Utils
             return lowerCase ? result.ToLower() : result;
         }
 
-        // Password tipo: abc123 / xyz456
         public static string RandomPassword(int size = 0)
         {
             var builder = new StringBuilder();
-            builder.Append(RandomString(3, true));      // letras minúsculas
-            builder.Append(RandomNumber(100, 999));     // 3 dígitos
+            builder.Append(RandomString(3, true));      
+            builder.Append(RandomNumber(100, 999));   
             return builder.ToString();
         }
     }

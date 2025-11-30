@@ -128,9 +128,6 @@ else
                 @(_detalle.IsActive ? "Desactivar Usuario" : "Activar Usuario")
             </button>
 
-            <!-- ============================= -->
-            <!-- BLOQUE: CAMBIAR CONTRASEÑA   -->
-            <!-- ============================= -->
 <hr class="my-4 opacity-25" />
 
 <div class="p-3 bg-light rounded-3 border">
@@ -208,7 +205,6 @@ else
 
     private readonly string[] _rolesDisponibles = { "Administrador", "Secretaria", "Medico", "Paciente" };
 
-    // ---- Campos para cambiar contraseña ----
     private string _passNueva = string.Empty;
     private string _passConfirmar = string.Empty;
     private string? _passError;
@@ -233,7 +229,6 @@ else
         }
         catch
         {
-            // Manejo de error
         }
         finally
         {
@@ -255,9 +250,9 @@ else
             return;
         }
 
-        _detalle = res; // Actualizamos la vista con la respuesta
+        _detalle = res;
         _guardando = false;
-        Nav.NavigateTo("/Administrador/usuarios", true); // Opcional: volver a la lista
+        Nav.NavigateTo("/Administrador/usuarios", true); 
     }
 
     private async Task ToggleEstadoAsync()
@@ -271,9 +266,6 @@ else
             _detalle.IsActive = nuevo;
     }
 
-    // ===========================
-    // CAMBIO DE CONTRASEÑA (ADMIN)
-    // ===========================
     private async Task CambiarPasswordAsync()
     {
         _passError = null;

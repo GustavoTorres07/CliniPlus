@@ -15,9 +15,6 @@ namespace CliniPlus.Api.Repositories.Implementa
             _db = db;
         }
 
-        // =====================================================
-        //  LISTAR
-        // =====================================================
         public async Task<List<MedicoListadoDTO>> ListarAsync()
         {
             return await _db.Medico
@@ -37,9 +34,6 @@ namespace CliniPlus.Api.Repositories.Implementa
                 .ToListAsync();
         }
 
-        // =====================================================
-        //  OBTENER DETALLE POR ID
-        // =====================================================
         public async Task<MedicoDetalleDTO?> ObtenerAsync(int id)
         {
             var m = await _db.Medico
@@ -64,12 +58,8 @@ namespace CliniPlus.Api.Repositories.Implementa
             };
         }
 
-        // =====================================================
-        //  CREAR MÉDICO
-        // =====================================================
         public async Task<int?> CrearAsync(MedicoCrearDTO dto)
         {
-            // 1) ¿Existe el usuario?
             var usuario = await _db.Usuario
                 .FirstOrDefaultAsync(u => u.IdUsuario == dto.UsuarioId && u.IsActive);
 
@@ -79,12 +69,10 @@ namespace CliniPlus.Api.Repositories.Implementa
             if (usuario.Rol != "Medico")
                 throw new InvalidOperationException("USUARIO_NO_MEDICO");
 
-            // 3) ¿Ya está vinculado como médico?
             var yaExiste = await _db.Medico.AnyAsync(m => m.UsuarioId == dto.UsuarioId);
             if (yaExiste)
                 throw new InvalidOperationException("USUARIO_YA_ES_MEDICO");
 
-            // 4) Validar especialidad (si viene)
             if (dto.EspecialidadId.HasValue)
             {
                 bool espExiste = await _db.Especialidad
@@ -94,7 +82,6 @@ namespace CliniPlus.Api.Repositories.Implementa
                     throw new InvalidOperationException("ESPECIALIDAD_NO_ENCONTRADA");
             }
 
-            // Crear médico
             var med = new Medico
             {
                 UsuarioId = dto.UsuarioId,
@@ -111,9 +98,6 @@ namespace CliniPlus.Api.Repositories.Implementa
             return med.IdMedico;
         }
 
-        // =====================================================
-        //  EDITAR
-        // =====================================================
         public async Task<MedicoDetalleDTO?> EditarAsync(int id, MedicoEditarDTO dto)
         {
             var m = await _db.Medico
@@ -123,7 +107,6 @@ namespace CliniPlus.Api.Repositories.Implementa
 
             if (m == null) return null;
 
-            // Si viene especialidad, validar
             if (dto.EspecialidadId.HasValue)
             {
                 bool espExiste = await _db.Especialidad
@@ -142,13 +125,9 @@ namespace CliniPlus.Api.Repositories.Implementa
 
             await _db.SaveChangesAsync();
 
-            // Devolvemos el detalle actualizado
             return await ObtenerAsync(id);
         }
 
-        // =====================================================
-        //  CAMBIAR ESTADO
-        // =====================================================
         public async Task<bool> CambiarEstadoAsync(int id, bool activo)
         {
             var m = await _db.Medico.FirstOrDefaultAsync(x => x.IdMedico == id);
@@ -159,9 +138,6 @@ namespace CliniPlus.Api.Repositories.Implementa
             return true;
         }
 
-        // =====================================================
-        //  LISTAR POR ESPECIALIDAD
-        // =====================================================
         public async Task<List<MedicoListadoDTO>> ListarPorEspecialidadAsync(int especialidadId)
         {
             return await _db.Medico
@@ -182,9 +158,6 @@ namespace CliniPlus.Api.Repositories.Implementa
                 .ToListAsync();
         }
 
-        // =====================================================
-        //  HORARIOS
-        // =====================================================
         public async Task<List<MedicoHorarioDTO>> ListarHorariosAsync(int medicoId)
         {
             return await _db.MedicoHorario
@@ -304,9 +277,6 @@ namespace CliniPlus.Api.Repositories.Implementa
             return true;
         }
 
-        // =====================================================
-        //  BLOQUEOS
-        // =====================================================
         public async Task<List<MedicoBloqueoDTO>> ListarBloqueosAsync(int medicoId)
         {
             return await _db.MedicoBloqueo

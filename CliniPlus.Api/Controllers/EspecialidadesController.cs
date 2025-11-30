@@ -17,20 +17,14 @@ namespace CliniPlus.Api.Controllers
             _repo = repo;
         }
 
-        // ======================================================
-        // GET: api/especialidades/listar  --> PUBLICO
-        // ======================================================
         [HttpGet("listar")]
-        [AllowAnonymous]   // 👈 importante: sin [Authorize] acá ni en la clase
+        [AllowAnonymous]   
         public async Task<ActionResult<List<EspecialidadDTO>>> Listar()
         {
             var lista = await _repo.ListarAsync();
             return Ok(lista);
         }
 
-        // ======================================================
-        // GET: api/especialidades/5  --> solo Admin/Sec
-        // ======================================================
         [HttpGet("{id:int}")]
         [Authorize(Roles = "Administrador,Secretaria")]
         public async Task<ActionResult<EspecialidadDTO>> ObtenerPorId(int id)
@@ -42,9 +36,6 @@ namespace CliniPlus.Api.Controllers
             return Ok(esp);
         }
 
-        // ======================================================
-        // POST: api/especialidades/crear
-        // ======================================================
         [HttpPost("crear")]
         [Authorize(Roles = "Administrador,Secretaria")]
         public async Task<ActionResult<EspecialidadDTO>> Crear([FromBody] EspecialidadDTO dto)
@@ -63,9 +54,6 @@ namespace CliniPlus.Api.Controllers
             }
         }
 
-        // ======================================================
-        // PUT: api/especialidades/editar/5
-        // ======================================================
         [HttpPut("editar/{id:int}")]
         [Authorize(Roles = "Administrador,Secretaria")]
         public async Task<ActionResult<EspecialidadDTO>> Editar(int id, [FromBody] EspecialidadDTO dto)
@@ -85,9 +73,6 @@ namespace CliniPlus.Api.Controllers
             }
         }
 
-        // ======================================================
-        // PATCH: api/especialidades/estado/5
-        // ======================================================
         [HttpPatch("estado/{id:int}")]
         [Authorize(Roles = "Administrador,Secretaria")]
         public async Task<IActionResult> CambiarEstado(int id, [FromBody] EspecialidadEstadoDTO body)

@@ -10,7 +10,7 @@ namespace CliniPlus.Shared.DTOs
     public class AuthLoginRequest
     {
         [Required(ErrorMessage = "El email es obligatorio")]
-        [EmailAddress(ErrorMessage = "El email no tiene un formato válido")]
+        [EmailAddress(ErrorMessage = "El email no tiene un formato valido")]
         [MaxLength(150, ErrorMessage = "El email no puede exceder los 150 caracteres")]
         public string Email { get; set; } = null!;
 

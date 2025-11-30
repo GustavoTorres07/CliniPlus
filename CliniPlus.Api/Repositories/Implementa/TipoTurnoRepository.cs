@@ -1,5 +1,4 @@
-﻿// CliniPlus.Api/Repositories/Implementa/TipoTurnoRepository.cs
-using CliniPlus.Api.Data;
+﻿using CliniPlus.Api.Data;
 using CliniPlus.Api.Repositories.Contrato;
 using CliniPlus.Shared.DTOs;
 using Microsoft.EntityFrameworkCore;

@@ -1,10 +1,4 @@
-﻿/* -------------------------------------------------------------------------- */
-/* ESTILOS PARA PERFIL MÉDICO (VISTA PACIENTE)                  */
-/* Fuente: Nunito | Color primario: #6e7bff                   */
-/* -------------------------------------------------------------------------- */
-
-/* Global */
-.home-page {
+﻿.home-page {
     padding: 24px 20px;
     font-family: 'Nunito', sans-serif;
     background-color: #f8f9fc;
@@ -12,7 +6,6 @@
     padding-bottom: 100px;
 }
 
-/* --- HEADER --- */
 .home-header {
     display: flex;
     justify-content: space-between;
@@ -41,7 +34,6 @@
     padding: 4px 10px;
 }
 
-/* Botón Volver */
 .btn-back {
     width: 40px;
     height: 40px;
@@ -61,7 +53,6 @@
         background-color: #f1f3f5;
     }
 
-/* Avatar Header */
 .home-avatar {
     width: 50px;
     height: 50px;
@@ -77,7 +68,6 @@
     overflow: hidden; /* Para recortar la imagen si la hay */
 }
 
-/* --- TARJETAS --- */
 .home-card {
     background: white;
     border-radius: 20px;
@@ -102,7 +92,6 @@
     display: block;
 }
 
-/* --- DATOS PROFESIONALES (ITEMS) --- */
 .info-item {
     display: flex;
     align-items: center;
@@ -119,7 +108,7 @@
     width: 36px;
     height: 36px;
     border-radius: 10px;
-    background-color: #f3e5f5; /* Fondo violeta claro */
+    background-color: #f3e5f5; 
     color: #8e24aa;
     display: flex;
     align-items: center;
@@ -127,7 +116,6 @@
     font-size: 1rem;
 }
 
-    /* Variantes de icono */
     .info-icon.success {
         background-color: #e8f5e9;
         color: #2e7d32;
@@ -155,7 +143,6 @@
     font-weight: 700;
 }
 
-/* --- BOTONES --- */
 .btn-primary {
     background-color: #6e7bff;
     border: none;
@@ -174,7 +161,6 @@
     box-shadow: 0 4px 15px rgba(110, 123, 255, 0.25);
 }
 
-/* --- BOTTOM NAV --- */
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -217,7 +203,6 @@
         color: #6e7bff;
     }
 
-/* Utilidades */
 .fade-in {
     animation: fadeIn 0.4s ease-in-out;
 }

@@ -38,7 +38,7 @@ namespace CliniPlus.Api.Controllers
             }
             catch (InvalidOperationException ex) when (ex.Message == "CIE10_YA_EXISTE")
             {
-                return Conflict("Ya existe un diagnóstico con ese código.");
+                return Conflict("Ya existe un diagnostico con ese codigo.");
             }
         }
 
@@ -57,7 +57,7 @@ namespace CliniPlus.Api.Controllers
         public async Task<IActionResult> Delete(string codigo)
         {
             var ok = await _repo.EliminarAsync(codigo);
-            if (!ok) return BadRequest("No se pudo eliminar el diagnóstico (puede estar en uso).");
+            if (!ok) return BadRequest("No se pudo eliminar el diagnostico (puede estar en uso).");
 
             return NoContent();
         }

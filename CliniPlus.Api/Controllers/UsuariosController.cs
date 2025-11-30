@@ -68,13 +68,11 @@ namespace CliniPlus.Api.Controllers
                       : NotFound("Usuario no encontrado");
         }
 
-        /// <summary>Cambia la contraseña de un usuario (solo Admin).</summary>
-        /// Nombre en Postman: Usuarios - Cambiar contraseña (Admin)
         [HttpPatch("password/{id:int}")]
         public async Task<IActionResult> CambiarPassword(int id, [FromBody] UsuarioPasswordAdminDTO dto)
         {
             if (!ModelState.IsValid)
-                return BadRequest("Contraseña inválida.");
+                return BadRequest("Contraseña invalida.");
 
             var ok = await _repo.CambiarPasswordAdminAsync(id, dto.NuevaPassword);
 

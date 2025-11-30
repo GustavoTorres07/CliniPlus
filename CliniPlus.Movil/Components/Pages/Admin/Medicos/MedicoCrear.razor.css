@@ -1,5 +1,4 @@
-﻿/* --- ESTRUCTURA GLOBAL --- */
-.home-page {
+﻿.home-page {
     padding: 24px 20px;
     font-family: 'Nunito', sans-serif;
     background-color: #f8f9fc;
@@ -10,7 +9,6 @@
     height: 80px;
 }
 
-/* --- HEADER --- */
 .home-header {
     display: flex;
     align-items: center;
@@ -28,7 +26,6 @@
     margin: 0;
 }
 
-/* --- TARJETA --- */
 .home-card {
     background: white;
     border-radius: 24px;
@@ -36,7 +33,6 @@
     border: 1px solid #f0f2f5;
 }
 
-/* --- INPUTS ELEVADOS --- */
 .input-elevated {
     border-radius: 16px;
     background-color: #f8f9fc;
@@ -77,7 +73,6 @@
             font-weight: 400;
         }
 
-/* --- BOTONES --- */
 .btn-pill {
     border-radius: 99px;
     font-weight: 700;
@@ -89,7 +84,6 @@
     box-shadow: 0 4px 10px rgba(110, 123, 255, 0.2);
 }
 
-/* --- BOTTOM NAV --- */
 .bottom-nav {
     position: fixed;
     bottom: 0;

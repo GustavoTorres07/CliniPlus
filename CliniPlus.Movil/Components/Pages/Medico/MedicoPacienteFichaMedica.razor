@@ -22,7 +22,6 @@ else
 {
     <div class="home-page">
 
-        <!-- HEADER -->
         <div class="home-header mb-4">
             <div class="d-flex align-items-center gap-3">
                 <button class="btn-back" @onclick="VolverDetallePaciente">
@@ -42,7 +41,6 @@ else
             </div>
         </div>
 
-        <!-- INFO BÁSICA PACIENTE -->
         <div class="home-card mb-3 p-4">
             <div class="patient-summary">
                 <div class="info-row">
@@ -82,14 +80,12 @@ else
             </div>
         </div>
 
-        <!-- FORM FICHA MÉDICA -->
         <EditForm Model="_ficha" OnValidSubmit="GuardarFicha">
             <DataAnnotationsValidator />
 
             <div class="home-card mb-3 p-4">
                 <h6 class="section-title mb-3">Datos Clínicos</h6>
 
-                <!-- Grupo sanguíneo -->
                 <div class="mb-3">
                     <label class="label-mini">Grupo Sanguíneo</label>
                     <InputText class="form-control input-modern"
@@ -97,7 +93,6 @@ else
                                placeholder="Ej: 0+, A-, B+ ..." />
                 </div>
 
-                <!-- Alergias -->
                 <div class="mb-3">
                     <label class="label-mini">Alergias</label>
                     <InputTextArea class="form-control input-modern"
@@ -106,7 +101,6 @@ else
                                    placeholder="Describir alergias relevantes..." />
                 </div>
 
-                <!-- Enfermedades crónicas -->
                 <div class="mb-3">
                     <label class="label-mini">Enfermedades Crónicas</label>
                     <InputTextArea class="form-control input-modern"
@@ -115,7 +109,6 @@ else
                                    placeholder="Diabetes, HTA, cardiopatías, etc." />
                 </div>
 
-                <!-- Medicación habitual -->
                 <div class="mb-3">
                     <label class="label-mini">Medicación Habitual</label>
                     <InputTextArea class="form-control input-modern"
@@ -124,7 +117,6 @@ else
                                    placeholder="Medicamentos que toma en forma regular..." />
                 </div>
 
-                <!-- Observaciones -->
                 <div class="mb-1">
                     <label class="label-mini">Observaciones Generales</label>
                     <InputTextArea class="form-control input-modern"
@@ -134,7 +126,6 @@ else
                 </div>
             </div>
 
-            <!-- BOTÓN GUARDAR FLOTANTE -->
             <div class="fixed-bottom-action p-3 bg-white shadow-lg border-top">
 
                 @if (!string.IsNullOrWhiteSpace(_mensaje))
@@ -166,7 +157,6 @@ else
     </div>
 }
 
-<!-- BOTTOM NAV -->
 <div class="bottom-nav shadow-soft">
     <button class="bottom-nav-item" @onclick="IrInicio">
         <i class="bi bi-house-door-fill"></i>
@@ -183,7 +173,7 @@ else
 </div>
 
 @code {
-    [Parameter] public int Id { get; set; } // PacienteId
+    [Parameter] public int Id { get; set; } 
 
     private AuthMeResponse? _usuario;
     private bool _cargando = true;
@@ -220,7 +210,6 @@ else
                 return;
             }
 
-            // Obtener o crear ficha vacía
             _ficha = await FichaMedicaService.ObtenerAsync(Id)
                      ?? new FichaMedicaDTO { PacienteId = Id };
         }
@@ -256,7 +245,6 @@ else
                 _error = false;
                 _mensaje = "Ficha médica guardada correctamente.";
 
-                // Limpiar mensaje después de unos segundos
                 _ = Task.Delay(3000).ContinueWith(_ =>
                 {
                     _mensaje = "";

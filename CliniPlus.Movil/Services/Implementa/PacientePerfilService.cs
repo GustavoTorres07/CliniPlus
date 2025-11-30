@@ -18,6 +18,7 @@ namespace CliniPlus.Movil.Services.Implementa
         public async Task<PerfilPacienteDTO?> ObtenerAsync()
         {
             var resp = await Client().GetAsync("api/PacientePerfil/datos");
+
             if (!resp.IsSuccessStatusCode) return null;
 
             return await resp.Content.ReadFromJsonAsync<PerfilPacienteDTO>();
@@ -26,12 +27,14 @@ namespace CliniPlus.Movil.Services.Implementa
         public async Task<bool> ActualizarAsync(PerfilPacienteDTO dto)
         {
             var resp = await Client().PutAsJsonAsync("api/PacientePerfil/datos", dto);
+
             return resp.IsSuccessStatusCode;
         }
 
         public async Task<bool> CambiarPasswordAsync(CambiarPasswordDTO dto)
         {
             var resp = await Client().PostAsJsonAsync("api/PacientePerfil/cambiar-password", dto);
+
             return resp.IsSuccessStatusCode;
         }
     }

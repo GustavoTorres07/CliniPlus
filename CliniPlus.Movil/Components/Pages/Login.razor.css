@@ -1,12 +1,10 @@
-﻿/* Fondo general */
-.login-page {
+﻿.login-page {
     min-height: 100vh;
     background: #ffffff;
     padding: 32px 16px;
-    font-family: 'Nunito', sans-serif; /* Asegura la fuente redondeada */
+    font-family: 'Nunito', sans-serif; 
 }
 
-/* Tarjeta central */
 .login-card {
     width: 100%;
     max-width: 380px;
@@ -20,7 +18,6 @@
     box-shadow: 0 20px 45px rgba(96, 112, 255, 0.18);
 }
 
-/* --- LOGO CRUZ PURA (Estilo Nuevo) --- */
 .logo-pure {
     width: 42px;
     height: 42px;
@@ -29,7 +26,7 @@
 
     .logo-pure span {
         position: absolute;
-        background-color: #6e7bff; /* Azul principal */
+        background-color: #6e7bff; 
         border-radius: 8px;
     }
 
@@ -47,10 +44,9 @@
         transform: translateY(-50%);
     }
 
-/* Marca (Texto alineado) */
 .brand-name {
     font-weight: 800;
-    font-size: 2rem; /* Letra grande para acompañar al logo */
+    font-size: 2rem; 
     color: #15161b;
     line-height: 1;
     margin: 0;
@@ -60,7 +56,6 @@
         color: #6e7bff;
     }
 
-/* Títulos */
 .login-title {
     font-size: 1.1rem;
     font-weight: 700;
@@ -72,7 +67,6 @@
     color: #9ba0b8;
 }
 
-/* Inputs elevados */
 .input-elevated {
     border-radius: 18px;
     background-color: #f5f6fb;
@@ -82,7 +76,6 @@
     transition: all 0.2s;
 }
 
-    /* Efecto focus al input completo */
     .input-elevated:focus-within {
         background-color: #ffffff;
         border-color: #6e7bff;
@@ -112,7 +105,6 @@
             font-weight: 400;
         }
 
-/* Botón ojo */
 .btn-icon {
     border: none;
     background: transparent;
@@ -126,7 +118,6 @@
         color: #6e7bff;
     }
 
-/* Botón principal */
 .btn-pill {
     border-radius: 999px;
 }
@@ -152,10 +143,9 @@
         opacity: 0.7;
     }
 
-/* Botón outline */
 .btn-outline-primary {
     border-width: 1.5px;
-    border-color: #dbe0eb; /* Borde gris sutil */
+    border-color: #dbe0eb; 
     color: #6e7bff;
     background-color: transparent;
     font-weight: 600;
@@ -168,7 +158,6 @@
         color: #4a56e2;
     }
 
-/* Links y Checkbox */
 .btn-link-underline {
     color: #6e7bff;
     text-decoration: none;
@@ -189,7 +178,6 @@
         border-color: #6e7bff;
     }
 
-/* Divider */
 .login-divider {
     display: flex;
     align-items: center;

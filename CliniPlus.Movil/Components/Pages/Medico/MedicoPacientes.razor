@@ -21,7 +21,6 @@ else
 {
     <div class="home-page">
 
-        <!-- HEADER -->
         <div class="home-header mb-4">
             <div class="home-greeting">
                 <p class="home-hello">Mis Pacientes</p>
@@ -40,7 +39,6 @@ else
             </div>
         </div>
 
-        <!-- BUSCADOR -->
         <div class="px-1 mb-4">
             <div class="input-group input-elevated">
                 <span class="input-group-text">
@@ -53,7 +51,6 @@ else
             </div>
         </div>
 
-        <!-- LISTA PACIENTES -->
         <div class="d-flex flex-column gap-3">
             @if (_pacientesFiltrados is null || _pacientesFiltrados.Count == 0)
             {
@@ -107,7 +104,6 @@ else
     </div>
 }
 
-<!-- BOTTOM NAV -->
 <div class="bottom-nav shadow-soft">
     <button class="bottom-nav-item" @onclick="IrInicio">
         <i class="bi bi-house-door"></i>

@@ -39,18 +39,20 @@ namespace CliniPlus.Shared.Models
         [Column("ConsultaId")]
         public int? ConsultaId { get; set; }
 
-        // Navs
         [ForeignKey(nameof(PacienteId))]
         public virtual Paciente Paciente { get; set; } = null!;
 
         [ForeignKey(nameof(MedicoId))]
         public virtual Medico Medico { get; set; } = null!;
 
+
         [ForeignKey(nameof(CIE10Codigo))]
         public virtual CIE10 CIE10 { get; set; } = null!;
 
+
         [ForeignKey(nameof(TurnoId))]
         public virtual Turno? Turno { get; set; }
+
 
         [ForeignKey(nameof(ConsultaId))]
         public virtual Consulta? Consulta { get; set; }

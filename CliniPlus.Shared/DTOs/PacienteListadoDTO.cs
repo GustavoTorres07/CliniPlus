@@ -9,9 +9,13 @@ namespace CliniPlus.Shared.DTOs
     public class PacienteListadoDTO
     {
         public int IdPaciente { get; set; }
+
         public string? NombreCompleto { get; set; }
+
         public string? DNI { get; set; }
+
         public bool IsProvisional { get; set; }
+
         public string? ObraSocialNombre { get; set; }
     }
 }

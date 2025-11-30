@@ -16,9 +16,11 @@ namespace CliniPlus.Movil.Services.Implementa
         public async Task<List<ObraSocialDTO>?> ListarAsync()
         {
             var cli = _http.CreateClient("ApiCliniPlus");
+
             var res = await cli.GetAsync("api/obras-sociales/listar");
 
             if (!res.IsSuccessStatusCode)
+
                 return null;
 
             return await res.Content.ReadFromJsonAsync<List<ObraSocialDTO>>();
@@ -27,9 +29,11 @@ namespace CliniPlus.Movil.Services.Implementa
         public async Task<ObraSocialDTO?> ObtenerAsync(int id)
         {
             var cli = _http.CreateClient("ApiCliniPlus");
+
             var res = await cli.GetAsync($"api/obras-sociales/{id}");
 
             if (!res.IsSuccessStatusCode)
+
                 return null;
 
             return await res.Content.ReadFromJsonAsync<ObraSocialDTO>();
@@ -38,9 +42,11 @@ namespace CliniPlus.Movil.Services.Implementa
         public async Task<ObraSocialDTO?> CrearAsync(ObraSocialDTO dto)
         {
             var cli = _http.CreateClient("ApiCliniPlus");
+
             var res = await cli.PostAsJsonAsync("api/obras-sociales/crear", dto);
 
             if (!res.IsSuccessStatusCode)
+
                 return null;
 
             return await res.Content.ReadFromJsonAsync<ObraSocialDTO>();
@@ -49,9 +55,11 @@ namespace CliniPlus.Movil.Services.Implementa
         public async Task<ObraSocialDTO?> EditarAsync(int id, ObraSocialDTO dto)
         {
             var cli = _http.CreateClient("ApiCliniPlus");
+
             var res = await cli.PutAsJsonAsync($"api/obras-sociales/editar/{id}", dto);
 
             if (!res.IsSuccessStatusCode)
+
                 return null;
 
             return await res.Content.ReadFromJsonAsync<ObraSocialDTO>();

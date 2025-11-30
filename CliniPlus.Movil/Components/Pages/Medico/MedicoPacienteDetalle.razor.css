@@ -1,10 +1,4 @@
-﻿/* -------------------------------------------------------------------------- */
-/* ESTILOS PARA DETALLE DE PACIENTE (MÉDICO)                    */
-/* Fuente: Nunito | Color primario: #6e7bff                   */
-/* -------------------------------------------------------------------------- */
-
-/* Global */
-.home-page {
+﻿.home-page {
     padding: 24px 20px;
     font-family: 'Nunito', sans-serif;
     background-color: #f8f9fc;
@@ -12,7 +6,6 @@
     padding-bottom: 100px;
 }
 
-/* --- HEADER --- */
 .home-header {
     display: flex;
     justify-content: space-between;
@@ -32,7 +25,6 @@
     font-size: 1.4rem;
 }
 
-/* Botón Volver */
 .btn-back {
     width: 40px;
     height: 40px;
@@ -52,7 +44,6 @@
         background-color: #f1f3f5;
     }
 
-/* Avatar Médico (Header) */
 .home-avatar {
     width: 45px;
     height: 45px;
@@ -76,7 +67,6 @@
     padding: 4px 10px;
 }
 
-/* --- TARJETAS --- */
 .home-card {
     background: white;
     border-radius: 20px;
@@ -101,12 +91,11 @@
     display: block;
 }
 
-/* Avatar Paciente (Grande) */
 .patient-avatar-large {
     width: 60px;
     height: 60px;
     border-radius: 18px;
-    background-color: #e0f2f1; /* Verde suave */
+    background-color: #e0f2f1; 
     color: #009688;
     display: flex;
     align-items: center;
@@ -116,7 +105,6 @@
     flex-shrink: 0;
 }
 
-/* Badges */
 .badge-status {
     padding: 4px 10px;
     border-radius: 50px;
@@ -136,7 +124,6 @@
     color: #6c757d;
 }
 
-/* --- INPUTS MODERNOS (Filtros) --- */
 .input-modern {
     background-color: #f8f9fc;
     border: 1px solid #f0f2f5;
@@ -154,7 +141,6 @@
         outline: none;
     }
 
-/* --- LISTA HISTORIA CLÍNICA --- */
 .history-card {
     background: white;
     border: 1px solid #f0f2f5;
@@ -175,7 +161,6 @@
         box-shadow: 0 4px 12px rgba(110, 123, 255, 0.15);
     }
 
-/* --- DETALLE SELECCIONADO --- */
 .detail-box {
     background-color: #f8f9fc;
     border-radius: 12px;
@@ -183,7 +168,6 @@
     border: 1px solid #f0f2f5;
 }
 
-/* --- BOTONES --- */
 .btn-primary {
     background-color: #6e7bff;
     border: none;
@@ -195,7 +179,6 @@
         background-color: #5a66d1;
     }
 
-/* --- BOTTOM NAV --- */
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -238,7 +221,6 @@
         color: #6e7bff;
     }
 
-/* Utilidades */
 .fade-in {
     animation: fadeIn 0.4s ease-in-out;
 }

@@ -7,7 +7,7 @@ namespace CliniPlus.Api.Controllers
 {
     [ApiController]
     [Route("api/obras-sociales")]
-    [Authorize] // todas requieren JWT
+    [Authorize] 
     public class ObrasSocialesController : ControllerBase
     {
         private readonly IObraSocialRepository _repo;
@@ -17,7 +17,6 @@ namespace CliniPlus.Api.Controllers
             _repo = repo;
         }
 
-        // GET api/obras-sociales/listar
         [HttpGet("listar")]
         public async Task<ActionResult<List<ObraSocialDTO>>> Listar()
         {
@@ -25,7 +24,6 @@ namespace CliniPlus.Api.Controllers
             return Ok(lista);
         }
 
-        // GET api/obras-sociales/5
         [HttpGet("{id:int}")]
         public async Task<ActionResult<ObraSocialDTO>> Obtener(int id)
         {
@@ -34,7 +32,6 @@ namespace CliniPlus.Api.Controllers
             return Ok(os);
         }
 
-        // POST api/obras-sociales/crear
         [HttpPost("crear")]
         [Authorize(Policy = "AdministradorOnly")]
         public async Task<ActionResult<ObraSocialDTO>> Crear([FromBody] ObraSocialDTO dto)
@@ -53,7 +50,6 @@ namespace CliniPlus.Api.Controllers
             }
         }
 
-        // PUT api/obras-sociales/editar/5
         [HttpPut("editar/{id:int}")]
         [Authorize(Policy = "SecretariaOAdministrador")]
         public async Task<ActionResult<ObraSocialDTO>> Editar(int id, [FromBody] ObraSocialDTO dto)
@@ -72,7 +68,6 @@ namespace CliniPlus.Api.Controllers
             }
         }
 
-        // PATCH api/obras-sociales/estado/5
         [HttpPatch("estado/{id:int}")]
         [Authorize(Policy = "SecretariaOAdministrador")]
         public async Task<IActionResult> CambiarEstado(int id, [FromBody] ObraSocialEstadoDTO body)

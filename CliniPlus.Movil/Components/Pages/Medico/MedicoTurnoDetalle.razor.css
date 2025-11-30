@@ -1,10 +1,4 @@
-﻿/* -------------------------------------------------------------------------- */
-/* ESTILOS PARA DETALLE DE TURNO (MÉDICO)                       */
-/* Fuente: Nunito | Color primario: #6e7bff                   */
-/* -------------------------------------------------------------------------- */
-
-/* Global */
-.home-page {
+﻿.home-page {
     padding: 24px 20px;
     font-family: 'Nunito', sans-serif;
     background-color: #f8f9fc;
@@ -12,7 +6,6 @@
     padding-bottom: 100px;
 }
 
-/* --- HEADER --- */
 .home-header {
     display: flex;
     justify-content: space-between;
@@ -32,7 +25,6 @@
     font-size: 1.4rem;
 }
 
-/* Botón Volver */
 .btn-back {
     width: 40px;
     height: 40px;
@@ -52,7 +44,6 @@
         background-color: #f1f3f5;
     }
 
-/* Avatar Header */
 .home-avatar {
     width: 45px;
     height: 45px;
@@ -76,7 +67,6 @@
     padding: 4px 10px;
 }
 
-/* --- TARJETAS --- */
 .home-card {
     background: white;
     border-radius: 20px;
@@ -101,7 +91,6 @@
     display: block;
 }
 
-/* Badges Estado */
 .badge-status {
     padding: 6px 12px;
     border-radius: 50px;
@@ -131,7 +120,6 @@
     color: #f44336;
 }
 
-/* Info Paciente */
 .patient-avatar-box {
     width: 50px;
     height: 50px;
@@ -145,7 +133,6 @@
     font-size: 1.2rem;
 }
 
-/* --- FORMULARIOS (Inputs Modernos) --- */
 .input-modern {
     background-color: #f8f9fc;
     border: 1px solid #f0f2f5;
@@ -169,7 +156,6 @@
     color: #6e7bff;
 }
 
-/* --- BOTONES DE SELECCIÓN DE ESTADO (NUEVO) --- */
 .btn-select-status {
     flex: 1;
     display: flex;
@@ -186,7 +172,6 @@
     transition: all 0.2s;
 }
 
-    /* Estilo Atendido (Verde) */
     .btn-select-status.status-success.active {
         background-color: #e8f5e9;
         color: #2e7d32;
@@ -194,7 +179,6 @@
         box-shadow: 0 2px 8px rgba(46, 125, 50, 0.15);
     }
 
-    /* Estilo Negativo (Rojo/Naranja) */
     .btn-select-status.status-danger.active {
         background-color: #fff3e0;
         color: #e65100;
@@ -202,7 +186,6 @@
         box-shadow: 0 2px 8px rgba(230, 81, 0, 0.15);
     }
 
-/* --- LISTA DE DIAGNÓSTICOS --- */
 .diagnosis-item {
     background-color: #f8f9fc;
     border: 1px solid #f0f2f5;
@@ -243,7 +226,6 @@
         border-color: #ef5350;
     }
 
-/* Botones Resultado Turno */
 .btn-outline-primary {
     border-color: #6e7bff;
     color: #6e7bff;
@@ -254,7 +236,6 @@
         color: white;
     }
 
-/* --- MODAL CUSTOM (CIE-10) --- */
 .modal-backdrop-custom {
     position: fixed;
     inset: 0;
@@ -290,7 +271,6 @@
     flex: 1;
     overflow-y: auto;
     margin-bottom: 16px;
-    /* Ocultar scrollbar visualmente */
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
@@ -322,7 +302,6 @@
     color: #6c757d;
 }
 
-/* --- BOTÓN FLOTANTE --- */
 .fixed-bottom-action {
     position: fixed;
     bottom: 70px;
@@ -351,7 +330,6 @@
         background-color: #5a66d1;
     }
 
-/* --- BOTTOM NAV --- */
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -394,7 +372,6 @@
         color: #6e7bff;
     }
 
-/* Utilidades */
 .fade-in {
     animation: fadeIn 0.4s ease-in-out;
 }

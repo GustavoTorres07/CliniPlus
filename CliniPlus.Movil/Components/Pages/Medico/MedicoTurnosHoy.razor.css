@@ -1,10 +1,4 @@
-﻿/* -------------------------------------------------------------------------- */
-/* ESTILOS PARA AGENDA DEL DÍA (MÉDICO)                         */
-/* Fuente: Nunito | Color primario: #6e7bff                   */
-/* -------------------------------------------------------------------------- */
-
-/* Global */
-.home-page {
+﻿.home-page {
     padding: 24px 20px;
     font-family: 'Nunito', sans-serif;
     background-color: #f8f9fc;
@@ -12,7 +6,6 @@
     padding-bottom: 100px;
 }
 
-/* --- HEADER --- */
 .home-header {
     display: flex;
     justify-content: space-between;
@@ -32,7 +25,6 @@
     font-size: 1.4rem;
 }
 
-/* Botón Volver */
 .btn-back {
     width: 40px;
     height: 40px;
@@ -52,7 +44,6 @@
         background-color: #f1f3f5;
     }
 
-/* Avatar */
 .home-avatar {
     width: 45px;
     height: 45px;
@@ -67,7 +58,6 @@
     box-shadow: 0 4px 10px rgba(110, 123, 255, 0.3);
 }
 
-/* --- TARJETAS DE TURNO --- */
 .turn-card {
     background: white;
     border-radius: 20px;
@@ -85,7 +75,6 @@
         background-color: #fbfbfc;
     }
 
-    /* Borde izquierdo de color según estado */
     .turn-card::before {
         content: '';
         position: absolute;
@@ -93,30 +82,26 @@
         top: 0;
         bottom: 0;
         width: 6px;
-        background-color: #e0e0e0; /* Default */
+        background-color: #e0e0e0; 
     }
 
     .turn-card.status-active::before {
         background-color: #4caf50;
     }
-    /* En curso */
     .turn-card.status-reserved::before {
         background-color: #6e7bff;
     }
-    /* Reservado */
     .turn-card.status-free::before {
         background-color: #e0e0e0;
     }
-/* Disponible */
 
 .turn-content {
     display: flex;
     gap: 15px;
     align-items: center;
-    padding-left: 8px; /* Espacio por la barra de color */
+    padding-left: 8px; 
 }
 
-/* Columna de Hora */
 .time-box {
     display: flex;
     flex-direction: column;
@@ -139,7 +124,6 @@
     text-transform: uppercase;
 }
 
-/* Info del Paciente */
 .info-box {
     flex-grow: 1;
 }
@@ -160,7 +144,6 @@
     gap: 4px;
 }
 
-/* Badges de Estado */
 .badge-status {
     padding: 4px 10px;
     border-radius: 50px;
@@ -185,7 +168,6 @@
     color: #9ba0b8;
 }
 
-/* --- FECHA HEADER --- */
 .date-header {
     background-color: #fff;
     padding: 10px 16px;
@@ -205,7 +187,6 @@
         font-size: 1rem;
     }
 
-/* --- EMPTY STATE --- */
 .empty-state {
     text-align: center;
     padding: 40px 20px;
@@ -214,7 +195,6 @@
     border: 1px dashed #e0e0e0;
 }
 
-/* --- BOTTOM NAV --- */
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -257,7 +237,6 @@
         color: #6e7bff;
     }
 
-/* Utilidades */
 .home-loading {
     color: #9ba0b8;
 }

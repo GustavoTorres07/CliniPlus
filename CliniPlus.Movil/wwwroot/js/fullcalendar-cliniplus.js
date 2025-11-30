@@ -16,9 +16,6 @@
 
             dateClick: function (info) {
 
-                // ------------------------------
-                // ❌ Bloquear días pasados
-                // ------------------------------
                 let today = new Date();
                 today.setHours(0, 0, 0, 0);
 
@@ -26,13 +23,9 @@
                 clicked.setHours(0, 0, 0, 0);
 
                 if (clicked < today) {
-                    // No notificar a Blazor → Ignorar selección
                     return;
                 }
 
-                // ------------------------------
-                // 👉 Avisar a Blazor la fecha seleccionada
-                // ------------------------------
                 dotnetRef.invokeMethodAsync('NotifyDateSelected', info.dateStr);
             }
         });

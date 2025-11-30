@@ -9,7 +9,9 @@ namespace CliniPlus.Shared.DTOs
     public class RegistrarConsultaDiagnosticoDTO
     {
         public string CIE10Codigo { get; set; } = "";
+
         public string? Comentario { get; set; }
+
         public bool Principal { get; set; }
     }
 }

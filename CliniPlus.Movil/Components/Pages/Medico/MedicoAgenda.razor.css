@@ -1,10 +1,4 @@
-﻿/* -------------------------------------------------------------------------- */
-/* ESTILOS PARA AGENDA GENERAL (MÉDICO)                         */
-/* Fuente: Nunito | Color primario: #6e7bff                   */
-/* -------------------------------------------------------------------------- */
-
-/* Global */
-.home-page {
+﻿.home-page {
     padding: 24px 20px;
     font-family: 'Nunito', sans-serif;
     background-color: #f8f9fc;
@@ -12,7 +6,6 @@
     padding-bottom: 100px;
 }
 
-/* --- HEADER --- */
 .home-header {
     display: flex;
     justify-content: space-between;
@@ -41,7 +34,6 @@
     padding: 4px 10px;
 }
 
-/* Avatar Header */
 .home-avatar {
     width: 45px;
     height: 45px;
@@ -74,7 +66,6 @@
         background-color: #fff5f5;
     }
 
-/* --- CONTROLES DE FECHA (Card) --- */
 .date-controls-card {
     background: white;
     border-radius: 24px;
@@ -119,7 +110,6 @@
     font-weight: 600;
 }
 
-/* Input de fecha estilizado */
 .input-date-custom {
     border: 1px solid #f0f2f5;
     background-color: #f8f9fc;
@@ -132,7 +122,6 @@
     width: auto;
 }
 
-/* Botón Hoy */
 .btn-today {
     border: 1px solid #6e7bff;
     color: #6e7bff;
@@ -149,7 +138,6 @@
         color: white;
     }
 
-/* --- TARJETAS DE TURNO --- */
 .turn-card {
     background: white;
     border-radius: 20px;
@@ -167,7 +155,6 @@
         background-color: #fbfbfc;
     }
 
-    /* Barra lateral de estado */
     .turn-card::before {
         content: '';
         position: absolute;
@@ -197,7 +184,6 @@
     padding-left: 8px;
 }
 
-/* Hora */
 .time-box {
     display: flex;
     flex-direction: column;
@@ -213,7 +199,6 @@
     line-height: 1;
 }
 
-/* Info */
 .info-box {
     flex-grow: 1;
 }
@@ -234,7 +219,6 @@
     gap: 4px;
 }
 
-/* Badge Estado */
 .badge-status {
     padding: 4px 10px;
     border-radius: 50px;
@@ -259,7 +243,6 @@
     color: #9ba0b8;
 }
 
-/* --- EMPTY STATE --- */
 .empty-state {
     text-align: center;
     padding: 40px 20px;
@@ -268,7 +251,6 @@
     border: 1px dashed #e0e0e0;
 }
 
-/* --- BOTTOM NAV --- */
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -311,7 +293,6 @@
         color: #6e7bff;
     }
 
-/* Utilidades */
 .home-loading {
     color: #9ba0b8;
 }

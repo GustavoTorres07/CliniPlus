@@ -12,7 +12,9 @@ namespace CliniPlus.Movil.Services.Contrato
         Task<List<Cie10DTO>?> BuscarAsync(string? filtro);
 
         Task<Cie10DTO?> CrearAsync(Cie10CrearDTO dto);
+
         Task<Cie10DTO?> EditarAsync(string codigo, Cie10EditarDTO dto);
+
         Task<bool> EliminarAsync(string codigo);
     }
 }

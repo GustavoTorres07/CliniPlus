@@ -6,18 +6,19 @@ namespace CliniPlus.Movil.Services.Implementa
 {
     public class MedicoPerfilService : IMedicoPerfilService
     {
-        private readonly IHttpClientFactory _http; // ← Cambio aquí
+        private readonly IHttpClientFactory _http; 
 
-        public MedicoPerfilService(IHttpClientFactory http) // ← Cambio aquí
+        public MedicoPerfilService(IHttpClientFactory http) 
         {
             _http = http;
         }
 
-        private HttpClient CreateClient() => _http.CreateClient("ApiCliniPlus"); // ← Añadir esto
+        private HttpClient CreateClient() => _http.CreateClient("ApiCliniPlus"); 
 
         public async Task<PerfilMedicoDTO?> ObtenerAsync()
         {
-            var cli = CreateClient(); // ← Usar esto
+            var cli = CreateClient(); 
+
             var res = await cli.GetAsync("api/MedicoPerfil/datos");
 
             Console.WriteLine("STATUS PERFIL: " + res.StatusCode);
@@ -25,7 +26,9 @@ namespace CliniPlus.Movil.Services.Implementa
             if (!res.IsSuccessStatusCode)
             {
                 var txt = await res.Content.ReadAsStringAsync();
+
                 Console.WriteLine("ERROR PERFIL: " + txt);
+
                 return null;
             }
 
@@ -34,8 +37,10 @@ namespace CliniPlus.Movil.Services.Implementa
 
         public async Task<bool> ActualizarAsync(PerfilMedicoDTO dto)
         {
-            var cli = CreateClient(); // ← Usar esto
+            var cli = CreateClient(); 
+
             var resp = await cli.PutAsJsonAsync("api/MedicoPerfil/datos", dto);
+
             return resp.IsSuccessStatusCode;
         }
     }

@@ -16,7 +16,6 @@ namespace CliniPlus.Api.Services.Implementa
 
         public async Task EnviarPasswordTemporalAsync(string emailDestino, string nombreDestino, string passwordTemporal)
         {
-            // Datos desde appsettings.json (recomendado)
             var emailOrigen = _config["Email:SmtpUser"];
             var password = _config["Email:SmtpPass"];
             var host = _config["Email:SmtpServer"] ?? "smtp.gmail.com";
@@ -28,17 +27,17 @@ namespace CliniPlus.Api.Services.Implementa
                 throw new InvalidOperationException("Configuración de correo incompleta.");
 
             var cuerpoMail =
-                $"<h3>Recuperación de contraseña - Clini+</h3>" +
-                $"<p>Hola <b>{nombreDestino}</b>,</p>" +
+                $"<h3>Recuperacion de contraseña - Clini+</h3>" +
+                $"<p>Hola! <b>{nombreDestino}</b>,</p>" +
                 $"<p>Hemos generado una contraseña temporal para que puedas acceder a la app Clini+.</p>" +
                 $"<p>Tu contraseña temporal es: <b>{passwordTemporal}</b></p>" +
-                $"<p>Por seguridad, al ingresar deberás cambiarla por una nueva contraseña.</p>" +
+                $"<p>Por seguridad, al ingresar deberas cambiarla por una nueva contraseña.</p>" +
                 $"<br/><p>Saludos, equipo Clini+</p>";
 
             var mensaje = new MailMessage
             {
                 From = new MailAddress(emailOrigen, fromName),
-                Subject = "Recuperación de contraseña - Clini+",
+                Subject = "Recuperacion de contraseña - Clini+",
                 Body = cuerpoMail,
                 IsBodyHtml = true
             };

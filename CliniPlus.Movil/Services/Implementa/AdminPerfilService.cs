@@ -23,12 +23,15 @@ namespace CliniPlus.Movil.Services.Implementa
         public async Task<bool> ActualizarAsync(PerfilAdminDTO dto)
         {
             var res = await CreateClient().PutAsJsonAsync("api/AdminPerfil/datos", dto);
+
             return res.IsSuccessStatusCode;
         }
         public async Task<bool> CambiarPasswordAsync(CambiarPasswordDTO dto)
         {
             var cli = CreateClient();
+
             var res = await cli.PutAsJsonAsync("api/AdminPerfil/password", dto);
+
             return res.IsSuccessStatusCode;
         }
     }

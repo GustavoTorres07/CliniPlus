@@ -157,7 +157,7 @@
             if (res is null)
             {
                 _error = "No se pudo crear. Verifica el email.";
-                return; // El finally se encarga del _guardando = false
+                return; 
             }
 
             Nav.NavigateTo("/Administrador/usuarios", true);

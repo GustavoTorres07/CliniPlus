@@ -11,9 +11,13 @@ namespace CliniPlus.Shared.DTOs
     {
         [Required]
         public int UsuarioId { get; set; }
+
         public string? Bio { get; set; }
+
         public string? FotoUrl { get; set; }
+
         public int DefaultSlotMin { get; set; } = 30;
+
         public int? EspecialidadId { get; set; }
     }
 }

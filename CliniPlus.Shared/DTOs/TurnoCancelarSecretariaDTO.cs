@@ -9,6 +9,7 @@ namespace CliniPlus.Shared.DTOs
     public class TurnoCancelarSecretariaDTO
     {
         public int TurnoId { get; set; }
+
         public string? Motivo { get; set; }
     }
 }

@@ -1,5 +1,4 @@
-﻿/* --- ESTRUCTURA GLOBAL --- */
-.home-page {
+﻿.home-page {
     padding: 24px 20px;
     font-family: 'Nunito', sans-serif;
     background-color: #f8f9fc;
@@ -10,7 +9,6 @@
     height: 80px;
 }
 
-/* --- HEADER --- */
 .home-header {
     display: flex;
     justify-content: space-between;
@@ -29,7 +27,6 @@
     margin: 0;
 }
 
-/* --- FILTROS (CHIPS) --- */
 .filter-chip {
     border: 1px solid #e0e0e0;
     background-color: white;
@@ -68,7 +65,6 @@
         font-weight: 700;
     }
 
-/* Ocultar scrollbar en filtros */
 .no-scrollbar::-webkit-scrollbar {
     display: none;
 }
@@ -78,7 +74,6 @@
     scrollbar-width: none;
 }
 
-/* --- TARJETAS --- */
 .home-card {
     background: white;
     border-radius: 20px;
@@ -96,7 +91,6 @@
         background-color: #fbfbfc;
     }
 
-/* Avatar (Violeta) */
 .medico-avatar-circle {
     width: 45px;
     height: 45px;
@@ -120,12 +114,10 @@
     border: 1px solid #f0f0f0;
 }
 
-/* Botón Acción dentro de la tarjeta */
 .action-btn:active {
     transform: scale(0.95);
 }
 
-/* --- ESTADOS VACÍOS --- */
 .icon-box {
     width: 60px;
     height: 60px;
@@ -144,7 +136,6 @@
     color: #8e24aa;
 }
 
-/* --- BOTONES Y BADGES --- */
 .btn-pill {
     border-radius: 99px;
 }
@@ -161,7 +152,6 @@
     letter-spacing: 0.3px;
 }
 
-/* --- BOTTOM NAV --- */
 .bottom-nav {
     position: fixed;
     bottom: 0;

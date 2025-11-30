@@ -21,7 +21,6 @@ else
 {
     <div class="home-page">
 
-        <!-- HEADER -->
         <div class="home-header mb-4">
             <div class="d-flex align-items-center gap-3">
                 <button class="btn-back" @onclick="IrLogin">
@@ -34,7 +33,6 @@ else
             </div>
         </div>
 
-        <!-- 1) TUS DATOS -->
         <div class="home-card p-4 mb-3">
             <h6 class="section-title mb-3">Tus Datos</h6>
 
@@ -70,7 +68,6 @@ else
             </div>
         </div>
 
-        <!-- 2) SELECCIÓN PROFESIONAL -->
         <div class="home-card p-4 mb-3">
             <h6 class="section-title mb-3">Profesional</h6>
 
@@ -86,11 +83,11 @@ else
             </div>
 
             <div class="mb-2">
-                <label class="label-mini">Médico</label>
+                <label class="label-mini">Medico</label>
                 <select class="form-select input-modern"
                         @onchange="OnMedicoChanged"
                         disabled="@(_medicos.Count == 0)">
-                    <option value="">-- Seleccionar Médico --</option>
+                    <option value="">-- Seleccionar Medico --</option>
                     @foreach (var m in _medicos)
                     {
                         <option value="@m.IdMedico">@m.NombreCompleto</option>
@@ -99,7 +96,6 @@ else
             </div>
         </div>
 
-        <!-- 3) FECHA -->
         <div class="home-card p-4 mb-3">
             <h6 class="section-title mb-3">Fecha</h6>
             <div class="calendar-wrapper">
@@ -110,7 +106,6 @@ else
             </div>
         </div>
 
-        <!-- 4) HORARIOS -->
         <div class="home-card p-4 mb-4">
             <h6 class="section-title mb-3">Horarios Disponibles</h6>
 
@@ -118,7 +113,7 @@ else
             {
                 <div class="text-center py-3">
                     <i class="bi bi-person-exclamation text-muted fs-3 mb-2"></i>
-                    <p class="text-muted small mb-0">Seleccioná un médico para ver la agenda.</p>
+                    <p class="text-muted small mb-0">Selecciona un medico para ver la agenda.</p>
                 </div>
             }
             else if (_slots is null)
@@ -140,7 +135,6 @@ else
                 <div class="row g-2 fade-in">
                     @foreach (var slot in _slots)
                     {
-                        // Solo se marca seleccionado si es exactamente el mismo objeto
                         var isSelected = _slotSeleccionado == slot;
 
                         var classes = "btn w-100 slot-btn";
@@ -167,7 +161,6 @@ else
             }
         </div>
 
-        <!-- BOTÓN CONFIRMAR FLOTANTE -->
         <div class="fixed-bottom-action p-3 bg-white shadow-lg border-top">
             @if (!string.IsNullOrWhiteSpace(_mensaje))
             {
@@ -199,28 +192,23 @@ else
 @code {
     private bool _cargando = true;
 
-    // Datos invitado
     private string _dni = "";
     private string _nombre = "";
     private string _apellido = "";
     private string? _numeroAfiliado;
     private int? _obraSocialId;
 
-    // Listas
     private List<EspecialidadDTO> _especialidades = new();
     private List<ObraSocialDTO> _obrasSociales = new();
     private List<MedicoListadoDTO> _medicos = new();
 
-    // Selección
     private int _especialidadIdSeleccionada;
     private int _medicoIdSeleccionado;
     private DateTime _fechaSeleccionada = DateTime.Today;
 
-    // Slots
     private List<TurnoSlotDTO>? _slots;
     private TurnoSlotDTO? _slotSeleccionado;
 
-    // Estado UI
     private bool _confirmando = false;
     private string _mensaje = "";
 
@@ -237,7 +225,6 @@ else
         {
             _especialidades = await EspecialidadService.ListarAsync() ?? new();
             _obrasSociales = await ObraSocialService.ListarAsync() ?? new();
-            // Cargar todos los médicos al inicio
             _medicos = await MedicoService.ListarAsync(null) ?? new();
         }
         finally
@@ -264,7 +251,7 @@ else
 
         if (_medicoIdSeleccionado > 0)
         {
-            await Task.Delay(200); // UI feedback
+            await Task.Delay(200); 
             _slots = await TurnoService.ObtenerSlotsDiaPublicAsync(_medicoIdSeleccionado, _fechaSeleccionada)
                      ?? new List<TurnoSlotDTO>();
         }
@@ -313,7 +300,7 @@ else
             return;
 
         _slotSeleccionado = slot;
-        _mensaje = "";   // por si había algún mensaje de error anterior
+        _mensaje = "";   
     }
 
     private async Task ConfirmarReserva()
@@ -341,7 +328,7 @@ else
 
         if (ok)
         {
-            _mensaje = "¡Turno reservado correctamente! La secretaría completará tus datos.";
+            _mensaje = "¡Turno reservado correctamente! La secretaría completara tus datos.";
             await Task.Delay(2000);
             Nav.NavigateTo("/", true);
         }

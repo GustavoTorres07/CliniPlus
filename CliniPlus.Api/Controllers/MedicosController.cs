@@ -21,8 +21,6 @@ namespace CliniPlus.Api.Controllers
             _repo = repo;
         }
 
-        // ================= MÉDICOS =================
-
         [HttpGet]
         [Authorize(Policy = "SecretariaOAdministrador")]
         public async Task<ActionResult<List<MedicoListadoDTO>>> Listar()
@@ -45,20 +43,19 @@ namespace CliniPlus.Api.Controllers
         public async Task<ActionResult<MedicoDetalleDTO>> Crear([FromBody] MedicoCrearDTO dto)
         {
             if (!ModelState.IsValid)
-                return BadRequest("Datos inválidos.");
+                return BadRequest("Datos invalidos.");
 
             try
             {
                 var id = await _repo.CrearAsync(dto);
                 if (id is null)
-                    return BadRequest("No se pudo crear el médico.");
+                    return BadRequest("No se pudo crear el medico.");
 
                 var medico = await _repo.ObtenerAsync(id.Value);
                 return Ok(medico);
             }
             catch (InvalidOperationException ex)
             {
-                // USUARIO_NO_ENCONTRADO, USUARIO_NO_MEDICO, USUARIO_YA_ES_MEDICO, etc.
                 return BadRequest(new { error = ex.Message });
             }
         }
@@ -82,17 +79,16 @@ namespace CliniPlus.Api.Controllers
         }
 
         [HttpGet("especialidad/{especialidadId:int}")]
-        [Authorize] // cualquier autenticado
+        [Authorize] 
         public async Task<ActionResult<List<MedicoListadoDTO>>> ListarPorEspecialidad(int especialidadId)
         {
             var lista = await _repo.ListarPorEspecialidadAsync(especialidadId);
             return Ok(lista);
         }
 
-        // ================= HORARIOS =================
 
         [HttpGet("{medicoId:int}/horarios")]
-        [Authorize(Policy = "SecretariaOAdministrador")] // o también permitir Médico si querés
+        [Authorize(Policy = "SecretariaOAdministrador")] 
         public async Task<ActionResult<List<MedicoHorarioDTO>>> ListarHorarios(int medicoId)
         {
             var lista = await _repo.ListarHorariosAsync(medicoId);
@@ -139,8 +135,6 @@ namespace CliniPlus.Api.Controllers
             return Ok();
         }
 
-        // ================= BLOQUEOS =================
-
         [HttpGet("{medicoId:int}/bloqueos")]
         [Authorize(Policy = "SecretariaOAdministrador")]
         public async Task<ActionResult<List<MedicoBloqueoDTO>>> ListarBloqueos(int medicoId)
@@ -160,7 +154,6 @@ namespace CliniPlus.Api.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                // MEDICO_NO_ENCONTRADO, BLOQUEO_RANGO_INVALIDO
                 return BadRequest(new { error = ex.Message });
             }
         }
@@ -197,14 +190,12 @@ namespace CliniPlus.Api.Controllers
             return Ok(activos);
         }
 
-        // GET: api/turnos/paciente/medicos?especialidadId=1&q=ana
         [HttpGet("paciente/medicos")]
         [Authorize(Roles = "Paciente")]
         public async Task<ActionResult<List<MedicoDisponiblePacienteDTO>>> GetMedicosDisponibles(
             [FromQuery] int? especialidadId,
             [FromQuery] string? q)
         {
-            // Sólo usuarios Paciente, ya está validado por el atributo Authorize
 
             var query = _db.Medico
                 .Include(m => m.Usuario)
@@ -222,7 +213,6 @@ namespace CliniPlus.Api.Controllers
                     (m.Usuario.Nombre + " " + m.Usuario.Apellido).ToLower().Contains(texto));
             }
 
-            // Opcional: podrías chequear horarios o turnos para setear TieneAgenda / ProximoTurno
             var lista = await query
                 .OrderBy(m => m.Usuario.Apellido)
                 .ThenBy(m => m.Usuario.Nombre)
@@ -233,8 +223,8 @@ namespace CliniPlus.Api.Controllers
                     EspecialidadNombre = m.Especialidad != null ? m.Especialidad.Nombre : null,
                     Bio = m.Bio,
                     FotoUrl = m.FotoUrl,
-                    TieneAgenda = true,           // por ahora asumimos que sí
-                    ProximoTurnoUtc = null        // si lo querés calcular lo vemos después
+                    TieneAgenda = true,           
+                    ProximoTurnoUtc = null        
                 })
                 .ToListAsync();
 

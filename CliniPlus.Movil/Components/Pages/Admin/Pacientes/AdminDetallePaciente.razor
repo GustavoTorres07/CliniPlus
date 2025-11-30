@@ -27,7 +27,6 @@ else if (!_accesoPermitido || _paciente is null)
 else
 {
     <div class="home-page">
-        <!-- HEADER -->
         <div class="home-header mb-4">
             <div class="d-flex align-items-center gap-3">
                 <BotonVolver />
@@ -43,15 +42,12 @@ else
                 </div>
             </div>
 
-            <!-- Botón Editar Header (Opcional o duplicado abajo) -->
             <button class="btn btn-light btn-sm btn-pill border shadow-sm" @onclick="IrEditar">
                 <i class="bi bi-pencil text-muted"></i>
             </button>
         </div>
 
-        <!-- TARJETA PRINCIPAL: DATOS -->
         <div class="home-card p-4 mb-3 position-relative overflow-hidden">
-            <!-- Decoración de fondo suave -->
             <div class="position-absolute top-0 end-0 p-3 opacity-10">
                 <i class="bi bi-person-vcard text-success" style="font-size: 5rem;"></i>
             </div>
@@ -106,7 +102,6 @@ else
             </div>
         </div>
 
-        <!-- TARJETA: OBRA SOCIAL -->
         <div class="home-card p-4 mb-3">
             <h6 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
                 <i class="bi bi-heart-pulse text-danger"></i> Cobertura
@@ -123,7 +118,6 @@ else
             </div>
         </div>
 
-        <!-- TARJETA: CONTACTO -->
         <div class="home-card p-4 mb-3">
             <h6 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
                 <i class="bi bi-chat-square-text text-primary"></i> Contacto
@@ -152,7 +146,6 @@ else
             </div>
         </div>
 
-        <!-- TARJETA: ACCIONES -->
         <div class="home-card p-4 mb-3">
             <h6 class="fw-bold text-dark mb-3">Acciones</h6>
             
@@ -185,7 +178,6 @@ else
     </div>
 }
 
-<!-- BOTTOM NAV -->
 <div class="bottom-nav shadow-soft">
     <button class="bottom-nav-item" @onclick="IrInicio">
         <i class="bi bi-house-door"></i>
@@ -238,12 +230,11 @@ else
     }
 
     private void IrInicio() => Nav.NavigateTo("/Administrador/home");
-    private void IrPacientes() => Nav.NavigateTo("/Administrador/pacientes"); // Usado si quieres volver a la lista
+    private void IrPacientes() => Nav.NavigateTo("/Administrador/pacientes"); 
     
     private void IrEditar()
     {
         if (_paciente is null) return;
-        // IMPORTANTE: Coincide con la ruta que definimos antes
         Nav.NavigateTo($"/Administrador/pacientes/editar/{_paciente.IdPaciente}");
     }
 

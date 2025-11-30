@@ -1,10 +1,4 @@
-﻿/* -------------------------------------------------------------------------- */
-/* ESTILOS ESPECÍFICOS PARA MEDICO HOME (Dashboard)             */
-/* Fuente: Nunito | Color primario: #6e7bff                   */
-/* -------------------------------------------------------------------------- */
-
-/* Reutilización de Estructura Global (si no está importada globalmente) */
-.home-page {
+﻿.home-page {
     padding: 24px 20px;
     font-family: 'Nunito', sans-serif;
     background-color: #f8f9fc;
@@ -12,7 +6,6 @@
     padding-bottom: 100px;
 }
 
-/* --- HEADER --- */
 .home-header {
     display: flex;
     justify-content: space-between;
@@ -41,11 +34,10 @@
     padding: 4px 10px;
 }
 
-/* Avatar del Header */
 .home-avatar {
     width: 48px;
     height: 48px;
-    border-radius: 16px; /* Cuadrado redondeado moderno */
+    border-radius: 16px; 
     background: linear-gradient(135deg, #6e7bff, #b3baff);
     color: white;
     display: flex;
@@ -74,7 +66,6 @@
         transform: scale(0.95);
     }
 
-/* --- SECCIONES Y GRID DE ACCIONES --- */
 .section-title {
     font-size: 0.9rem;
     font-weight: 700;
@@ -90,7 +81,6 @@
     gap: 12px;
 }
 
-/* --- TARJETAS DE ACCIÓN RÁPIDA (QUICK CARDS) --- */
 .quick-card {
     background: white;
     border: none;
@@ -120,7 +110,6 @@
         line-height: 1.2;
     }
 
-/* Estado deshabilitado visualmente */
 .disabled-card {
     opacity: 0.6;
     background-color: #f8f9fc;
@@ -128,7 +117,6 @@
     border: 1px solid #f0f2f5;
 }
 
-/* --- CAJAS DE ICONOS (Variantes de color) --- */
 .icon-box {
     width: 42px;
     height: 42px;
@@ -144,8 +132,6 @@
     transform: scale(1.1);
 }
 
-/* Colores Específicos */
-/* Azul (Turnos) - Usamos el color primario #6e7bff */
 .bg-blue-light {
     background-color: #e2e6ff;
 }
@@ -154,7 +140,6 @@
     color: #6e7bff;
 }
 
-/* Púrpura (Agenda) */
 .bg-purple-light {
     background-color: #f3e5f5;
 }
@@ -163,7 +148,6 @@
     color: #8e24aa;
 }
 
-/* Verde (Pacientes) - Tono suave menta */
 .bg-green-light {
     background-color: #e0f2f1;
 }
@@ -172,7 +156,6 @@
     color: #009688;
 }
 
-/* Naranja (Perfil) */
 .bg-orange-light {
     background-color: #fff3e0;
 }
@@ -181,17 +164,15 @@
     color: #ff9800;
 }
 
-/* Gris (Deshabilitado) */
 .bg-gray-light {
     background-color: #e9ecef;
 }
 
-/* --- METRICAS Y RESUMEN --- */
 .home-card {
     background: white;
     border-radius: 24px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-    overflow: hidden; /* Para que el header respete bordes */
+    overflow: hidden; 
 }
 
 .home-card-header {
@@ -206,7 +187,6 @@
     font-size: 1.1rem;
 }
 
-/* --- BOTTOM NAV (Copiado del global para referencia) --- */
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -250,7 +230,6 @@
         position: relative;
     }
 
-        /* Indicador activo opcional (punto arriba) */
         .bottom-nav-item.active::after {
             content: '';
             position: absolute;

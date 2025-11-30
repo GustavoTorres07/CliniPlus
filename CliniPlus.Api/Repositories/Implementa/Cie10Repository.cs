@@ -98,7 +98,6 @@ namespace CliniPlus.Api.Repositories.Implementa
             }
             catch
             {
-                // Puede fallar por FKs (HistoriaClinica, Consulta). Si pasa, devolvemos false.
                 return false;
             }
         }

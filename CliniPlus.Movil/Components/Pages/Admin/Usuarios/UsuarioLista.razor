@@ -127,7 +127,6 @@ else
     private bool _cargando = true;
     private string _rolFiltro = "";
 
-    // Propiedad computada para filtrar en tiempo real
     private IEnumerable<UsuarioListDTO> ListaFiltrada =>
         string.IsNullOrWhiteSpace(_rolFiltro)
             ? _lista
@@ -140,8 +139,7 @@ else
             _lista = await UsuarioService.ListarAsync() ?? new();
         }
         catch
-        {
-            // Manejo de error
+        {        
         }
         finally
         {

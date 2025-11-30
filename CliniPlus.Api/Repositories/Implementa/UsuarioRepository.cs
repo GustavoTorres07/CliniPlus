@@ -16,7 +16,6 @@ namespace CliniPlus.Api.Repositories.Implementa
             _db = db;
         }
 
-        // LISTAR
         public async Task<List<UsuarioListDTO>> ListarAsync()
         {
             return await _db.Usuario
@@ -32,7 +31,6 @@ namespace CliniPlus.Api.Repositories.Implementa
                 .ToListAsync();
         }
 
-        // OBTENER POR ID
         public async Task<UsuarioDetalleDTO?> ObtenerPorIdAsync(int id)
         {
             return await _db.Usuario
@@ -50,12 +48,10 @@ namespace CliniPlus.Api.Repositories.Implementa
                 .FirstOrDefaultAsync();
         }
 
-        // CREAR
         public async Task<UsuarioDetalleDTO> CrearAsync(UsuarioCrearDTO dto)
         {
             var emailTrim = dto.Email.Trim().ToLower();
 
-            // Validar email duplicado
             bool existe = await _db.Usuario.AnyAsync(u => u.Email == emailTrim);
             if (existe)
                 throw new InvalidOperationException("EMAIL_EXISTE");
@@ -86,7 +82,6 @@ namespace CliniPlus.Api.Repositories.Implementa
             };
         }
 
-        // EDITAR
         public async Task<UsuarioDetalleDTO?> EditarAsync(int id, UsuarioEditarDTO dto)
         {
             var u = await _db.Usuario.FindAsync(id);
@@ -119,7 +114,6 @@ namespace CliniPlus.Api.Repositories.Implementa
             };
         }
 
-        // CAMBIAR ESTADO (activar/desactivar)
         public async Task<bool> CambiarEstadoAsync(int id, bool isActive)
         {
             var u = await _db.Usuario.FindAsync(id);
@@ -135,7 +129,6 @@ namespace CliniPlus.Api.Repositories.Implementa
             var u = await _db.Usuario.FirstOrDefaultAsync(x => x.IdUsuario == id);
             if (u == null) return false;
 
-            // Hasheamos la nueva contraseña
             u.PasswordHash = BCrypt.Net.BCrypt.HashPassword(nuevaPassword);
 
             await _db.SaveChangesAsync();

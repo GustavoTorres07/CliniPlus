@@ -21,6 +21,7 @@ namespace CliniPlus.Movil.Services.Implementa
             var url = $"api/pacientes/listar?incluirInactivos={incluirInactivos.ToString().ToLower()}";
 
             var res = await cli.GetAsync(url);
+
             if (!res.IsSuccessStatusCode) return null;
 
             return await res.Content.ReadFromJsonAsync<List<PacienteListDTO>>();
@@ -29,36 +30,44 @@ namespace CliniPlus.Movil.Services.Implementa
         public async Task<PacienteDetalleDTO?> ObtenerAsync(int id)
         {
             var cli = CreateClient();
+
             var res = await cli.GetAsync($"api/pacientes/{id}");
 
             if (!res.IsSuccessStatusCode) return null;
+
             return await res.Content.ReadFromJsonAsync<PacienteDetalleDTO>();
         }
 
         public async Task<PacienteDetalleDTO?> CrearAsync(PacienteCrearDTO dto)
         {
             var cli = CreateClient();
+
             var res = await cli.PostAsJsonAsync("api/pacientes/crear", dto);
 
             if (!res.IsSuccessStatusCode) return null;
+
             return await res.Content.ReadFromJsonAsync<PacienteDetalleDTO>();
         }
 
         public async Task<PacienteDetalleDTO?> EditarAsync(int id, PacienteEditarDTO dto)
         {
             var cli = CreateClient();
+
             var res = await cli.PutAsJsonAsync($"api/pacientes/editar/{id}", dto);
 
             if (!res.IsSuccessStatusCode) return null;
+
             return await res.Content.ReadFromJsonAsync<PacienteDetalleDTO>();
         }
 
         public async Task<bool> CambiarEstadoAsync(int id, bool isActive)
         {
             var cli = CreateClient();
+
             var payload = new PacienteEstadoDTO { IsActive = isActive };
 
             var res = await cli.PatchAsJsonAsync($"api/pacientes/estado/{id}", payload);
+
             return res.IsSuccessStatusCode;
         }
 
@@ -69,6 +78,7 @@ namespace CliniPlus.Movil.Services.Implementa
             var res = await cli.GetAsync("api/pacientes/secretaria/listar");
 
             if (!res.IsSuccessStatusCode)
+
                 return null;
 
             return await res.Content.ReadFromJsonAsync<List<PacienteListadoDTO>>();
@@ -91,6 +101,5 @@ namespace CliniPlus.Movil.Services.Implementa
 
             return res.IsSuccessStatusCode;
         }
-
     }
 }

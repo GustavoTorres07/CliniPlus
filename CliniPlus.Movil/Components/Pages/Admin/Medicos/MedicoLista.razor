@@ -10,7 +10,6 @@
 @inject NavigationManager Nav
 
 <div class="home-page">
-    <!-- HEADER -->
     <div class="home-header mb-4">
         <div class="d-flex align-items-center gap-3">
             <BotonVolver />
@@ -25,9 +24,7 @@
         </button>
     </div>
 
-    <!-- FILTROS (CHIPS) -->
     <div class="filters-container mb-3">
-        <!-- Filtro Estado -->
         <div class="d-flex gap-2 mb-3 overflow-auto pb-1 no-scrollbar">
             @foreach (var item in _filtrosEstado)
             {
@@ -39,7 +36,6 @@
             }
         </div>
 
-        <!-- Filtro Especialidad -->
         @if (_especialidadesFiltro.Count > 1)
         {
             <div class="d-flex gap-2 overflow-auto pb-1 no-scrollbar">
@@ -55,7 +51,6 @@
         }
     </div>
 
-    <!-- LISTA -->
     @if (_cargando)
     {
         <div class="home-loading d-flex flex-column align-items-center justify-content-center py-5">
@@ -81,7 +76,6 @@
                      @onclick="() => IrDetalle(m.IdMedico)">
 
                     <div class="d-flex align-items-center gap-3">
-                        <!-- Avatar -->
                         @if (!string.IsNullOrWhiteSpace(m.FotoUrl))
                         {
                             <img src="@m.FotoUrl" class="medico-avatar-img" alt="Foto" />
@@ -93,7 +87,6 @@
                             </div>
                         }
 
-                        <!-- Info Principal -->
                         <div class="flex-grow-1">
                             <h6 class="mb-0 fw-bold text-dark">@m.NombreCompleto</h6>
                             <small class="text-muted d-block">
@@ -101,16 +94,13 @@
                                 @(!string.IsNullOrEmpty(m.Especialidad) ? m.Especialidad : "General")
                             </small>
 
-                            <!-- BOTONES DE ACCIÓN RÁPIDA -->
                             <div class="d-flex flex-wrap gap-2 mt-2">
-                                <!-- Botón Horarios (Azul) -->
                                 <button class="btn btn-sm btn-light text-primary border px-3 py-1 rounded-pill shadow-sm action-btn"
                                         @onclick="() => IrHorarios(m.IdMedico)"
                                         @onclick:stopPropagation="true">
                                     <i class="bi bi-clock me-1"></i> Horarios
                                 </button>
 
-                                <!-- Botón Bloqueos (Rojo) -->
                                 <button class="btn btn-sm btn-light text-danger border px-3 py-1 rounded-pill shadow-sm action-btn"
                                         @onclick="() => IrBloqueos(m.IdMedico)"
                                         @onclick:stopPropagation="true">
@@ -119,7 +109,6 @@
                             </div>
                         </div>
 
-                        <!-- Badge Estado y Flecha -->
                         <div class="d-flex flex-column align-items-end gap-1">
                             @if (m.IsActive)
                             {
@@ -140,7 +129,6 @@
     <div class="spacer-bottom"></div>
 </div>
 
-<!-- BOTTOM NAV -->
 <div class="bottom-nav shadow-soft">
     <button class="bottom-nav-item" @onclick="IrInicio">
         <i class="bi bi-house-door"></i>
@@ -187,7 +175,6 @@
 
             _lista = await MedicoService.ListarAsync() ?? new();
 
-            // Extraer especialidades únicas
             var esp = _lista
                 .Where(m => !string.IsNullOrEmpty(m.Especialidad))
                 .Select(m => m.Especialidad!)
@@ -242,10 +229,8 @@
     private void IrCrear() => Nav.NavigateTo("/Administrador/medicos/crear");
     private void IrDetalle(int id) => Nav.NavigateTo($"/Administrador/medicos/{id}");
 
-    // Navegación a Bloqueos
     private void IrBloqueos(int id) => Nav.NavigateTo($"/Administrador/medicos/{id}/bloqueos");
 
-    // Navegación a Horarios (NUEVO)
     private void IrHorarios(int id) => Nav.NavigateTo($"/Administrador/medicos/{id}/horarios");
 
     private void IrInicio() => Nav.NavigateTo("/Administrador/home");

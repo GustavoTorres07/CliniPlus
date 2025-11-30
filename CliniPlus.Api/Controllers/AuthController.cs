@@ -16,7 +16,7 @@ namespace CliniPlus.Api.Controllers
     {
         private readonly AppDbContext _db;
         private readonly ITokenRepository _tokens;
-        private readonly IEmailService _email;   // 👈 nuevo
+        private readonly IEmailService _email;   
 
         public AuthController(AppDbContext db, ITokenRepository tokens, IEmailService email)
         {
@@ -29,18 +29,17 @@ namespace CliniPlus.Api.Controllers
         [AllowAnonymous]
         public IActionResult Ping() => Ok(new { ok = true, message = "Auth OK" });
 
-        // ---------------- LOGIN ----------------
         [HttpPost("login")]
         [AllowAnonymous]
         public async Task<ActionResult<AuthLoginResponseDTO>> Login([FromBody] AuthLoginRequest req)
         {
-            if (!ModelState.IsValid) return BadRequest("Datos inválidos.");
+            if (!ModelState.IsValid) return BadRequest("Datos invalidos.");
 
             var u = await _db.Usuario.FirstOrDefaultAsync(x => x.Email == req.Email && x.IsActive);
-            if (u == null) return Unauthorized("Usuario o contraseña inválidos.");
+            if (u == null) return Unauthorized("Usuario o contraseña invalidos.");
 
             if (!BCrypt.Net.BCrypt.Verify(req.Password, u.PasswordHash))
-                return Unauthorized("Usuario o contraseña inválidos.");
+                return Unauthorized("Usuario o contraseña invalidos.");
 
             var token = _tokens.EmitirToken(u.IdUsuario, u.Nombre, u.Apellido, u.Email, u.Rol);
 
@@ -51,12 +50,10 @@ namespace CliniPlus.Api.Controllers
                 Rol = u.Rol,
                 Token = token,
 
-                // 👇 sólo Paciente usa recuperación de contraseña
                 DebeCambiarPassword = (u.Rol == "Paciente" && u.RecuperarContrasena)
             };
         }
 
-        // ---------------- ME ----------------
         [HttpGet("me")]
         [Authorize]
         public ActionResult<AuthMeResponse> Me()
@@ -89,7 +86,6 @@ namespace CliniPlus.Api.Controllers
             return Ok(dto);
         }
 
-        // ---------------- RECUPERAR PASSWORD (solo Paciente) ----------------
         [HttpPost("recuperar-password")]
         [AllowAnonymous]
         public async Task<IActionResult> RecuperarPassword([FromBody] RecuperarPasswordRequest body)
@@ -121,7 +117,7 @@ namespace CliniPlus.Api.Controllers
                 tempPassword
             );
 
-            return Ok(new { mensaje = "Se envió una contraseña temporal a tu correo." });
+            return Ok(new { mensaje = "Se envio una contraseña temporal a tu correo." });
         }
 
     }

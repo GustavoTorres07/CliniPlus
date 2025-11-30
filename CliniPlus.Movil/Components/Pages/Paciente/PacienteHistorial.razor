@@ -20,7 +20,6 @@ else if (_usuario is null)
 else
 {
     <div class="home-page">
-        <!-- HEADER -->
         <div class="home-header mb-4">
             <div class="d-flex align-items-center gap-3">
                 <button class="btn-back" @onclick="IrInicio">
@@ -38,7 +37,6 @@ else
             </div>
         </div>
 
-        <!-- FILTROS DE FECHA -->
         <div class="home-card p-4 mb-3">
             <h6 class="section-title mb-3">Filtrar por fechas</h6>
 
@@ -61,7 +59,6 @@ else
             </div>
         </div>
 
-        <!-- LISTA DE ENTRADAS -->
         <div class="d-flex flex-column gap-2 mb-4">
             @if (_historial is null || _historial.Count == 0)
             {
@@ -104,7 +101,6 @@ else
             }
         </div>
 
-        <!-- DETALLE DE LA ENTRADA SELECCIONADA -->
         @if (_detalleSeleccionado is not null)
         {
             <div class="home-card p-4 mb-5 shadow-sm fade-in border-primary">
@@ -115,7 +111,6 @@ else
                     </button>
                 </div>
 
-                <!-- FECHA Y HORA ARRIBA -->
                 <div class="mb-3">
                     <div class="small text-muted mb-1 d-flex align-items-center">
                         <i class="bi bi-calendar3 me-2 text-primary"></i>
@@ -129,7 +124,6 @@ else
                     </div>
                 </div>
 
-                <!-- NOTAS -->
                 @if (!string.IsNullOrWhiteSpace(_detalleSeleccionado.Notas))
                 {
                     <div class="detail-box mb-3">
@@ -138,7 +132,6 @@ else
                     </div>
                 }
                 
-                <!-- ATENDIDO POR -->
                 @if (!string.IsNullOrWhiteSpace(_detalleSeleccionado.MedicoNombre))
                 {
                      <div class="small text-muted border-top border-light pt-2 pb-2">
@@ -147,7 +140,6 @@ else
                     </div>
                 }
 
-                <!-- INFORMACIÓN TÉCNICA (TURNO, CONSULTA, ESTADO) -->
                 <div class="small text-muted d-flex flex-column gap-1 border-top border-light pt-2 bg-light bg-opacity-25 rounded-3 p-2">
                     @if (_detalleSeleccionado.TurnoId.HasValue)
                     {
@@ -185,7 +177,6 @@ else
     </div>
 }
 
-<!-- BOTTOM NAV -->
 <div class="bottom-nav shadow-soft">
     <button class="bottom-nav-item" @onclick="IrInicio">
         <i class="bi bi-house-door-fill"></i>

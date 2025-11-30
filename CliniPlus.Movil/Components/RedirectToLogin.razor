@@ -10,8 +10,6 @@
 @code {
     protected override void OnInitialized()
     {
-        // Redirige inmediatamente a la raíz "/" (tu Login)
-        // forceLoad: true asegura que se limpie el estado de la app
         Nav.NavigateTo("/", forceLoad: true);
     }
 }

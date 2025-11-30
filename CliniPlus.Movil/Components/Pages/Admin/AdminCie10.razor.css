@@ -1,10 +1,4 @@
-﻿/* -------------------------------------------------------------------------- */
-/* ESTILOS PARA ADMIN CIE-10 (Catálogo)                         */
-/* Fuente: Nunito | Color primario: #6e7bff                   */
-/* -------------------------------------------------------------------------- */
-
-/* Estructura Global */
-.home-page {
+﻿.home-page {
     padding: 24px 20px;
     font-family: 'Nunito', sans-serif;
     background-color: #f8f9fc;
@@ -12,14 +6,12 @@
     padding-bottom: 100px;
 }
 
-/* --- HEADER --- */
 .home-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-/* Botón Volver (Nuevo) */
 .btn-back {
     width: 40px;
     height: 40px;
@@ -65,7 +57,7 @@
     border-radius: 8px;
     padding: 4px 10px;
     font-size: 0.75rem;
-    align-self: flex-start; /* Para que no se estire si está en flex column */
+    align-self: flex-start; 
 }
 
 .home-avatar {
@@ -94,7 +86,6 @@
     justify-content: center;
 }
 
-/* --- TARJETAS & BUSCADOR --- */
 .home-card {
     background: white;
     border-radius: 20px;
@@ -103,7 +94,7 @@
 }
 
 .border-purple-subtle {
-    border-color: #f3e5f5; /* Borde suave para el form */
+    border-color: #f3e5f5; 
 }
 
 .label-mini {
@@ -114,7 +105,6 @@
     color: #9ba0b8;
 }
 
-/* Input Buscador (con icono dentro) */
 .input-elevated {
     background-color: #f8f9fc;
     border: 1px solid #f0f2f5;
@@ -155,7 +145,6 @@
         background-color: #5a66d1;
     }
 
-/* --- FORMULARIO & INPUTS SIMPLES --- */
 .input-elevated-simple {
     background-color: #f8f9fc;
     border: 1px solid #f0f2f5;
@@ -213,7 +202,6 @@
         background-color: #5a66d1;
     }
 
-/* --- LISTADO (CIE CARDS) --- */
 .cie-card {
     background: white;
     border-radius: 16px;
@@ -233,7 +221,6 @@
     text-align: center;
 }
 
-/* Botones de acción (Editar/Borrar) */
 .btn-icon-secondary, .btn-icon-danger {
     width: 32px;
     height: 32px;
@@ -265,7 +252,6 @@
         color: #e03131;
     }
 
-/* --- BOTTOM NAV --- */
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -308,7 +294,6 @@
         color: #6e7bff;
     }
 
-/* Utilidades */
 .fade-in {
     animation: fadeIn 0.4s ease-in-out;
 }
