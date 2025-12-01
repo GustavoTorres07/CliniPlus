@@ -43,9 +43,9 @@ else
                 <div>
                     <div class="label-mini text-muted mb-0">Fecha y Hora</div>
                     <div class="fw-bold fs-5">
-                        @_detalle.ScheduledAtUtc.ToLocalTime().ToString("HH:mm") <small class="fs-6 text-muted">hs</small>
+                        @_detalle.ScheduledAtUtc.ToString("HH:mm") <small class="fs-6 text-muted">hs</small>
                     </div>
-                    <div class="small text-muted">@_detalle.ScheduledAtUtc.ToLocalTime().ToString("dd/MM/yyyy")</div>
+                    <div class="small text-muted">@_detalle.ScheduledAtUtc.ToString("dd/MM/yyyy")</div>
                 </div>
 
                 <span class="@GetBadgeClass(_detalle.Estado)">

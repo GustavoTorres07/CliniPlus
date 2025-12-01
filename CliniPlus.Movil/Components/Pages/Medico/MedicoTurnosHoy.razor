@@ -58,7 +58,7 @@ else
             {
                 foreach (var t in _turnos)
                 {
-                    var horaLocal = t.ScheduledAtUtc.ToLocalTime();
+                    var horaLocal = t.ScheduledAtUtc; 
                     var estadoClase = GetEstadoCardClass(t);
 
                     <div class="turn-card @estadoClase" @onclick="() => AbrirTurno(t.IdTurno)">
