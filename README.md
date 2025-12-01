@@ -129,8 +129,4 @@ Políticas:
 git clone https://github.com/tu-repo/cliniPlus.git
 ```
 ---
-⭐ Estado del Proyecto
-
-🚧 En desarrollo activo
-Todos los módulos principales están funcionando y validados.
 
